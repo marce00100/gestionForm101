@@ -1,0 +1,203 @@
+
+.quest{
+  color: rgba(19, 19, 19) !important;
+}
+.quest-input{	
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: none !important; 
+  width: 80%;
+  resize: none; 
+}
+.quest-input-line{
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: 1px solid #444 !important;  
+  width: 90%;
+  resize: none; 
+}
+textarea.quest-input-line{
+  border: 1px solid #444 !important; 
+  width: 90%;
+  resize: none !important; 
+}
+.quest-input.adorno{
+	border-bottom: 1px dashed grey !important;
+}
+.quest-input:hover{
+  border-bottom: 1px solid grey !important;  
+}
+.quest-input:focus,   .quest-input-line:hover, .quest-input-line:focus{
+  border-bottom: 1px solid #951111 !important;  
+}
+/* para que no salga un borde al rededor feo*/
+.quest-input:focus-visible{
+  outline: none;
+}
+.quest-h1{
+	font-size: 30px !important;
+  height: 40px;  
+}
+.quest-h2{
+	font-size: 20px !important;
+  height: 30px;  
+}
+
+.quest-md{
+  font-size: 14px !important;
+}
+.quest-sm{
+	font-size: 11px !important;
+}
+
+/** los textos de la encueta */
+.quest-titulo{
+	font-size: 22px !important;
+	font-weight: bold;
+	text-align: center;
+  margin-bottom: 20px !important;
+  color: #116e7a !important;
+}
+
+.quest-descripcion{
+  font-size: 12px !important;
+  color: #b54633 !important;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.quest-pregunta{
+	font-size: 16px !important;
+}
+
+.quest-opcion{
+  font-size: 14px !important;
+  font-weight: normal;
+}
+.quest-texto{
+	font-size: 14px !important;
+}
+
+
+.quest-label{
+	font-size: 14px !important;
+	font-weight: normal;	
+}
+.quest-input-label{
+  padding: 5px 20px ;
+  height: 32px;
+}
+
+/* Cada elemento */
+.__elemento{
+	margin: 0px 0px 0px 0px;
+	padding: 5px 10px 5px 15px;
+	position: relative;
+  border: 1px solid rgb(0,0,0,0) ;
+}
+.elemento_over{
+	border: 1px solid #ddd !important;
+}
+.elemento_sel{
+	border: 2px solid #bbb !important;
+	border-left: 3px solid #d1b00e !important;
+}
+
+/*En edicion coloca un bullet redondo o cuadrado como radio o checkbox*/
+.quest_option_single li>bullet:before
+{
+  content: "\2609";
+  margin-right: 5px;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.quest_option_multiple li>bullet:before
+{
+  content: "\2610";
+  margin-right:5px;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.quest_option_single [__config_btn=checkbox], .quest_option_multiple [__config_btn=checkbox]{
+  display: none;
+}
+
+.quest_option_mixta li>bullet:before
+{
+  content: "\2609";
+  margin-right: 5px;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.quest_option_mix_radio bullet:before
+{
+  content: "\2609";
+  margin-right: 5px;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.quest_option_mixta .quest_option_mixta_check bullet:before
+{
+  content: "\2610"!important;
+  margin-right:5px;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.select_tres_oculto{
+  display: none;;
+}
+
+
+
+
+
+
+
+.activoPri{
+   background-color: #444449 !important; /* 4c5064 dark-dark */
+   color: #f1f1f1 !important;
+   border-color: #aed248;
+}
+.activoSub{
+   background-color: #ABEBC6   !important;
+   border-color: #aed248;
+}
+
+
+
+
+/* mINPUTS PARA QUE SE VEAN MAS PEQUEÑOS */
+.admin-form .select > select {
+/*    -moz-appearance: none;
+    background: #fff none repeat scroll 0 0;
+    border: 1px solid #ddd;
+    color: #626262;
+    display: block;
+    margin: 0;
+    outline: medium none;*/
+    padding: 8px 10px;
+/*    text-indent: 0.01px;
+    text-overflow: "";
+    z-index: 10;*/
+}
+
+
+/** Para fondo del formulario*/
+.fondo_panel{
+  background: linear-gradient(to bottom, rgb(236 236 236 / 88%) 0%,rgb(231 231 231 / 83%) 100%),
+            url(../img/fondo1.jpg) repeat center top;
+  background-size: contain;
+}
+/* transparencia*/
+.efecto_sobre_fondo_panel{
+  box-shadow: 0px -1px 14px 0px;
+    background-color: rgb(255 255 255 / 68%);
+
+}

@@ -1,0 +1,119 @@
+.pvtUi {
+    color: #222;
+    border-collapse: collapse;
+
+}
+
+table.pvtTable tbody tr td {
+    color: #222;
+    padding: 3px !important;
+}
+
+.pvtUi .pvtVals, .pvtUi .pvtTdForRender{
+    padding: 5px !important;
+}
+
+.pvtUi .pvtVals select, .pvtUi .pvtTdForRender select{
+    padding: 5px !important;
+    font-size: 14px;
+    width: 200px
+}
+
+.pvtVals {
+    text-align: left;
+    white-space: nowrap;
+}
+
+
+.pvtAxisContainer,
+.pvtVals {
+    border: 1px solid #dedede;
+    background: #f9f9ff;
+}
+
+
+.pvtAxisContainer li {
+    padding: 4px 4px;
+}
+
+.pvtAxisContainer li.pvtPlaceholder {
+    -webkit-border-radius: 5px;
+    padding: 8px 20px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border: 1px dashed #aaa;
+    background-color: #b3d6e8;
+    opacity: 0.6;
+}
+
+.pvtAxisContainer li span.pvtAttr {
+    -webkit-text-size-adjust: 100%;
+    background: #F3F3F3;
+    border: 1px solid #a5a5a5;
+    padding: 1px 10px 4px 15px;
+    white-space: nowrap;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* botones de dimensiones */
+.pvtUnused li span.pvtAttr, .pvtUnused li span.pvtTriangle {
+    color: #0f0e0e;
+    background: #dedede;
+}
+
+.pvtCols li span.pvtAttr, 
+.pvtCols li span.pvtAttr span.pvtTriangle {
+    color: #fff;
+    background: #747d55;
+}
+
+.pvtRows li span.pvtAttr,
+.pvtRows li span.pvtAttr span.pvtTriangle {
+    color: #fff;
+    background: #1F618D;
+    /*#316191; */
+}
+
+
+
+/* filtros */
+.pvtFilterBox {
+    z-index: 100;
+    min-width: auto;
+    border: 1px solid gray;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    position: absolute;
+    text-align: center;
+    opacity: 1;
+}
+
+.pvtFilterBox h4 span, .pvtFilterBox h4 span .count{
+    margin: 15px;
+    color: #4b4b4b !important;
+
+}
+
+.pvtFilterBox input[type='text'] {
+    width: 95%;
+    padding: 5px 10px;
+    margin-bottom: 6px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.pvtFilterBox  .pvtCheckContainer {
+    text-align: left;
+    font-size: 12px;
+    color: #434343 !important;
+}
+.pvtFilterBox  .pvtCheckContainer p  {
+    margin:  4px 5px 0px 5px !important; 
+}
+.pvtFilterBox  .pvtCheckContainer .count{
+    display:none;
+}
+

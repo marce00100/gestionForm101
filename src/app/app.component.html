@@ -1,3 +1,18 @@
-<ion-app>
+<!-- <ion-app>
   <ion-router-outlet></ion-router-outlet>
+</ion-app> -->
+
+
+<ion-app style="display: block; justify-content: start;">
+  <div style="    height: 100px; display: flex; justify-content: start; padding: 0px 50px; width: 100%;" class="">
+    <h1>CABECERA LOGO</h1>
+  </div>
+  
+  <div class="bg-light darker p5">
+    <a routerLink="/form"><span class=" ml10 ph10 fs14 bg-info light  ">Formulario</span></a>
+    <a routerLink="/users"><span class=" ml10 ph10 fs14 bg-info light  ">Usuarios</span></a>
+    <a routerLink="/ingenios"><span class=" ml10 ph10 fs14 bg-info light  ">Ingenios</span></a>
+  </div>
+  
+  <router-outlet></router-outlet>
 </ion-app>
