@@ -1,0 +1,10 @@
+
+- Para permitir el manejo de codigo js, con jquery se tuvo que colocar en tsconfig.ts   la propiedad strict:false, (esto va para angular, en proys ionic no esta descrita esta propiedad,)
+
+- la aplicacion  esta dentro de <ion-app> dentro hay <ion-header> y <ion-content> esto basicamente permite la encapsulacion de ionic y que se muestre  el contenido debidamente , sino se oculta parte de estos
+
+- Los estilos globales, (solo los que son forzados por ionic, que son normalizados)  de la aplicacion estan dentro de 
+  
+    src/globals.css
+
+-

@@ -1,0 +1,55 @@
+<style>
+    #toolbar_elementos.local-sticky {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0px;
+        z-index: 10;
+        background-color: #f9f9ff;
+        padding: 14px;
+        height: 60px;
+        margin: 0 -11px 10px -11px;
+        border-bottom: 1px solid #c5c5c5 !important;
+    }
+</style>
+<div id="gestor_encuesta" class='frctl container-fluid efecto_sobre_fondo_panel_ '
+    style="box-shadow: 2px 1px 11px -2px;">
+    <div class='' style="padding: 0px 2px 2px 2px">
+        <div class="col-md-12 bg-white " style="width: 100%; ">
+            <h1 style="color:#ddd; padding: 10px 25px; margin: 0px; ">Editor del Formulario 101</h1>
+            <hr style="margin: 10px 0;">
+            <input type="hidden" name="_token" __rg_field=_token value="">
+            <div class="">
+
+                <div class="bg-light darker ptn ">
+                    <div class="row bg-white" style=" margin:0 auto;">
+                        <div id="toolbar_elementos" class=" br-b pl50 pv5 fs14 text-center local-sticky">
+                            <button __accion_encuesta=save class="btn btn-primary dark br6 pull-left" title="Guardar">
+                                <i class="fa fa-save fa-2x"></i>
+                                <!-- <ion-icon name="save-sharp" font-size="48"></ion-icon> -->
+                            </button>
+                            <span __agregar_elem=pregunta class="glyphicon glyphicon-plus text-center pt10 mh15"
+                                style="cursor: pointer; width: 30px; height: 30px; " title="Agregar Pregunta"></span>
+                            |
+                            <span __agregar_elem=titulo
+                                class="glyphicons glyphicons-text_underline text-center pt10 mh15"
+                                style="cursor: pointer; width: 30px; height: 30px;" title="Agregar titulo"></span>
+                            |
+                            <span __agregar_elem=texto class="fa fa-align-left text-center pt10 mh15"
+                                style="cursor: pointer; width: 30px; height: 30px;" title="Agregar texto"></span>
+                            |
+                            <span __agregar_elem=separador class="fa-solid fa-minus  text-center pt10 mh15"
+                                style="cursor: pointer; width: 30px; height: 30px;" title="Agregar separador"></span>
+                        </div>
+
+                        <div __contenido_elementos class="" style="min-height: 500px; ">
+                        </div>
+                    </div>
+
+                </div>
+                <div class="" style="padding-top: 50px;">
+                    <hr>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

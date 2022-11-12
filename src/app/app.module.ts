@@ -25,6 +25,7 @@ import { AppComponent }         from './app.component';
 import { UsersComponent }       from './users/users.component';
 import { IngeniosComponent }    from './ingenios/ingenios.component';
 import { FormComponent }        from './form/form.component';
+import { GestorFormsComponent }        from './gestor-forms/gestor-forms.component';
 
 // declare var $:any;
 // declare var _:any;
@@ -35,6 +36,7 @@ const AppRoutes: Routes = [
   { path: "form", component: FormComponent },
   { path: "users", component: UsersComponent },
   { path: "ingenios", component: IngeniosComponent },
+  { path: "gestorforms", component: GestorFormsComponent },
 ]
 
 @NgModule({
@@ -42,7 +44,8 @@ const AppRoutes: Routes = [
     AppComponent,
     UsersComponent,
     IngeniosComponent,
-    FormComponent
+    FormComponent,
+    GestorFormsComponent
   ],
   imports: [
     BrowserModule, IonicModule.forRoot(), RouterModule.forRoot(AppRoutes)
