@@ -1,9 +1,9 @@
 jQuery(function($){
     var xyzFunctions =  {
-        urlBase: window.location.pathname + (window.location.pathname.charAt(window.location.pathname.length - 1) == '/' ? '../' : '/../'),
-        urlApi : window.location.pathname + (window.location.pathname.charAt(window.location.pathname.length - 1) == '/' ? '../' : '/../') + 'wp-json/',
-        urlRestApi   : 'http://localhost/www/wp/domain/core_api/' ,
-        urlRestApiWP : 'http://localhost/www/wp/domain/wp-json/' ,
+        // urlBase: window.location.pathname + (window.location.pathname.charAt(window.location.pathname.length - 1) == '/' ? '../' : '/../'),
+        // urlApi : window.location.pathname + (window.location.pathname.charAt(window.location.pathname.length - 1) == '/' ? '../' : '/../') + 'wp-json/',
+        urlRestApi   : 'http://localhost/www/opermin/coreapi/api' ,
+        // urlRestApiWP : 'http://localhost/www/wp/domain/wp-json/' ,
 
         showModal : function(modal){
             $(".state-error").removeClass("state-error")

@@ -1,19 +1,23 @@
 <ion-app style="display: flex; justify-content: start;">
-    <ion-header>
+  <ion-header>
 
-        <div style="    height: 50px; display: flex; justify-content: start; padding: 0px 50px; width: 100%;" class="">
-            <h1>CABECERA LOGOx</h1>
-        </div>
+    <div style="    height: 50px; display: flex; justify-content: start; padding: 0px 50px; width: 100%;" class="">
+      <h1>CABECERA LOGOx</h1>
+    </div>
 
-        <div class="bg-light darker p5 ">
-            <a routerLink="/form"><span class=" ml10 ph10 fs14 bg-info light  ">Formulario</span></a>
-            <a routerLink="/users"><span class=" ml10 ph10 fs14 bg-info light  ">Usuarios</span></a>
-            <a routerLink="/ingenios"><span class=" ml10 ph10 fs14 bg-info light  ">Ingenios</span></a>
-            <a routerLink="/gestorforms"><span class=" ml10 ph10 fs14 bg-info light  ">Gestor de Forms</span></a>
-        </div>
-    </ion-header>
+    <div class="bg-light darker p5 ">
+      <a routerLink="/gestorforms"><span class=" ml10 ph10 fs14 bg-info light  ">Gestor de Formularios</span></a>
+      <a routerLink="/form"><span class=" ml10 ph10 fs14 bg-info light  ">Formulario</span></a>
+      <a routerLink="/users"><span class=" ml10 ph10 fs14 bg-info light  ">Usuarios</span></a>
+      <a routerLink="/ingenios"><span class=" ml10 ph10 fs14 bg-info light  ">Ingenios</span></a>
+    </div>
+  </ion-header>
 
-    <ion-content>
+  <ion-content>
+    <div class="row mn" style="background-color: #fcfcff; padding: 30px 0;"> 
+      <div class="animated fadeIn col-md-10 col-md-offset-1 pn" style="box-shadow: 2px 1px 11px -4px;">
         <router-outlet></router-outlet>
-    </ion-content>
+      </div>
+    </div>
+  </ion-content>
 </ion-app>

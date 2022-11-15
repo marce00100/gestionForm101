@@ -15,17 +15,20 @@
 // })
 // export class AppModule {}
 
-import { NgModule }             from '@angular/core';
-import { BrowserModule }        from '@angular/platform-browser';
-import { RouterModule, Routes } from '@angular/router';
+import { NgModule }                        from '@angular/core';
+import { BrowserModule }                   from '@angular/platform-browser';
+import { RouterModule, Routes }            from '@angular/router';
 
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 
-import { AppComponent }         from './app.component';
-import { UsersComponent }       from './users/users.component';
-import { IngeniosComponent }    from './ingenios/ingenios.component';
-import { FormComponent }        from './form/form.component';
-import { GestorFormsComponent }        from './gestor-forms/gestor-forms.component';
+import { AppComponent }                    from './app.component';
+import { UsersComponent }                  from './admin/ingenios/users/users.component';
+import { GestorFormsComponent }            from './admin/ingenios/gestor-forms/gestor-forms.component';
+import { IngeniosComponent }               from './admin/ingenios/ingenios.component';
+import { FormComponent }                   from './operadores/form/form.component';
+
+import { MenuadminComponent }              from './shared/menuadmin.component';
+import { MenuoperComponent }               from './shared/menuoper.component';
 
 // declare var $:any;
 // declare var _:any;
@@ -45,7 +48,11 @@ const AppRoutes: Routes = [
     UsersComponent,
     IngeniosComponent,
     FormComponent,
-    GestorFormsComponent
+    GestorFormsComponent,
+    /* shared */
+    MenuadminComponent,
+    MenuoperComponent
+
   ],
   imports: [
     BrowserModule, IonicModule.forRoot(), RouterModule.forRoot(AppRoutes)
