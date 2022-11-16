@@ -1,0 +1,5 @@
+- Se ha copiado los archivos dela carpeta public al root 
+    index.php, favicon, htacces, robots.txt
+    TODO si se escribe la url raiz/.env se puede ver el archivo de configuracion, Modificar y solucionar esto
+
+- 

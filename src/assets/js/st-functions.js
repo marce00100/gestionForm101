@@ -2,7 +2,10 @@ jQuery(function($){
     var xyzFunctions =  {
         // urlBase: window.location.pathname + (window.location.pathname.charAt(window.location.pathname.length - 1) == '/' ? '../' : '/../'),
         // urlApi : window.location.pathname + (window.location.pathname.charAt(window.location.pathname.length - 1) == '/' ? '../' : '/../') + 'wp-json/',
-        urlRestApi   : 'http://localhost/www/opermin/coreapi/api' ,
+        // urlRestApi   : 'http://62.171.160.162/opermin/coreapi/api' ,
+        // urlRestApi   : 'http://localhost/www/opermin/coreapi/api' ,
+        urlRestApi   : 'http://localhost/www/opermin/frontapp/$_apinucleo/api' ,
+        // urlRestApi   : '../$coreapi/api' ,
         // urlRestApiWP : 'http://localhost/www/wp/domain/wp-json/' ,
 
         showModal : function(modal){

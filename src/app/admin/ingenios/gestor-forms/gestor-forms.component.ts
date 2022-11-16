@@ -354,7 +354,7 @@ export class GestorFormsComponent implements OnInit {
           let objSend: any = ctxMain.getData();
           objSend._token = $("[__rg_field=_token]").val();
           xyzFuns.spinner(true, { texto: 'Guardando ...' });
-          $.post(ctxG.rutabase + '/savecuestionario', objSend, function (res) {
+          $.post(ctxG.rutabase + '/save-form-elems', objSend, function (res) {
             xyzFuns.spinner(false);
             ctxMain.setData(res.data);
   
@@ -372,7 +372,7 @@ export class GestorFormsComponent implements OnInit {
       let funs = {
         cargarFormulario: ()=>{  
           let editarformulario = (id) => {
-            $.get(`${ctxG.rutabase}/getcuestionario`, {id_c: id}, function(res){
+            $.get(`${ctxG.rutabase}/get-form-elems`, {id_f: 2}, function(res){
               ctxMain.setData(res.data);
               /* Para que se acomoden los tamaños*/
               $("[__tipo=pregunta] textarea").trigger('keydown');

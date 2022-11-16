@@ -297,9 +297,8 @@ export class FormComponent implements OnInit {
       let ctxMain = {
         creaFormulario: () => {
 
-          $.get(ctxG.rutabase + '/getform', { id: 1 }, function (res) {
+          $.get(ctxG.rutabase + '/get-form-elems', { id_f: 2 }, function (res) {
             ctxMain.renderizarElementos(res.data);
-
           })
         },
         renderizarElementos: function (objCuestionario) {
@@ -508,7 +507,7 @@ export class FormComponent implements OnInit {
           xyzFuns.spinner();
           let dataSend = ctxMain.getData();
           console.log(dataSend);
-          $.post(`${ctxG.rutabase}/saverespuestas`, dataSend, function (res) {
+          $.post(`${ctxG.rutabase}/save-respuestas`, dataSend, function (res) {
             xyzFuns.spinner(false);
             if (res.estado == 'ok') {
               funs.stateView('guardado');
