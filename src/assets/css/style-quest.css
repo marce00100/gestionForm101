@@ -54,11 +54,16 @@ textarea.quest-input-line{
 
 /** los textos de la encueta */
 .quest-titulo{
-	font-size: 22px !important;
+	font-size: 18px !important;
 	font-weight: bold;
-	text-align: center;
-  margin-bottom: 20px !important;
+	text-align: left;
+  margin-bottom: 10px !important;
   color: #116e7a !important;
+}
+
+/* para los titulos colocados y para los titulos que son generados*/
+.quest-titulo, .quest-titulo .__elem_texto{
+  margin-left: 20px;
 }
 
 .quest-descripcion{
@@ -155,19 +160,15 @@ textarea.quest-input-line{
 }
 
 
-
-
-
-
-
-.activoPri{
-   background-color: #444449 !important; /* 4c5064 dark-dark */
-   color: #f1f1f1 !important;
-   border-color: #aed248;
+.activoPri {
+  background-color: #444449 !important;
+  /* 4c5064 dark-dark */
+  color: #f1f1f1 !important;
+  border-color: #aed248;
 }
-.activoSub{
-   background-color: #ABEBC6   !important;
-   border-color: #aed248;
+.activoSub {
+  background-color: #ABEBC6 !important;
+  border-color: #aed248;
 }
 
 

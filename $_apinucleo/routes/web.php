@@ -1,8 +1,8 @@
 <?php
-
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Formularios\GestorFormulariosController;
 use App\Http\Controllers\Formularios\FormularioController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\GestionUsuarios\UsuariosController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,19 +20,29 @@ Route::get('/', function () {
 });
 
 
-
-
+/**
+ * RUTAS API DE LA APLICACION 
+ */
 Route::group(['prefix' => 'api', 'middleware' => ['cors']], function () {
-        /** Obtiene la lista de los elementos de un formulario */
-        Route::get('get-form-elems'     , [GestorFormulariosController::class, 'getFormularioElementos']);
-        /** Guarda un formulario con sus elementos */
-        Route::post('save-form-elems'   , [GestorFormulariosController::class, 'saveFormularioElementos']);
+    /** Obtiene la lista de los formularios activos */
+    Route::get('get-forms'     , [GestorFormulariosController::class, 'getFormularios']);
+    /** Obtiene la lista de los elementos de un formulario */
+    Route::post('get-form-elems'     , [GestorFormulariosController::class, 'getFormularioElementos']);
+    /** Guarda un formulario con sus elementos */
+    Route::post('save-form-elems'   , [GestorFormulariosController::class, 'saveFormularioElementos']);
+    /** Guarda las respuestas del formulario */
+    Route::post('save-respuestas'   , [FormularioController::class, 'saveRespuestas']);
+    
+    /** Obtiene el Operador Minero */
+    Route::post('operador-minero'   , [UsuariosController::class, 'getUser']);
 
-        Route::post('save-respuestas'   , [FormularioController::class, 'saveRespuestas']);
-        
-        Route::post('savecontexto'      , [FormularioController::class, 'saveContexto']);  
-        
-        Route::get('getmunicipios'      , [FormularioController::class, 'getMunicipios']);
+
+    
+    Route::post('savecontexto'      , [FormularioController::class, 'saveContexto']);  
+    
+    Route::get('getmunicipios'      , [FormularioController::class, 'getMunicipios']);
+
+
 });
 
 /** RUTA DE EJEMPLO PARA GENERAR PERSONAS ALEATORIAS */

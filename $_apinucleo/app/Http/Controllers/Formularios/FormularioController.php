@@ -11,40 +11,46 @@ use Illuminate\Support\Facades\Auth;
 class FormularioController extends MasterController
 {
 
-
+    private $numFormBase = 100000;
     /**
      * POST Guardar las respuestas del Formulario en las tablas consolidadas
      */
-    public function saveRespuestas(Request $req)
-    {
-
+    public function saveRespuestas(Request $req) {
         $contest = (object)$req;
-        $idFormulario                   = $contest->id_formulario;
-        // $idCuestionario                 = $this->decrypt($contest->id_cuestionario);
         $contestado                     = (object)[];
         $contestado->id                 = $contest->id ?? null;
+
+        /**Obtiene el MAximo Numero deFormulario */
+        $maxNumeroForm = collect(\DB::select("SELECT max(numero_form) as numero 
+                                        FROM forms_llenos"))->first()->numero;
+        $numeroFormulario = $maxNumeroForm + 1  > $this->numFormBase ? $maxNumeroForm + 1 : $this->numFormBase + 1;
+
         /* insert */
         if(is_null($contestado->id) ){
-            $contestado->id_formulario    = $idFormulario;
-            $contestado->estado             = $contest->estado;
-            // $contestado->cedula_identidad   = $contest->con_ci ? $contest->cedula_identidad : '';
-            // $contestado->fecha_nacimiento   = $contest->fecha_nacimiento == '' || $contest->fecha_nacimiento == '--' ? null : $contest->fecha_nacimiento;
-            $contestado->tiempo_seg         = $contest->tiempo_seg;
-            $contestado->departamento       = $contest->departamento;
-            $contestado->municipio          = $contest->municipio;
-            // $contestado->edad               = $contest->edad ?? null;
-            // $contestado->con_ci             = $contest->con_ci ?? 0;
-            $contestado->created_at         = \Carbon\Carbon::now(-4);
-            $contestado->id_user            = Auth::user() ? Auth::user()->id : 0;
-            $contestado->ip                 = $this->getIp();
-            $contestado->periodo            = $contest->periodo;
+            $contestado->id_formulario     = $req->id_formulario;
+            $contestado->id_usuario        = $req->id_usuario;//Auth::user() ? Auth::user()->id : 0;
+            $contestado->estado_form_lleno = 'Enviado';
+            $contestado->numero_form       = $numeroFormulario;
+            $contestado->tiempo_seg        = $req->tiempo_seg;
+            $contestado->nim               = $req->nim;
+            $contestado->nit               = $req->nit;
+            $contestado->nombres           = $req->nombres;
+            $contestado->apellidos         = $req->apellidos;
+            $contestado->razon_social      = $req->razon_social;
+            $contestado->departamento      = $req->departamento;
+            $contestado->municipio         = $req->municipio;
+            $contestado->codigo_municipio  = $req->codigo_municipio;
+            $contestado->fecha_registro    = $this->now();
+            $contestado->created_at        = $this->now();
+            $contestado->created_by        = $req->id_usuario;
+            $contestado->ip                = $this->getIp();
             // session()->forget("'" . $contestado->cedula_identidad . "'");
         }
         /* update */
         else{
-            // $contestado->nombre_apellido    = $contest->nombre_apellido;
-            // $contestado->mail               = $contest->mail;
-            // $contestado->telefono           = $contest->telefono;
+            // $contestado->nombre_apellido    = $req->nombre_apellido;
+            // $contestado->mail               = $req->mail;
+            // $contestado->telefono           = $req->telefono;
         }
 
         try {
@@ -102,18 +108,18 @@ class FormularioController extends MasterController
     public function saveContexto(Request $req){
         $estado = 'ok';
         $data   = (object)[];
-        $id_user = Auth::user() ? Auth::user()->id : 0;
+        $id_usuario = Auth::user() ? Auth::user()->id : 0;
         $cedula_identidad = $req->cedula_identidad ?? '';
 
         if ($req->contexto == 'guardar_datos_encuestado') {
-            \DB::statement("DELETE FROM encuestados_tmp_respuestas WHERE id_user = {$id_user} AND cedula_identidad = '{$cedula_identidad}' ");
-            \DB::statement("DELETE FROM encuestados_tmp WHERE id_user = {$id_user} AND cedula_identidad = '{$cedula_identidad}' ");
+            \DB::statement("DELETE FROM encuestados_tmp_respuestas WHERE id_usuario = {$id_usuario} AND cedula_identidad = '{$cedula_identidad}' ");
+            \DB::statement("DELETE FROM encuestados_tmp WHERE id_usuario = {$id_usuario} AND cedula_identidad = '{$cedula_identidad}' ");
             $encuestado = (object)[];
             $encuestado->id                 = $req->id ?? null;
             $encuestado->id_cuestionario    = $req->idCuestionario;
             $encuestado->estado             = $req->estado;
             $encuestado->cedula_identidad   = $req->cedula_identidad ?? '';
-            $encuestado->id_user            = Auth::user() ? Auth::user()->id : 0;
+            $encuestado->id_usuario            = Auth::user() ? Auth::user()->id : 0;
             $encuestado->fecha_nacimiento   = $req->fecha_nacimiento;
             $encuestado->departamento       = $req->departamento;
             $encuestado->municipio          = $req->municipio;
@@ -136,9 +142,9 @@ class FormularioController extends MasterController
         
         if ($req->contexto == 'guardar_respuesta_pregunta') {
             // $yaRespondioPregunta = \DB::
-            // \DB::statement("DELETE FROM encuestados_tmp_respuestas WHERE id_user = {$id_user} AND cedula_identidad = '{$cedula_identidad}' AND id_elemento = {$req->id_elemento} ");
+            // \DB::statement("DELETE FROM encuestados_tmp_respuestas WHERE id_usuario = {$id_usuario} AND cedula_identidad = '{$cedula_identidad}' AND id_elemento = {$req->id_elemento} ");
             $respuesta = (object)[];
-            $respuesta->id_user          = $req->id_user;
+            $respuesta->id_usuario          = $req->id_usuario;
             $respuesta->cedula_identidad = $req->cedula_identidad;
             $respuesta->id_elemento      = $req->id_elemento;
             $respuesta->id_opcion        = isset($req->id_opcion) ? $req->id_opcion : null;
@@ -158,7 +164,7 @@ class FormularioController extends MasterController
 
         if($req->contexto == 'guardar_consolidado'){
             $respuesta = (object)[];
-            $respuesta->id_user          = $req->id_user;
+            $respuesta->id_usuario          = $req->id_usuario;
             $respuesta->cedula_identidad = $req->cedula_identidad;
             $respuesta->id_elemento      = $req->id_elemento;
             $respuesta->id_opcion        = isset($req->id_opcion) ? $req->id_opcion : null;

@@ -1,6 +1,6 @@
 /** MODIFICACIONES 
 - body { } se ha comentado todos los bodys para que funcione con el tema de WordpresP
-- pwn% se ha aumentado pw  que es width: n% !important
+- wpn% se ha aumentado pw  que es width: n% !important
 
 
 **/
@@ -18486,49 +18486,7 @@ ol.timeline-list li.timeline-item .timeline-date {
 .br-tp-left {
   border-left-color: rgba(0, 0, 0, 0.1);
 }
-/*===============================================
-  H.FLUID Width percents Helpers
-================================================= */
 
-.pw10 {
-  width: 10% !important;
-}
-.pw20 {
-  width: 20% !important;
-}
-.pw25 {
-  width: 25% !important;
-}
-.pw33 {
-  width: 33% !important;
-}
-.pw40 {
-  width: 40% !important;
-}
-.pw50 {
-  width: 50% !important;
-}
-.pw66 {
-  width: 66% !important;
-}
-.pw60 {
-  width: 60% !important;
-}
-.pw70 {
-  width: 70% !important;
-}
-.pw75 {
-  width: 75% !important;
-}
-.pw80 {
-  width: 80% !important;
-}
-.pw90 {
-  width: 90% !important;
-}
-.pw100 {
-  width: 100% !important;
-}
 
 /*===============================================
   H. Max Width Helpers
@@ -18714,6 +18672,48 @@ on tables, feel free to add more*/
 }
 .mnw1000 {
   min-width: 1000px !important;
+}
+.wp10 {
+  width: 10% !important;
+}
+.wp20 {
+  width: 20% !important;
+}
+.wp25 {
+  width: 25% !important;
+}
+.wp30 {
+  width: 30% !important;
+}
+.wp33 {
+  width: 33% !important;
+}
+.wp40 {
+  width: 40% !important;
+}
+.wp50 {
+  width: 50% !important;
+}
+.wp66 {
+  width: 66% !important;
+}
+.wp60 {
+  width: 60% !important;
+}
+.wp70 {
+  width: 70% !important;
+}
+.wp75 {
+  width: 75% !important;
+}
+.wp80 {
+  width: 80% !important;
+}
+.wp90 {
+  width: 90% !important;
+}
+.wp100 {
+  width: 100% !important;
 }
 /* ================================================
   A. Table Styling Helpers

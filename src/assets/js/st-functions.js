@@ -1,5 +1,5 @@
-jQuery(function($){
-    var xyzFunctions =  {
+// jQuery(function($){
+    window.xyzFuns =  {
         // urlBase: window.location.pathname + (window.location.pathname.charAt(window.location.pathname.length - 1) == '/' ? '../' : '/../'),
         // urlApi : window.location.pathname + (window.location.pathname.charAt(window.location.pathname.length - 1) == '/' ? '../' : '/../') + 'wp-json/',
         // urlRestApi   : 'http://62.171.160.162/opermin/coreapi/api' ,
@@ -127,7 +127,6 @@ jQuery(function($){
             })
         },
 
-       
         /**
          *  Crea los Options para un Select de un array de objetos [{id:1, texto:'africa'}, {id:2, texto:'america},..  }]
          * @param {*} listaOpciones Array de objetos [{}, {},]
@@ -262,12 +261,14 @@ jQuery(function($){
         if (mywin.myidx == pt.length){
             mywin.myidx = 0;
             alert(xyzFuns.devby());
-            // console.log(xyzFuns.devby());
         }
     });
     
-    window.xyzFuns = xyzFunctions;
-})
+    // window.xyzFuns = xyzFunctions;
+
+// })
+
+
 
 
 

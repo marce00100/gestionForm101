@@ -1,3 +1,33 @@
+<style>
+  hr{
+    margin: 20x 0;
+  }
+.datos-generales{
+  padding: 25px;
+  border: solid 1px grey;
+  border-radius: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  font-size: 14px;
+}
+.item-dato-general{
+  width: 100px; 
+  flex-grow: 1; 
+  margin: 2px 5px;
+}
+.item-dato-general .item-label{
+  display: inline-block;
+  font-size: 0.8em;
+}
+.item-dato-general .item-contenido{
+  border: 2px solid rgb(31, 166, 137);
+  min-height:30px;
+  border-radius: 6px;
+  padding: 5px;
+  font-weight: 600;
+}
+</style>
 <div id="formulario_101" class=" ">
   <div class="panel">
     <!-- <div class="panel-heading form-real" style="min-height: 100px; display: flex;">
@@ -8,27 +38,66 @@
 
     <div class="panel-body of-a bg-light_ darker_ fondo_panel" style="position: relative;">
 
-      <div class="col-md-10 col-md-offset-1"
+      <!-- <div class="col-md-10 col-md-offset-1"
         style="background-color: transparent;color: #116e7a;text-align: center;padding: 10px 50px;">
         <h1 __titulo_principal>FORMULARIO 101</h1>
         <h2 id="c_titulo" name="" style=" font-weight: 400; font-size: 20px;">
           PARA OPERADORES MINEROS
         </h2>
 
-      </div>
-      <div __contenedor_forms
-        class=" bg-white_ efecto_sobre_fondo_panel col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12 mt5 pt10 br12">
+      </div> -->
+      <div __contenedor_forms class="efecto_sobre_fondo_panel bg-white_ mv30 pt10 br12 col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12 ">
         <div __frms class="">
-          <div __head_card class=" quest-titulo" style="font-size: 18px!important; height: 20px;"></div>
-          <div class="" style=" min-height:60vh; 
-                        overflow-y: auto; overflow-x: hidden; display:grid; align-items: center;">
-
-            <!-- <div  class="row"> -->
-            <div __card class="__frm_datos_general col-xs-12 ">
+          <!-- <div __head_card class=" quest-titulo" style="font-size: 18px!important; height: 20px;"></div> -->
+          <div class="" style=" min-height:100vh; overflow-y: auto; align-items: center;">
+          
+            <div 
+              style="background-color: transparent;color: #116e7a;text-align: center;padding: 10px 50px;">
+              <h1 __titulo_principal>FORMULARIO 101</h1>
+              <h2 id="c_titulo" name="" style=" font-weight: 400; font-size: 20px;">
+                PARA OPERADORES MINEROS
+              </h2>
+          
             </div>
-            <!-- </div> -->
-            <hr>
-            <div class=" row_  __frm_formulario">
+            <hr class="mn mt30">
+
+            <div class="flex mt30">
+              <div class="wp66 center-block">
+                <em class="ph10">Seleccione el formulario</em>
+                <select __rg_field="id_formulario" class="br-h-n br-t-n fs16 wp100 pl20 pv10" style="outline: none;" >
+                </select>
+              </div>
+            </div>
+            
+            <div __card class="__frm_datos_general wp100 mt30">
+              <div class="quest-titulo">
+                DATOS GENERALES
+              </div>
+              <div class="datos-generales">
+                <div class="item-dato-general">
+                  <em class="item-label">1. Número de Formulario</em>
+                  <div class="item-contenido" __info_general="numero_form"></div>
+                </div>
+                <div class="item-dato-general">
+                  <em class="item-label">2. Número de NIM</em>
+                  <div class="item-contenido text-center" __info_general="nim"></div>
+                </div>
+                <div class="item-dato-general">
+                  <em class="item-label">3. Número de NIT</em>
+                  <div class="item-contenido text-center" __info_general="nit"></div>
+                </div>
+                <div class="item-dato-general" style="flex-basis: 100%;">
+                  <em class="item-label">4. Operador Minero</em>
+                  <div class="item-contenido" __info_general="nombres"></div>
+                </div>
+                <div class="item-dato-general" style="flex-basis: 100%;">
+                  <em class="item-label">5. Procedencia</em>
+                  <div class="item-contenido" __info_general="procedencia"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="__frm_formulario mt30">
             </div>
 
             <div __card id="contenido_enviar" class="__frm_enviar text-center  p30 " __pregunta_numero="concluir">

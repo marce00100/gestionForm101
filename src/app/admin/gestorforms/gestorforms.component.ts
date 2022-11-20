@@ -7,7 +7,7 @@ declare var PNotify: any;
 
 @Component({
   selector: 'app-gestor-forms',
-  templateUrl: './gestor-forms.component.html',
+  templateUrl: './gestorforms.component.html',
 })
 export class GestorFormsComponent implements OnInit {
 
@@ -23,7 +23,6 @@ export class GestorFormsComponent implements OnInit {
     return $(function(){
       /*----   ctxG variable que contiene el contexto global, variables globales */
       let ctxG = {
-        // rutabase: 'http://localhost/www/opermin/coreapi/api',
         rutabase: xyzFuns.urlRestApi,
         c : {   
           activoPri : 'activoPri',
@@ -99,6 +98,8 @@ export class GestorFormsComponent implements OnInit {
                   <option value="mixta">Selección mixta</option>
                   <option value="open_sm">Respuesta corta</option>
                   <option value="open_lg">Respuesta larga</option>
+                  <option value="number">Numero</option>
+                  <option value="date">Fecha</option>
                   <option value="select_numbers">Selector de números</option>
                 </select>
               </div>
@@ -110,6 +111,12 @@ export class GestorFormsComponent implements OnInit {
     
         pregunta_corta: /*html*/`
             <div style="border-bottom:1px solid grey; width: 50%; height: 30px; padding:5px">Respuesta..
+            </div>`,
+        pregunta_numero: /*html*/`
+            <div style="border-bottom:1px solid grey; width: 50%; height: 30px; padding:5px; text-align:right">0
+            </div>`,
+        pregunta_fecha: /*html*/`
+            <div style="border-bottom:1px solid grey; width: 50%; height: 30px; padding:5px">dd/mm/aaaa
             </div>`,
         pregunta_larga: /*html*/`
             <div style="border:1px solid grey; width: 90%; height: 70px; padding:5px; margin-top:7px">Respuesta ...
@@ -187,15 +194,9 @@ export class GestorFormsComponent implements OnInit {
     
       let ctxMain = {
         getData: function () {
-          // let cuestionario = {
-          // 	id: $("#c_id").val(),
-          // 	nombre: $("#c_nombre").val(),
-          // 	titulo: $("#c_titulo").val(),
-          // 	_token : $('input[name=_token]').val(),
-          // 	elementos: [],
-          // };
-          let cuestionario = {
-            id: 1,
+          let formulario = {
+            id_formulario: $("[__rg_field=id_formulario]").val(),
+            _token: $("[__rg_field=_token]").val(),
             elementos: [],
           }
           let elementos = $(`[__contenido_elementos] .__elemento`);
@@ -263,24 +264,20 @@ export class GestorFormsComponent implements OnInit {
   
               objElem.config = JSON.stringify(objConfig);
             }
-            cuestionario.elementos.push(objElem);
+            formulario.elementos.push(objElem);
           })
-          return cuestionario;
+          return formulario;
         },
-        setData: function (objCuestionario) {
+        setData: function (objForm) {
           $("[__contenido_elementos]").html('');
           /* NUEVO : verifica si no existe el obj es para nuevo cuestionario*/
-          if (!objCuestionario) {
+          if (!objForm) {
             // $(`${ctxMain.idmodal} textarea, ${ctxMain.idmodal} input`).val('');
             // funs.adicionarElemento("titulo");
           }
           /* EDITAR */
-          else {
-            // $("#c_id").val(objCuestionario.id);
-            // $("#c_nombre").val(objCuestionario.nombre);
-            // $("#c_titulo").val(objCuestionario.titulo);
-  
-            objCuestionario.elementos.forEach(function (objElem) {
+          else {  
+            objForm.elementos.forEach(function (objElem) {
               funs.adicionarElemento(objElem.tipo);
   
               let elemento = $("[__contenido_elementos] .__elemento").last();
@@ -352,7 +349,6 @@ export class GestorFormsComponent implements OnInit {
         },
         save: function () {
           let objSend: any = ctxMain.getData();
-          objSend._token = $("[__rg_field=_token]").val();
           xyzFuns.spinner(true, { texto: 'Guardando ...' });
           $.post(ctxG.rutabase + '/save-form-elems', objSend, function (res) {
             xyzFuns.spinner(false);
@@ -370,17 +366,25 @@ export class GestorFormsComponent implements OnInit {
       }
     
       let funs = {
-        cargarFormulario: ()=>{  
-          let editarformulario = (id) => {
-            $.get(`${ctxG.rutabase}/get-form-elems`, {id_f: 2}, function(res){
-              ctxMain.setData(res.data);
-              /* Para que se acomoden los tamaños*/
-              $("[__tipo=pregunta] textarea").trigger('keydown');
-            })
-          };
-    
-          editarformulario(1); /* Revisar el envio de formulario dependiendo de cual se va a cargar TODO No funciona*/
-    
+        cargarComboFomularios: () => {
+          $.get(`${ctxG.rutabase}/get-forms`, (res) => {
+            let comboFormularios = $("[__rg_field=id_formulario]");
+            let optsForms = xyzFuns.generaOpciones(res.data, 'id', 'nombre');
+            comboFormularios.append(optsForms);
+            funs.cargarFormulario(comboFormularios.val());
+
+          })
+        },
+
+        /** Carga el formulario seleccionado */
+        cargarFormulario: (id_formulario) => {
+          xyzFuns.spinner();
+          $.post(`${ctxG.rutabase}/get-form-elems`, { id_formulario: id_formulario }, function (res) {
+            ctxMain.setData(res.data);
+            /* Para que se acomoden los tamaños*/
+            $("[__tipo=pregunta] textarea").trigger('keydown');
+            xyzFuns.spinner(false);
+          });
           /* Para que se acomoden los tamaños*/
           $("[__tipo=pregunta] textarea").trigger('keydown ');
         },
@@ -453,6 +457,12 @@ export class GestorFormsComponent implements OnInit {
           if (tipo == 'select_numbers') {
             elem_respuesta.html(elemshtml.select_numbers)
           }
+          if (tipo == 'number') {
+            elem_respuesta.html(elemshtml.pregunta_numero)
+          }
+          if (tipo == 'date') {
+            elem_respuesta.html(elemshtml.pregunta_fecha)
+          }
         },
         agregaOpcion: (elemento) => {
           let opcionesRespuesta = $(elemento).find('.__opciones_respuesta');
@@ -495,14 +505,6 @@ export class GestorFormsComponent implements OnInit {
               $(config).find('[__config_cuadro]').removeClass('hide');
               $(config).find('[__config_input=ayuda]').removeClass('hide').focus();
             }
-            // if(accion == 'depende'){
-            //   $(config).find('[__config_cuadro]').removeClass('hide');
-            //   $(config).find('[__config_input=depende]').removeClass('hide').focus();
-            // }
-            // if(accion == 'goto'){
-            //   $(config).find('[__config_cuadro]').removeClass('hide');
-            //   $(config).find('[__config_input=goto]').removeClass('hide').focus();
-            // }
           }
           /* cerrar cuadro*/
           else{
@@ -520,8 +522,6 @@ export class GestorFormsComponent implements OnInit {
           let classNormal  = 'bg-light darker';
           let classAyuda   = 'bg-info light';
           let classRequerido = 'bg-danger darker';
-          // let classDepende = 'bg-warning darker';
-          // let classGoto    = 'bg-system darker';
     
           $(config).find('[__config_input=ayuda]').val() != "" ? 
             $(config).find(("[__config_btn=ayuda]")).removeClass(classNormal).addClass(classAyuda)
@@ -530,16 +530,7 @@ export class GestorFormsComponent implements OnInit {
           $(config).find('[__config_btn=requerido]').hasClass('requerido')?
             $(config).find(("[__config_btn=requerido]")).removeClass(classNormal).addClass(classRequerido)
             : $(config).find(("[__config_btn=requerido]")).removeClass(classRequerido).addClass(classNormal);
-          
-          // $(config).find('[__config_input=depende]').val() != "" ? 
-          //   $(config).find(("[__config_btn=depende]")).removeClass(classNormal).addClass(classDepende)
-          //   : $(config).find(("[__config_btn=depende]")).removeClass(classDepende).addClass(classNormal);
-        
-          // $(config).find('[__config_input=goto]').val() != "" ? 
-          //   $(config).find(("[__config_btn=goto]")).removeClass(classNormal).addClass(classGoto)
-          //   : $(config).find(("[__config_btn=goto]")).removeClass(classGoto).addClass(classNormal);
-        
-        
+
         }
     
     
@@ -548,6 +539,11 @@ export class GestorFormsComponent implements OnInit {
     
       let listeners = () => {
         $("#gestor_formulario")
+        /** Seleccionar Formulario */
+        .on('change', "[__rg_field='id_formulario']", function() {
+          console.log($("[__rg_field=id_formulario]").val());
+          funs.cargarFormulario($("[__rg_field=id_formulario]").val());
+        })
     
         /* heigh automatica en textareas*/
         .on('change drop keydown cut paste','textarea', function() {
@@ -636,8 +632,8 @@ export class GestorFormsComponent implements OnInit {
     
       let gestionInit = (() => {
         listeners();
-        funs.cargarFormulario();
-    
+        funs.cargarComboFomularios();
+        // funs.cargarFormulario();    
       })();
 
   

@@ -22,9 +22,9 @@ import { RouterModule, Routes }            from '@angular/router';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 
 import { AppComponent }                    from './app.component';
-import { UsersComponent }                  from './admin/ingenios/users/users.component';
-import { GestorFormsComponent }            from './admin/ingenios/gestor-forms/gestor-forms.component';
+import { UsersComponent }                  from './admin/users/users.component';
 import { IngeniosComponent }               from './admin/ingenios/ingenios.component';
+import { GestorFormsComponent }            from './admin/gestorforms/gestorforms.component';
 import { FormComponent }                   from './operadores/form/form.component';
 
 import { MenuadminComponent }              from './shared/menuadmin.component';

@@ -5,8 +5,7 @@ declare var xyzFuns: any;
 @Component({
   selector: 'app-form',
   templateUrl: './form.component.html',
-  styles: [
-  ]
+  styles: []
 })
 export class FormComponent implements OnInit {
 
@@ -16,24 +15,22 @@ export class FormComponent implements OnInit {
   ngOnInit(): void {
 
     this.form();
-
+    // form();
   }
 
 
   form = function () {
     $(function () {
-      let ctxG = {
+      let ctxG: any = {
         rutabase: xyzFuns.urlRestApi,
         timeIni: new Date(), /* Para calcular tiempo*/
         municipios: [],
-        // cards: [],  /* Array con las cards*/
-        // index: 0,   /* Indice de la Card Actual*/
+        datosUser: {}
 
-        // datosCabecera: {
-        //   edad: 0,
-        //   ci: '',
-        // }
+      }
 
+      let temp = {
+        id_usuario: 62,
       }
 
       let regmodel = {
@@ -205,117 +202,107 @@ export class FormComponent implements OnInit {
         }
       }
 
+      let form = {
+        elemhtml : {
+          /* Elementos */
+          pregunta_rend: /*html*/`
+                            <div __card class="__elemento row  " __tipo="pregunta" __id_elemento="" __pregunta_numero __titulo_principal_seccion>                          
+                                <div class="__elem_texto quest quest-pregunta  "  ></div>
+                                <div class="__elem_descripcion quest quest-descripcion "  ></div>
+                                <div class="__elem_respuesta pl20 col-md-12"  __tipo_respuesta="" __dependencia>
+                                </div>  
+                            </div>`,
+          titulo_rend: /*html*/`  
+                            <div p__card class="__elemento row   quest quest-titulo" __tipo="titulo" __id_elemento="">
+                                <div  class=" __elem_texto " ></div>                 
+                            </div>`,
+          texto_rend: /*html*/`  
+                            <div p__card class="__elemento row  quest quest-texto" __tipo="texto" __id_elemento="">
+                                <div  class=" __elem_texto " ></div>                      
+                            </div>`,
+          separador_rend: /*html*/`  
+                            <div class="__elemento row " __tipo="separador" __id_elemento="">
+                                <hr style="margin: 10px 0;">                     
+                            </div>`,
+  
+          /* tipos de respuesta*/
+          respuesta_corta_rend: /*html*/` 
+                                <div class="mt15 mb20">
+                                        <input type="text" class="bg-white  form-control quest-input-line quest-texto __open_sm" placeholder="Escribe tu respuesta" style="width:80%"  >
+                                </div>`,
+          respuesta_numero_rend: /*html*/` 
+                                <div class="mt15 mb20">
+                                        <input type="number" class="bg-white  form-control quest-input-line quest-texto __number" placeholder="" style="width:150px"  >
+                                </div>`,
+          respuesta_fecha_rend: /*html*/` 
+                                <div class="mt15 mb20">
+                                        <input type="date" class="bg-white  form-control quest-input-line quest-texto __date" placeholder="Escribe tu respuesta" style="width:150px"  >
+                                </div>`,
+          respuesta_larga_rend: /*html*/` 
+                                <div class="mt15 mb20">
+                                        <textarea class="bg-white  form-control quest-input-line quest-texto __open_lg" placeholder="Escribe tu respuesta" style="width:80%" rows="2"  ></textarea>
+                                </div>`,
+  
+          respuesta_select_numbers_rend: /*html*/` 
+                                <div class="mt15 mb20">
+                                        <select class="form-control w100 ph15 __select_numbers"></select>
+                                </div>`,
 
-      let elemhtml = {
-        /* Elementos */
-        pregunta_rend: /*html*/`
-                          <div __card class="__elemento row  " __tipo="pregunta" __id_elemento="" __pregunta_numero __titulo_principal_seccion>                          
-                              <div class="__elem_texto quest quest-pregunta  "  ></div>
-                              <div class="__elem_descripcion quest quest-descripcion "  ></div>
-                              <div class="__elem_respuesta pl20 col-md-12"  __tipo_respuesta="" __dependencia>
-                              </div>  
-                          </div>`,
-        titulo_rend: /*html*/`  
-                          <div p__card class="__elemento row   quest quest-titulo" __tipo="titulo" __id_elemento="">
-                              <div  class=" __elem_texto " ></div>                      
-                          </div>`,
-        texto_rend: /*html*/`  
-                          <div p__card class="__elemento row  quest quest-texto" __tipo="texto" __id_elemento="">
-                              <div  class=" __elem_texto " ></div>                      
-                          </div>`,
-        separador_rend: /*html*/`  
-                          <div class="__elemento row " __tipo="separador" __id_elemento="">
-                              <hr style="margin: 10px 0;">                     
-                          </div>`,
-
-        /* tipos de respuesta*/
-        respuesta_corta_rend: /*html*/` 
-                              <div class="mt15 mb20">
-                                      <input type="text" class="bg-white  form-control quest-input-line quest-texto __open_sm" placeholder="Escribe tu respuesta" style="width:80%"  >
-                              </div>`,
-        respuesta_larga_rend: /*html*/` 
-                              <div class="mt15 mb20">
-                                      <textarea class="bg-white  form-control quest-input-line quest-texto __open_lg" placeholder="Escribe tu respuesta" style="width:80%" rows="2"  ></textarea>
-                              </div>`,
-
-        respuesta_select_numbers_rend: /*html*/` 
-                              <div class="mt15 mb20">
-                                      <select class="form-control w100 ph15 __select_numbers"></select>
-                              </div>`,
-
-        respuesta_select_tres_rend: /*html*/` 
-                              <div class="mt15 mb20 fs13">
-                                      <span class="__select_opciones_texto_1"></span> <select class="form-control w300 ph15 __select_opciones_1" style="width: 80%"></select>
-                                      <span class="__select_opciones_texto_2"></span> <select class="form-control w300 ph15 __select_opciones_2" style="width: 80%"></select>
-                                      <span class="__select_opciones_texto_3"></span> <select class="form-control w300 ph15 __select_opciones_3" style="width: 80%"></select>
-                              </div>
-                              <div class="__no_elemento" __tipo="pregunta_oculta" __id_elemento select_tres_op2 respuesta>
-                                  <div __tipo_respuesta="pregunta_oculta"></div>
-                              </div> 
-                              <div class="__no_elemento" __tipo="pregunta_oculta" __id_elemento select_tres_op3 respuesta>
-                                  <div __tipo_respuesta="pregunta_oculta"></div>
-                              </div> `,
-
-        respuesta_seleccion_rend: /*html*/` 
-                              <ul class="__opciones_respuesta mv10 pl15" style="list-style: none;"></ul>`,
-
-        /* Opcion de seleccion*/
-        opcion_seleccion_rend: /*html*/`
-                              <li class="mt5 " style="display:flex; align-items: flex-start; gap: 5px" > 
-                                  <input __id_opcion __opcion_texto __opcion_numero id="" type="" name="" class="" title="" value="" >
-                                  <label class=" quest quest-opcion" for=""></label> 
-                              </li>`,
-
-        /* Opcion  "Otro... "*/
-        opcion_otro_rend:   /*html*/`
-                              <li class="mt5 " style="display:flex; align-items: flex-start; gap: 5px"> 
-                                  <input  __opcion_texto="Otro" id="" type="" name="" class="" title="" value="" >
-                                  <label class=" quest quest-opcion" for=""></label> 
-                                  <input type="text"  __opcion_otro class="bg-white  form-control quest-input-line quest-texto hide" placeholder="Especifique ..."  style="width:50%; display:inline-block"  >
-                              </li>`,
-
-        /* Opcion  "Ninguno"*/
-        opcion_ninguno_rend:   /*html*/`
-                              <li class="mt5 " style="display:flex; align-items: flex-start; gap: 5px"> 
-                                  <input  __opcion_texto="Ninguno" id="" type="checkbox" name="" class="" title="" value="" >
-                                  <label class=" quest quest-opcion" for="">Ninguno.</label> 
-                              </li>`,
-
-        ayuda: /*html*/`  
-              <span __ayuda class="pull-right">
-                  <span __ayuda_btn class=" text-center bg-primary br12 p5 ph8 ml10 fs11" title="más información..." style="cursor:pointer; position:relative">
-                      <i class="fa fa-question "></i>
-                  </span>
-                  <div __ayuda_texto class="hide fs12 text-white" style="top: 22px; left:0px;position: absolute;background: #000000aa;padding: 15px;border-radius: 12px;min-width: 250px;  z-index: 13;"></div>
-                  <div class="cuadro_fondo hide " style="position:fixed; top:0; left:0; width:100vw; height:100vh; background-color: #33333311; z-index:11">
-          </div>
-              </span>`
-
-      }
-
-
-      let ctxMain = {
-        creaFormulario: () => {
-
-          $.get(ctxG.rutabase + '/get-form-elems', { id_f: 2 }, function (res) {
-            ctxMain.renderizarElementos(res.data);
-          })
+  
+          respuesta_seleccion_rend: /*html*/` 
+                                <ul class="__opciones_respuesta mv10 pl15" style="list-style: none;"></ul>`,
+  
+          /* Opcion de seleccion*/
+          opcion_seleccion_rend: /*html*/`
+                                <li class="mt5 " style="display:flex; align-items: flex-start; gap: 5px" > 
+                                    <input __id_opcion __opcion_texto __opcion_numero id="" type="" name="" class="" title="" value="" >
+                                    <label class=" quest quest-opcion" for=""></label> 
+                                </li>`,
+  
+          /* Opcion  "Otro... "*/
+          opcion_otro_rend:   /*html*/`
+                                <li class="mt5 " style="display:flex; align-items: flex-start; gap: 5px"> 
+                                    <input  __opcion_texto="Otro" id="" type="" name="" class="" title="" value="" >
+                                    <label class=" quest quest-opcion" for=""></label> 
+                                    <input type="text"  __opcion_otro class="bg-white  form-control quest-input-line quest-texto hide" placeholder="Especifique ..."  style="width:50%; display:inline-block"  >
+                                </li>`,
+  
+          /* Opcion  "Ninguno"*/
+          opcion_ninguno_rend:   /*html*/`
+                                <li class="mt5 " style="display:flex; align-items: flex-start; gap: 5px"> 
+                                    <input  __opcion_texto="Ninguno" id="" type="checkbox" name="" class="" title="" value="" >
+                                    <label class=" quest quest-opcion" for="">Ninguno.</label> 
+                                </li>`,
+  
+          ayuda: /*html*/`  
+                <span __ayuda class="pull-right">
+                    <span __ayuda_btn class=" text-center bg-primary br12 p5 ph8 ml10 fs11" title="más información..." style="cursor:pointer; position:relative">
+                        <i class="fa fa-question "></i>
+                    </span>
+                    <div __ayuda_texto class="hide fs12 text-white" style="top: 22px; left:0px;position: absolute;background: #000000aa;padding: 15px;border-radius: 12px;min-width: 250px;  z-index: 13;"></div>
+                    <div class="cuadro_fondo hide " style="position:fixed; top:0; left:0; width:100vw; height:100vh; background-color: #33333311; z-index:11">
+                    </div>
+                </span>`
+  
         },
-        renderizarElementos: function (objCuestionario) {
-
-          $("#id_c").val(objCuestionario.id);
-          // $("#c_titulo").html(objCuestionario.titulo);
-          // $("#pruebareal").html(ctxMain.pruebareal == 'prueba'? 'Modo Previsualizacion, La respuestas emitidas seran para fines de PRUEBA.' : '');
+        renderizarElementos: function (objForm, contenedor) {
 
           let tituloSeccion = '';
 
-          _.forEach(objCuestionario.elementos, function (objElem, k) {
-            funs.adicionaElemento(objElem.tipo);
+          _.forEach(objForm.elementos, function (objElem, k) {
+            let tipoElemento = objElem.tipo;
+            let contenidoElementos = $(contenedor);
+            if (tipoElemento == 'pregunta')
+              contenidoElementos.append(form.elemhtml.pregunta_rend);
+            if (tipoElemento == 'titulo')
+              contenidoElementos.append(form.elemhtml.titulo_rend);
+            if (tipoElemento == 'texto')
+              contenidoElementos.append(form.elemhtml.texto_rend);
+            if (tipoElemento == 'separador')
+              contenidoElementos.append(form.elemhtml.separador_rend);
 
-            let elemento = $(".__frm_formulario .__elemento").last();
-            if (objElem.tipo != 'pregunta_oculta') {
-              $(elemento).attr('__id_elemento', objElem.id);
-            }
+            let elemento = $(`${contenedor} .__elemento`).last();
+            $(elemento).attr('__id_elemento', objElem.id);
 
             if (objElem.tipo == 'titulo' || objElem.tipo == 'texto') {
               $(elemento).find('.__elem_texto').html(objElem.texto); /* Añade el texto de la pregunta titulo o texto */
@@ -326,7 +313,8 @@ export class FormComponent implements OnInit {
 
             if (objElem.tipo == 'pregunta') {
               let numeroPregunta = funs.cortarNumero(objElem.texto);
-              $(elemento).find('.__elem_texto').html(numeroPregunta.texto);
+              $(elemento).find('.__elem_texto').html(objElem.texto);
+              // $(elemento).find('.__elem_texto').html(numeroPregunta.texto);
               $(elemento).attr('__pregunta_numero', numeroPregunta.numero);
               /* Coloca la descripcion solo a las preguntas*/
               (objElem.descripcion && objElem.descripcion.length > 0) ? $(elemento).find('.__elem_descripcion').html(objElem.descripcion)
@@ -343,7 +331,7 @@ export class FormComponent implements OnInit {
 
               /* agrega y Configura el boton ayuda si hay en el elemento */
               if (cnfElem.ayuda && cnfElem.ayuda.length > 0) {
-                $(elemento).find('.__elem_texto').append(elemhtml.ayuda);
+                $(elemento).find('.__elem_texto').append(form.elemhtml.ayuda);
                 $(elemento).find('[__ayuda_texto]').html(cnfElem.ayuda.replace(/\n/g, '<br>'));
               }
 
@@ -355,7 +343,7 @@ export class FormComponent implements OnInit {
 
 
               if (cnfElem.tipo_respuesta == 'single' || cnfElem.tipo_respuesta == 'multiple' || cnfElem.tipo_respuesta == 'mixta') {
-                $(elemento).find('.__elem_respuesta').append(elemhtml.respuesta_seleccion_rend);
+                $(elemento).find('.__elem_respuesta').append(form.elemhtml.respuesta_seleccion_rend);
 
                 _.forEach(objElem.opciones, function (op, k) {
                   let typeinput = cnfElem.tipo_respuesta == 'single' || cnfElem.tipo_respuesta == 'mixta' ? 'radio' : 'checkbox';
@@ -365,16 +353,16 @@ export class FormComponent implements OnInit {
                   if (cnfElem.tipo_respuesta == 'mixta' && cnfOpcion.opcion_combinada)
                     typeinput = 'checkbox';
 
-                  let opcion = $(elemhtml.opcion_seleccion_rend);
+                  let opcion = $(form.elemhtml.opcion_seleccion_rend);
                   /* se coloca en cada checkitem el id para enlazarcon label y el name con id de elemento para agrupar */
-                  let numeroOpcion = k + 1; // funs.cortarNumero(op.opcion_texto);
+                  let numeroOpcion = k + 1; 
                   $(opcion).find('input').attr('__id_opcion', op.id).attr('__opcion_numero', numeroOpcion).attr('__opcion_texto', op.opcion_texto).attr('id', op.id).attr('name', objElem.id).attr('type', typeinput);
                   $(opcion).find('label').attr('for', op.id).text(`${k + 1}. ${op.opcion_texto}`);
 
                   /* la config de la opcion ayuda y goto*/
                   $(opcion).find('input').attr('__goto', cnfOpcion.goto ? cnfOpcion.goto : '');
                   if (cnfOpcion.ayuda && cnfOpcion.ayuda.length > 0) {
-                    $(opcion).append(elemhtml.ayuda);
+                    $(opcion).append(form.elemhtml.ayuda);
                     $(opcion).find('[__ayuda_texto]').html(cnfOpcion.ayuda.replace(/\n/g, '<br>'));
                   }
 
@@ -384,7 +372,7 @@ export class FormComponent implements OnInit {
                 /* Opcion OTRO*/
                 if (cnfElem.opcion_otro) {
                   let typeinputOtro = cnfElem.tipo_respuesta == 'single' || cnfElem.tipo_respuesta == 'mixta' ? 'radio' : 'checkbox';
-                  let bloque_otro = $(elemhtml.opcion_otro_rend);
+                  let bloque_otro = $(form.elemhtml.opcion_otro_rend);
 
                   let numeroCorrelativoOtro = $(elemento).find('.__opciones_respuesta li').length + 1;
                   let id_rand = Math.random(); /* Crea un id aleatorio para el for del label con el input */
@@ -397,7 +385,7 @@ export class FormComponent implements OnInit {
                 /* Opcion NINGUNO*/
                 if (cnfElem.opcion_ninguno) {
                   let typeinputNinguno = 'checkbox'; // Siempre debe ser checkbox para habilitar o deshabilitar a todos los demas
-                  let bloque_ninguno = $(elemhtml.opcion_ninguno_rend);
+                  let bloque_ninguno = $(form.elemhtml.opcion_ninguno_rend);
 
                   let numeroCorrelativoNinguno = $(elemento).find('.__opciones_respuesta li').length + 1;
                   let id_rand = Math.random(); /* Crea un id aleatorio para el for del label con el input */
@@ -408,13 +396,19 @@ export class FormComponent implements OnInit {
                 }
               }
               if (cnfElem.tipo_respuesta == 'open_sm')
-                $(elemento).find('.__elem_respuesta').append(elemhtml.respuesta_corta_rend);
+                $(elemento).find('.__elem_respuesta').append(form.elemhtml.respuesta_corta_rend);
+                
+                if (cnfElem.tipo_respuesta == 'number')
+                $(elemento).find('.__elem_respuesta').append(form.elemhtml.respuesta_numero_rend);
+                
+                if (cnfElem.tipo_respuesta == 'date')
+                $(elemento).find('.__elem_respuesta').append(form.elemhtml.respuesta_fecha_rend);
 
               if (cnfElem.tipo_respuesta == 'open_lg')
-                $(elemento).find('.__elem_respuesta').append(elemhtml.respuesta_larga_rend);
+                $(elemento).find('.__elem_respuesta').append(form.elemhtml.respuesta_larga_rend);
 
               if (cnfElem.tipo_respuesta == 'select_numbers') {
-                $(elemento).find('.__elem_respuesta').append(elemhtml.respuesta_select_numbers_rend);
+                $(elemento).find('.__elem_respuesta').append(form.elemhtml.respuesta_select_numbers_rend);
                 let numeros = _.range(parseInt(cnfElem.min), parseInt(cnfElem.max) + 1);
                 let opts = xyzFuns.generaOpcionesArray(numeros, " ");
                 $(elemento).find('.__select_numbers').html(opts);
@@ -425,17 +419,15 @@ export class FormComponent implements OnInit {
         },
         getData() {
           let timeFin = new Date();
-          let datosCabeceraObj = xyzFuns.getData__fields('__rg_field');
-          let contest = {
-            id_cuestionario: $("#id_c").val(),
+          // let datosCabeceraObj = xyzFuns.getData__fields('__rg_field');
+          let contest = {            
             tiempo_seg: 0, 
             respuestas: []
           };
 
-
-          $.extend(contest, datosCabeceraObj);
-
-          _.forEach($(".__elemento[__tipo='pregunta'][__card='completado']"), function (elemento, k) {
+          // $.extend(contest, datosCabeceraObj);
+          console.log('contest',contest);
+          _.forEach($(".__elemento[__tipo='pregunta']"), function (elemento, k) {
 
             let tipoRespuesta = $(elemento).find('[__tipo_respuesta]').first().attr('__tipo_respuesta');
             if (tipoRespuesta == 'single' || tipoRespuesta == 'multiple' || tipoRespuesta == 'mixta') {
@@ -451,66 +443,95 @@ export class FormComponent implements OnInit {
                 contest.respuestas.push(objResp);
               })
             }
-            if (tipoRespuesta == 'open_sm') {
+            if (_.includes(['open_sm', 'number', 'date'], tipoRespuesta)) { 
               let respuesta_corta = $(elemento).find("input");
-              let objResp = {
-                id_elemento: $(elemento).attr('__id_elemento'),
-                respuesta: respuesta_corta.val(),
+              if(respuesta_corta.val() && respuesta_corta.val().trim().length > 0  ){
+                let objResp = {
+                  id_elemento: $(elemento).attr('__id_elemento'),
+                  respuesta: respuesta_corta.val(),
+                }
+                contest.respuestas.push(objResp);
               }
-              contest.respuestas.push(objResp);
             }
             if (tipoRespuesta == 'open_lg') {
               let respuesta_larga = $(elemento).find("textarea");
-              let objResp = {
-                id_elemento: $(elemento).attr('__id_elemento'),
-                respuesta: respuesta_larga.val(),
+              if(respuesta_larga.val() && respuesta_larga.val().trim().length > 0  ){
+                let objResp = {
+                  id_elemento: $(elemento).attr('__id_elemento'),
+                  respuesta: respuesta_larga.val(),
+                }
+                contest.respuestas.push(objResp);
               }
-              contest.respuestas.push(objResp);
             }
             if (tipoRespuesta == 'select_numbers') {
-              let num = $(elemento).find(".__select_numbers").val();
-              let objResp = {
-                id_elemento: $(elemento).attr('__id_elemento'),
-                respuesta: num,
-                respuesta_opcion: num,
+              let num = $(elemento).find(".__select_numbers");
+              if(num.val() && num.val().trim().length > 0  ){
+                let objResp = {
+                  id_elemento: $(elemento).attr('__id_elemento'),
+                  respuesta: num,
+                  respuesta_opcion: num,
+                }
+                contest.respuestas.push(objResp);
               }
-              contest.respuestas.push(objResp);
             }
-            if (tipoRespuesta == 'select_tres') {
-              let objResp = {
-                id_elemento: $(elemento).attr('__id_elemento'),
-                respuesta: $(elemento).find('.__select_opciones_1').val(),
-                respuesta_opcion: $(elemento).find('.__select_opciones_1').val(),
-              }
-              $(elemento).find('[__tipo=pregunta_oculta][select_tres_op2]').attr('respuesta', $(elemento).find('.__select_opciones_2').val())
-              $(elemento).find('[__tipo=pregunta_oculta][select_tres_op3]').attr('respuesta', $(elemento).find('.__select_opciones_3').val())
-              contest.respuestas.push(objResp);
 
-              let objResp2 = {
-                id_elemento: $(elemento).find('[select_tres_op2]').attr('__id_elemento'),
-                respuesta: $(elemento).find('[select_tres_op2]').attr('respuesta'),
-                respuesta_opcion: $(elemento).find('[select_tres_op2]').attr('respuesta'),
-              }
-              contest.respuestas.push(objResp2);
-
-              let objResp3 = {
-                id_elemento: $(elemento).find('[select_tres_op3]').attr('__id_elemento'),
-                respuesta: $(elemento).find('[select_tres_op3]').attr('respuesta'),
-                respuesta_opcion: $(elemento).find('[select_tres_op3]').attr('respuesta'),
-              }
-              contest.respuestas.push(objResp3);
-            }
           });
           return contest;
         },
+        
+      }
+
+      let funs = {
+        /** Carga los Formularios inicialmente */
+        cargarComboFomularios: () => {
+          xyzFuns.spinner();
+          $.get(`${ctxG.rutabase}/get-forms`, (res) => {
+            let comboFormularios = $("[__rg_field=id_formulario]");
+            let optsForms = xyzFuns.generaOpciones(res.data, 'id', 'nombre','-');
+            comboFormularios.append(optsForms);
+            xyzFuns.spinner(0);
+          });
+          funs.crearDatosCabecera(temp.id_usuario);
+        },
+        /**Carga el formulario con sus elementos */
+        cargarFormulario: (id_formulario) => {
+          xyzFuns.spinner();
+          $.post(`${ctxG.rutabase}/get-form-elems`, { id_formulario: id_formulario }, function (res) {
+            // funs.crearDatosCabecera(temp.id_usuario);
+            $(".__frm_formulario").html("");
+            form.renderizarElementos(res.data, ".__frm_formulario");
+            xyzFuns.spinner(false);
+          });
+        },
+        /** Carga Datos del usuario */
+        crearDatosCabecera: (id_usuario) => {
+          $.post(`${ctxG.rutabase}/operador-minero`, { id_usuario: id_usuario }, function (res) {
+            ctxG.datosUser = res.data;
+            $("[__info_general=nim]").html(`${_.isEmpty(ctxG.datosUser.nim) ? '' : ctxG.datosUser.nim}`);
+            $("[__info_general=nit]").html(`${_.isEmpty(ctxG.datosUser.nit) ? '' : ctxG.datosUser.nit}`);
+
+            let htmlNombres = !_.isEmpty(ctxG.datosUser.nombres) ? /*html*/`<span style="font-weight:400; font-size:0.8em">Nombre: </span> <span>${ctxG.datosUser.nombres} ${ctxG.datosUser.apellidos}</span>` : '';
+            let saltoLinea = !_.isEmpty(htmlNombres) && !_.isEmpty(ctxG.datosUser.razon_social) ? "<br>" : "";            
+            htmlNombres += !_.isEmpty(ctxG.datosUser.razon_social) ? /*html*/`${saltoLinea}<span style="font-weight:400; font-size:0.8em">Razón Social: </span> <span>${ctxG.datosUser.razon_social}</span>` :  '';
+            $("[__info_general=nombres]").html(htmlNombres);
+
+            let htmlProcedencia = !_.isEmpty(ctxG.datosUser.departamento) ? /*html*/`<span>${ctxG.datosUser.departamento}</span>` : '';
+            // let saltoLinea = !_.isEmpty(htmlNombres) && !_.isEmpty(ctxG.datosUser.razon_social) ? "<br>" : "";            
+            htmlProcedencia += !_.isEmpty(ctxG.datosUser.municipio) ? /*html*/`<br>Municipio: <span>${ctxG.datosUser.municipio} - Cód. Mun.: <span>${ctxG.datosUser.codigo_municipio} </span>` :  '';
+            $("[__info_general=procedencia]").html(htmlProcedencia);
+            
+          })
+        },
         save() {
           xyzFuns.spinner();
-          let dataSend = ctxMain.getData();
-          console.log(dataSend);
+          let dataSend: any = form.getData();
+          $.extend(dataSend, ctxG.datosUser);
+          dataSend.id_formulario = $("[__rg_field=id_formulario]").val(),
+          console.log('save',dataSend);
           $.post(`${ctxG.rutabase}/save-respuestas`, dataSend, function (res) {
             xyzFuns.spinner(false);
             if (res.estado == 'ok') {
-              funs.stateView('guardado');
+              // funs.stateView('guardado');
               let id_contestado = res.data.id;
               $('[__rg_field=id_contestado]').val(id_contestado);
 
@@ -521,18 +542,6 @@ export class FormComponent implements OnInit {
           })
         },
 
-        
-
-      }
-
-      let funs = {
-
-        creaFormularioDatosCabecera: () => {
-          // let html = regmodel.renderForm();
-          regmodel.create_fields(regmodel.model.sections);
-          regmodel.inicializaControles();
-        },
-
         /* Separa los textos de las preguntas en numero y texto , a partir del punto .*/
         cortarNumero: (texto) => {
           let separado = texto.split(".");
@@ -540,18 +549,7 @@ export class FormComponent implements OnInit {
             : { numero: '', texto: texto, }
         },
 
-        adicionaElemento: function (tipoElemento) {
-          let contenidoElementos = $(".__frm_formulario");
 
-          if (tipoElemento == 'pregunta')
-            contenidoElementos.append(elemhtml.pregunta_rend);
-          if (tipoElemento == 'titulo')
-            contenidoElementos.append(elemhtml.titulo_rend);
-          if (tipoElemento == 'texto')
-            contenidoElementos.append(elemhtml.texto_rend);
-          if (tipoElemento == 'separador')
-            contenidoElementos.append(elemhtml.separador_rend);
-        },
 
         stateView: (estado) => {
           if (estado == 'guardado') {
@@ -612,20 +610,15 @@ export class FormComponent implements OnInit {
 
       let listeners = () => {
         $("#formulario_101")
-
+          /** Seleccionar Formulario */
+          .on('change', "[__rg_field='id_formulario']", function () {
+            $("[__rg_field=id_formulario]").val() != '' ? funs.cargarFormulario($("[__rg_field=id_formulario]").val()): false;
+          })
           /* Tamaño de los textareas*/
           .on('change drop keydown cut paste', 'textarea', function () {
             $(this).height('auto');
             $(this).height($(this).prop('scrollHeight'));
           })
-
-          /* Al cmbiar fecha de nacimiento calcula edad*/
-          // .on('change', '[__card].__frm_autenticacion select', function () {
-          //   let fecha_nac_d = $("[__rg_field=fecha_nacimiento_d]").val();
-          //   let fecha_nac_m = $("[__rg_field=fecha_nacimiento_m]").val();
-          //   let fecha_nac_y = $("[__rg_field=fecha_nacimiento_y]").val();
-          //   ctxG.datosCabecera.edad = xyzFuns.calcularEdad(`${fecha_nac_y}-${fecha_nac_m}-${fecha_nac_d}`);
-          // })
 
           /* AL cambiar el departamento se cargan los unicipios respectivos*/
           .on('change', '[__rg_field=departamento]', function () {
@@ -638,7 +631,7 @@ export class FormComponent implements OnInit {
 
           /* Al hacer click en boton GUARDAR*/
           .on('click', "[__save]", function () {
-            ctxMain.save();
+            funs.save();
           })
 
           /* Para controlar la opcion OTRO , click en cualquier opcion,  */
@@ -691,9 +684,9 @@ export class FormComponent implements OnInit {
 
       let formInit = (() => {
         listeners();
-        // listenersPreguntasQuemadas();
-        funs.creaFormularioDatosCabecera();
-        ctxMain.creaFormulario();
+        funs.cargarComboFomularios();
+        // funs.creaFormularioDatosCabecera();
+        // form.creaFormulario();
 
       })()
 

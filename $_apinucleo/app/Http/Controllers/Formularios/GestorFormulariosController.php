@@ -8,12 +8,20 @@ use Illuminate\Http\Request;
 class GestorFormulariosController extends MasterController
 {
     /* config for the llop or survey  */
-    public $id_formulario = 2; /**/
+    // public $id_formulario = 2; /**/
+    
+    public function getFormularios(){
+        $forms = \DB::select("SELECT * FROM formularios where estado_formulario = 'Activo' order by nombre");
+        return response()->json([
+            'data' => $forms,
+            'estado' => 'ok'
+        ]);
+    }
     /**
      *  DE RUtA : Obtiene un Formulario con todas sus elementos-opciones de ID */
     public function getFormularioElementos(Request $req) {
         // $req->id_f = 1;
-        $formulario = $this->formularioElementos($req->id_f);
+        $formulario = $this->formularioElementos($req->id_formulario);
         $formulario->id = $this->encrypt($formulario->id);
         return response()->json([
             'data'   => $formulario,
@@ -33,13 +41,15 @@ class GestorFormulariosController extends MasterController
             return response()->json([ 'estado'=>'error', 'msg' => 'No existe el identificador' ]);
         }
 
-        $elementos = collect(\DB::select("SELECT * FROM elementos WHERE id_formulario = {$id_formulario}  ORDER BY orden, texto "))
-                        ->map(function($el, $k ){
-                            // $el->config = json_decode($el->config);
-                            $opciones = \DB::select("SELECT *  FROM opciones WHERE id_elemento = {$el->id} ORDER BY orden ");
-                            $el->opciones = $opciones; 
-                            return $el;
-                        });
+        $elementos = collect(\DB::select("SELECT * FROM elementos 
+                                            WHERE id_formulario = {$id_formulario} 
+                                            ORDER BY orden, texto "))
+                                ->map(function($el, $k ){
+                                    // $el->config = json_decode($el->config);
+                                    $opciones = \DB::select("SELECT *  FROM opciones WHERE id_elemento = {$el->id} ORDER BY orden ");
+                                    $el->opciones = $opciones; 
+                                    return $el;
+                                });
         $formulario->elementos = $elementos;
         
         return $formulario;
@@ -48,10 +58,9 @@ class GestorFormulariosController extends MasterController
 
     /* POST: Guarda un formulario con sus elementos y sus opciones respectivas*/
     public function saveFormularioElementos(Request $req) {
-        $reqObj = (object)$req;
         // $req->id = $this->decrypt($req->id);
         $formulario = new \stdClass();
-        $formulario->id = $this->id_formulario;
+        $formulario->id = $req->id_formulario;
         // $formulario->id = $req->id;
         // $formulario->nombre = $req->nombre;
         // $formulario->titulo = $req->titulo;
@@ -60,7 +69,7 @@ class GestorFormulariosController extends MasterController
         // $formulario->id = $this->saveObjectTabla($formulario, 'formularios');
         
         try {
-            $elems = $this->saveElementos($reqObj->elementos, $formulario->id);
+            $elems = $this->saveElementos($req->elementos, $formulario->id);
         } 
         catch (Exception $e) {
             return (object)[
@@ -108,7 +117,6 @@ class GestorFormulariosController extends MasterController
             $elem->descripcion     = (empty($el->descripcion) || !isset($el->descripcion)) ? null : $el->descripcion;
             $elem->tipo            = $el->tipo;
             $elem->orden           = $el->orden;
-            $elem->estado          = $el->tipo == 'pregunta_oculta' ? 'OCULTO' : 'A'; /* estado = {A:Activo, I:Inactivo, D:Deleted}*/
             $elem->config          = isset($el->config) ? $el->config : null;
             $elem->url             = isset($el->url) ?  $el->url : null;
             $elem->dependencia     = (empty($el->dependencia) || !isset($el->dependencia)) ? null : $el->dependencia;
@@ -135,9 +143,7 @@ class GestorFormulariosController extends MasterController
 
                     $this->guardarObjetoTabla($opcion, 'opciones');
                 }  
-            }
-
-            
+            }           
 
         });
     }
