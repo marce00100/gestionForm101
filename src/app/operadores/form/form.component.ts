@@ -30,7 +30,7 @@ export class FormComponent implements OnInit {
       }
 
       let temp = {
-        id_usuario: 62,
+        id_usuario: 4,
       }
 
       let regmodel = {
@@ -484,23 +484,25 @@ export class FormComponent implements OnInit {
       let funs = {
         /** Carga los Formularios inicialmente */
         cargarComboFomularios: () => {
+          funs.stateView('inicial')
           xyzFuns.spinner();
           $.get(`${ctxG.rutabase}/get-forms`, (res) => {
             let comboFormularios = $("[__rg_field=id_formulario]");
             let optsForms = xyzFuns.generaOpciones(res.data, 'id', 'nombre','-');
-            comboFormularios.append(optsForms);
+            comboFormularios.append(optsForms);  
             xyzFuns.spinner(0);
           });
-          funs.crearDatosCabecera(temp.id_usuario);
+          
         },
         /**Carga el formulario con sus elementos */
         cargarFormulario: (id_formulario) => {
           xyzFuns.spinner();
+          funs.crearDatosCabecera(temp.id_usuario);
           $.post(`${ctxG.rutabase}/get-form-elems`, { id_formulario: id_formulario }, function (res) {
-            // funs.crearDatosCabecera(temp.id_usuario);
             $(".__frm_formulario").html("");
             form.renderizarElementos(res.data, ".__frm_formulario");
             xyzFuns.spinner(false);
+            funs.stateView('mostrar_formulario')
           });
         },
         /** Carga Datos del usuario */
@@ -531,10 +533,10 @@ export class FormComponent implements OnInit {
           $.post(`${ctxG.rutabase}/save-respuestas`, dataSend, function (res) {
             xyzFuns.spinner(false);
             if (res.estado == 'ok') {
-              // funs.stateView('guardado');
+              funs.stateView('guardado');
               let id_contestado = res.data.id;
               $('[__rg_field=id_contestado]').val(id_contestado);
-
+              
             }
           }).fail(function (r) {
             funs.mostrarError("Hubo un error inesperado.");
@@ -551,19 +553,36 @@ export class FormComponent implements OnInit {
 
 
 
-        stateView: (estado) => {
-          if (estado == 'guardado') {
-            $(".__caratula").remove();
-            $(".__frm_autenticacion").remove();
-            $(".__frm_datos_general").remove();
-            $(".__frm_formulario").remove();
-            $(".__frm_enviar").remove();
-            $(".__botones_navegacion").remove();
+        stateView: (stateview) => {
+          if(stateview == 'inicial'){
+            $(".__frm_datos_general").hide();
+            $(".__frm_formulario").hide();
+            $(".__frm_enviar").hide();
+          }
+          if(stateview == 'mostrar_formulario'){
+            $(".__frm_datos_general").show();
+            $(".__frm_formulario").show();
+            $(".__frm_enviar").show();
+          }
+          if (stateview == 'guardado') {
+            $(".__frm_datos_general").hide();
+            $(".__frm_formulario").hide();
+            $(".__frm_enviar").hide();
+            $(".__botones_navegacion").hide();
 
             // $(".__frm_info_opcional").show();
-            funs.stateView('compartir_link')
+            // funs.stateView('compartir_link')
+
+              let mensje = /*html*/`
+                        <h2 class="text-center">Se ha enviado exitosamente el formulario.</h2>
+                        <h2>Muchas gracias.</h2>
+                        <br><br><br>
+                        <!--<div>Copia el siguiente enlace de la Encuesta Virtual, y comparte en tus redes sociales. </div>
+                        <div class="fs24 mt20">https://1raencuesta.defensoria.gob.bo/</div> -->
+                    `;
+              xyzFuns.alertMsg("[__frm_select_form]", mensje, ' alert-dark pastel   fs18 p30 br12 mt50', 'fa fa-check-circle fa-3x', '', false)
           }
-          // if (estado == 'compartir_link') {
+          // if (stateview == 'compartir_link') {
           //   $('[__frms]').remove();
           //   let mensje = /*html*/`
           //             <h2 class="text-center">Se ha enviado exitosamente la encuesta.</h2>

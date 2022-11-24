@@ -24,6 +24,7 @@ Route::get('/', function () {
  * RUTAS API DE LA APLICACION 
  */
 Route::group(['prefix' => 'api', 'middleware' => ['cors']], function () {
+    /** FORMULARIOS */
     /** Obtiene la lista de los formularios activos */
     Route::get('get-forms'     , [GestorFormulariosController::class, 'getFormularios']);
     /** Obtiene la lista de los elementos de un formulario */
@@ -37,10 +38,15 @@ Route::group(['prefix' => 'api', 'middleware' => ['cors']], function () {
     Route::post('operador-minero'   , [UsuariosController::class, 'getUser']);
 
 
+    Route::get('getmunicipios'      , [UsuariosController::class, 'getMunicipios']);
     
     Route::post('savecontexto'      , [FormularioController::class, 'saveContexto']);  
     
-    Route::get('getmunicipios'      , [FormularioController::class, 'getMunicipios']);
+
+    /** USUARIOS */
+    Route::get('get-usuarios'            , [UsuariosController::class, 'getUsuarios'])   ; //  ->middleware(['auth', 'access:1|3']);
+    Route::post('save-user'              , [UsuariosController::class, 'saveUser'])       ; //  ->middleware(['auth', 'access:1']);
+    Route::post('cambiar-password'       , [UsuariosController::class, 'cambioPassword']) ; //  ->middleware(['auth']);
 
 
 });

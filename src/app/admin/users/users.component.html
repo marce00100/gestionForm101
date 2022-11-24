@@ -1,1 +1,139 @@
-<p>users works!</p>
+<style>
+	.popup-basic {
+		position: relative;
+		background: #FFF;
+		width: auto;
+		max-width: 900px;
+		margin: 40px auto;
+	}
+
+	.admin-form .panel-heading {
+		background-color: #fafafa;
+		border-color: transparent -moz-use-text-color #ddd;
+		border-radius: 0;
+		border-style: solid none;
+		border-width: 1px 0;
+		color: #999;
+		height: auto;
+		overflow: hidden;
+		padding: 3px 15px 2px;
+		position: relative;
+	}
+
+
+	/* Estilos del Formulario Inicial de Datos del encuestado autogenerado*/
+	/*  estilo CSS Para maquetar en grid */
+	.rg_grid_form {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 10px 0px;
+		align-items: start;
+	}
+
+	/* cuando el field abarca dos espacios Fr */
+	.grid-column-span-2 {
+		grid-column: span 2;
+	}
+
+	/* estilo de cada contenedor de seccion*/
+	.section_container {
+		/* border-top: 1px solid #ddd; */
+		padding: 0px 0px;
+		/* border-top: 1px solid #eee; */
+		/* margin-bottom: 20px; */
+	}
+
+	/* Estilo de cada Titulo de seccion*/
+	.section_container .title_section {
+		text-align: center;
+		margin: 10px 0 30px 0;
+	}
+
+	/*--------------- fin fields */
+</style>
+<div id="users_contenedor">
+	<!--  ===========================================    begin: .tray-center    =============================================================== -->
+	<div class="tray tray-center  va-t posr pv20" id="div_principal">
+		<div class="row bg-white col-md-10 col-md-offset-1" style="    box-shadow: 1px 2px 9px 1px;">
+			<div class="col-md-12">
+				<div class="panel panel-visible ph10" id="spy2">
+					<div class="titulo-modulo p20 pb30">
+						<h1 class="titulo-modulo">Administrador de Usuarios</h1>
+					</div>
+
+
+					<div class="panel-heading  bg-dark ">
+						<div class="panel-title ">
+							<i class="fa fa-file-alt fa-2x"></i> Información de <span __cabecera_dt>Usuarios</span> <span
+								__cabecera_dt_est></span>
+						</div>
+					</div>
+					<div class="panel-body pn">
+						<div class="row">
+							<div class="col-md-12">
+								<button __accion="nuevo" class="btn btn-sm btn-success dark m5 br4"><i
+										class="fa fa-plus text-white"></i> Agregar </button>
+								<!-- <button  __accion="eliminar" class="btn btn-sm btn-danger dark m5 br4"><i class="fa fa-minus-circle text-white"></i> Eliminar</button>                                 -->
+
+							</div>
+						</div>
+						<div>
+							<div __users_list id="dataT" style="margin: 0 0 40px 0"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end: .tray-center -->
+
+
+
+
+	<!-- -----------------------------------------          Modal  --------------------------------------------------- -->
+	<div id="modal" class="white-popup-block popup-basic admin-form mfp-with-anim mfp-hide">
+		<div class="panel">
+			<div class="panel-heading bg-dark">
+				<span class="panel-title text-white" id="tituloModal"><i class="fa fa-pencil"></i> <span>__</span></span>
+			</div>
+			<!-- end .panel-heading section -->
+
+			<div id="form_cont" name="form_cont">
+				<!-- <input type="hidden" name="_token" __rg_field=_token value="{{ csrf_token() }}"> -->
+				<div class="panel-body mnw700 of-a">
+					<div class="row">
+						<div class=" pl5 br-r mvn15 " style="display: grid;">
+							<div __fields_usuario></div>
+							<div __fields_operador></div>
+							<!-- <input class="hidden" name="id" id="id" __field="id">-->		
+						</div>
+					</div>
+				</div>
+				<div class="panel-footer" style="display: flex; justify-content: space-evenly;">
+					<button __cerrar class="btn btn-danger br6 btn-sm w150 ">Cerrar</button>
+					<button __save type="submit" class="btn btn-primary btn-sm br6 w150">Guardar</button>
+				</div>
+			</div>
+		</div>
+		<!-- end: .panel -->
+	</div>
+
+</div>
+
+<!-- <script type="text/javascript" src="./public/libs/jqwidgets11/jqxcore.js"> </script>
+<script type="text/javascript" src="./public/libs/jqwidgets11/jqxbuttons.js"> </script>
+<script type="text/javascript" src="./public/libs/jqwidgets11/jqxscrollbar.js"> </script>
+<script type="text/javascript" src="./public/libs/jqwidgets11/jqxdata.js"> </script>
+<script type="text/javascript" src="./public/libs/jqwidgets11/jqxdatatable.js"> </script>
+<script type="text/javascript" src="./public/libs/jqwidgets11/jqxdraw.js"> </script>
+<script type="text/javascript" src="./public/libs/jqwidgets11/jqxchart.core.js"> </script>
+
+<script src="./public/libs/min/jqwidgets-localization_custom.js"></script>
+
+<script type="text/javascript" src="./public/libs/moment-2.29.2/min/moment.min.js"></script>
+<script type="text/javascript">
+
+
+
+
+</script> -->

@@ -68,7 +68,7 @@ textarea.quest-input-line{
 
 .quest-descripcion{
   font-size: 12px !important;
-  color: #b54633 !important;
+  /* color: #b54633 !important; */
   font-style: italic;
   font-weight: 600;
 }
