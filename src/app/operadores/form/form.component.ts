@@ -49,23 +49,23 @@ export class FormComponent implements OnInit {
               fields: [
                 {
                   field: 'numero_form', type: 'text', label: 'Número Formulario', placeholder: '', title: '', help: '',
-                  required: true, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn quest-label', icon: '', input: 'quest-input-label p5' },
+                  required: true, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input p5' },
                 },
                 {
                   field: 'numero_nit', type: 'text', label: 'Número NIT', placeholder: '', title: '', help: '',
-                  required: true, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn quest-label', icon: '', input: 'quest-input-label p5' },
+                  required: true, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input p5' },
                 },
                 {
                   field: 'numero:nim', type: 'text', label: 'Número NIM', placeholder: '', title: '', help: '',
-                  required: true, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn quest-label', icon: '', input: 'quest-input-label p5' },
+                  required: true, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input p5' },
                 },
                 {
                   field: 'departamento', type: 'select', label: 'Departamento', placeholder: '', title: '', help: '',
-                  required: true, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn quest-label', icon: '', input: 'quest-input-label p5' },
+                  required: true, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input p5' },
                 },
                 {
                   field: 'municipio', type: 'select', label: 'Municipio', placeholder: '', title: '', help: '',
-                  required: false, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn quest-label', icon: '', input: 'quest-input-label p5' },
+                  required: false, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input p5' },
                 },
               ]
             },
@@ -80,15 +80,15 @@ export class FormComponent implements OnInit {
             //         },
             //         {
             //             field: 'nombre_apellido', type: 'text', label: 'Nombres y Apellidos (opcional)', placeholder: '', title: '', help: '',
-            //             required: false, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn quest-label', icon: '', input: 'quest-input-label' },
+            //             required: false, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input' },
             //         },                       
             //         {
             //             field: 'mail', type: 'text', label: 'Correo Electrónico y Apellidos (opcional)', placeholder: '', title: '', help: '',
-            //             required: true, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn quest-label', icon: '', input: 'quest-input-label' },
+            //             required: true, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input' },
             //         },                        
             //         {
             //             field: 'telefono', type: 'text', label: 'Número teléfono/ Celular', placeholder: '', title: '', help: '',
-            //             required: false, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn quest-label', icon: '', input: 'quest-input-label' },
+            //             required: false, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input' },
             //         },
             //     ]
             // },

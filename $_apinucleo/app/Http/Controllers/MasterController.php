@@ -23,7 +23,7 @@ class MasterController extends Controller
             {
                 // $obj->activo =  true;
                 if ($datosAuditoria) {
-                    $obj->updated_by = $this->usuario->id;
+                    $obj->updated_by = $this->usuario->id ?? null;
                     $obj->updated_at = $this->now();
                 }                
                 \DB::table($tabla)->where('id', $obj->id)->update(get_object_vars($obj));
@@ -34,7 +34,7 @@ class MasterController extends Controller
                 unset($obj->id);
                 // $obj->activo = true;
                 if ($datosAuditoria) {
-                    $obj->created_by =  $this->usuario->id;
+                    $obj->created_by =  $this->usuario->id ?? null;
                     $obj->created_at =  $this->now();
                 }
                 return \DB::table($tabla)->insertGetId(get_object_vars($obj));
@@ -88,14 +88,14 @@ class MasterController extends Controller
 
     protected function eliminarDeTabla($id, $tabla)
     {
-        try{
+        try {
             \DB::table($tabla)->where('id', $id)->delete();
-        }
-        catch (Exception $e)
-        {
-            return response()->json(array(
-                'estado' => "error",
-                'msg'    => 'ERROR AL ELIMINAR',)//$e->getMessage())
+        } catch (Exception $e) {
+            return response()->json(
+                array(
+                    'estado' => "error",
+                    'msg'    => 'ERROR AL ELIMINAR',
+                ) //$e->getMessage())
             );
         }
     }

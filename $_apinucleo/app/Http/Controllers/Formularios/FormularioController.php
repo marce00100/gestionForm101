@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Formularios;
 use Illuminate\Http\Request;
 use App\Http\Controllers\MasterController;
 
-use App\Http\Controllers\Formularios\GestorFormulariosController;
-use Illuminate\Support\Facades\Auth;
+// use App\Http\Controllers\Formularios\GestorFormulariosController;
+// use Illuminate\Support\Facades\Auth;
 
 class FormularioController extends MasterController
 {

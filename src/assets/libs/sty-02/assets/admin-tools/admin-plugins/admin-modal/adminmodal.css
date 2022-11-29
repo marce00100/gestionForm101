@@ -1269,13 +1269,7 @@ perspective effects (not including the modals and the overlay).
 	-moz-transition: all 0.4s;
 	transition: all 0.4s;
 }
-.mfp-fullscale.mfp-removing.mfp-bg {
-	background: #000\A;
-  	opacity: 0;
-	-webkit-transition: all 0.4s;
-	-moz-transition: all 0.4s;
-	transition: all 0.4s;
-}
+
 
 /* ====== Sign ====== */
 .mfp-sign {}
