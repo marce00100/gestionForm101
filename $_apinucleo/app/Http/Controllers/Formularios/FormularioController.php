@@ -16,53 +16,39 @@ class FormularioController extends MasterController
      * POST Guardar las respuestas del Formulario en las tablas consolidadas
      */
     public function saveRespuestas(Request $req) {
-        $contest = (object)$req;
-        $contestado                     = (object)[];
-        $contestado->id                 = $contest->id ?? null;
 
         /**Obtiene el MAximo Numero deFormulario */
-        $maxNumeroForm = collect(\DB::select("SELECT max(numero_form) as numero 
-                                        FROM forms_llenos"))->first()->numero;
+        $maxNumeroForm = collect(\DB::select("SELECT max(numero_formulario) as numero_formulario
+                                        FROM forms_llenos"))->first()->numero_formulario;
         $numeroFormulario = $maxNumeroForm + 1  > $this->numFormBase ? $maxNumeroForm + 1 : $this->numFormBase + 1;
-
-        /* insert */
-        if(is_null($contestado->id) ){
-            $contestado->id_formulario     = $req->id_formulario;
-            $contestado->id_usuario        = $req->id_usuario;//Auth::user() ? Auth::user()->id : 0;
-            $contestado->estado_form_lleno = 'Enviado';
-            $contestado->numero_form       = $numeroFormulario;
-            $contestado->tiempo_seg        = $req->tiempo_seg;
-            $contestado->nim               = $req->nim;
-            $contestado->nit               = $req->nit;
-            $contestado->nombres           = $req->nombres;
-            $contestado->apellidos         = $req->apellidos;
-            $contestado->razon_social      = $req->razon_social;
-            $contestado->departamento      = $req->departamento;
-            $contestado->municipio         = $req->municipio;
-            $contestado->codigo_municipio  = $req->codigo_municipio;
-            $contestado->fecha_registro    = $this->now();
-            $contestado->created_at        = $this->now();
-            $contestado->created_by        = $req->id_usuario;
-            $contestado->ip                = $this->getIp();
-            // session()->forget("'" . $contestado->cedula_identidad . "'");
-        }
-        /* update */
-        else{
-            // $contestado->nombre_apellido    = $req->nombre_apellido;
-            // $contestado->mail               = $req->mail;
-            // $contestado->telefono           = $req->telefono;
-        }
-
+        
+        $form_contestado                    = (object)[];
+        $form_contestado->id                = $req->id ?? null;
+        $form_contestado->id_formulario     = $req->id_formulario;
+        $form_contestado->id_usuario        = $req->id_usuario;//Auth::user() ? Auth::user()->id : 0;
+        $form_contestado->numero_formulario = $numeroFormulario;
+        $form_contestado->tiempo_seg        = $req->tiempo_seg;
+        $form_contestado->estado_form_lleno = 'Enviado';
+        $form_contestado->ip                = $this->getIp();
+        $form_contestado->fecha_registro    = $this->now();
+        $form_contestado->nombres           = $req->nombres;
+        $form_contestado->apellidos         = $req->apellidos;
+        $form_contestado->razon_social      = $req->razon_social;
+        $form_contestado->nit               = $req->nit;
+        $form_contestado->nim               = $req->nim;
+        $form_contestado->id_municipio      = $req->id_municipio;
+        $form_contestado->tipo_formulario   = $req->tipo_formulario;
+        $form_contestado->mineral           = $req->mineral;
+        
         try {
-            $contestado->id              = $this->guardarObjetoTabla($contestado, 'forms_llenos');    
+            $form_contestado->id              = $this->guardarObjetoTabla($form_contestado, 'forms_llenos');    
             /* se recorren las respuestas */
-            if($contest->respuestas ){
+            if($req->respuestas ){
 
-                foreach ($contest->respuestas as $resp) {
+                foreach ($req->respuestas as $resp) {
                     $respuesta                   = (object)[];
                     $resp                        = (object)($resp);
-                    $respuesta->id_encuestado    = $contestado->id;
-                    // $respuesta->id_contestado    = $contestado->id;
+                    $respuesta->id_form_lleno    = $form_contestado->id;
                     $respuesta->id_elemento      = $resp->id_elemento;
                     $respuesta->id_opcion        = isset($resp->id_opcion) ? $resp->id_opcion : null;
                     $respuesta->respuesta_opcion = isset($resp->respuesta_opcion) ? $resp->respuesta_opcion : null;
@@ -81,13 +67,19 @@ class FormularioController extends MasterController
 
         return (object)[
             'estado' => "ok",            
-            'data'   => $contestado,
+            'data'   => $form_contestado,
             'msg'    => 'Se guardó correctamente'
         ];
-
-
     }
 
+
+
+
+
+
+
+
+    
     public function getEncuestaId(Request $req){
         $idEncuestado = $req->id_encuestado;
         $encuestado = collect(\DB::select("SELECT * from encuestados WHERE id = {$idEncuestado}"))->first();
@@ -206,20 +198,6 @@ class FormularioController extends MasterController
             'data'  => $cuestionario,
             'nprom' => $contestadosProm
         ]) ;
-    }
-
-    /**
-     * GET Obtiene los deparatmentos con sus municipios 
-     */
-    public function getMunicipios(){
-        $municipios = \DB::select("SELECT r1.nombre_comun departamento, r1.codigo_numerico departamento_cod, 
-                                    r3.nombre_comun municipio, r3.codigo_numerico municipio_cod    
-                                    FROM regiones r1, regiones r3 WHERE  substr(r3.codigo_numerico, 1, 2) = r1.codigo_numerico 
-                                    AND r3.categoria = 'NIVEL_3'
-                                    ORDER BY r3.codigo_numerico ");
-        return response()->json([
-            'data' => $municipios,
-        ]);
     }
 
 

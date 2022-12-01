@@ -569,9 +569,9 @@ export class UsersComponent implements OnInit {
 
       }
 
-
-      /*------------------------------  INIT ---------------------------------*/
-
+      /**
+       * Inicializa 
+       */  
       let init = () => {
         conT.cargarDatos();
         funs.crearFormulario();
@@ -579,11 +579,6 @@ export class UsersComponent implements OnInit {
 
       listen();
       init();
-
-
-
-
-
     })
   };
 
