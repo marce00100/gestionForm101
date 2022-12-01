@@ -33,174 +33,174 @@ export class FormComponent implements OnInit {
         id_usuario: 4,
       }
 
-      let regmodel = {
-        model: {
-          title: "_",
-          desc: "",
-          new: true,
-          update: true,
-          delete: true,
-          sections: [
-            {
-              html_parent: '.__frm_datos_general',
-              title_section: 'Datos Generales',
-              text_section: 'Información de la Procedencia',
-              class: { text: "mb10", section: "", title: " quest-titulo" },
-              fields: [
-                {
-                  field: 'numero_form', type: 'text', label: 'Número Formulario', placeholder: '', title: '', help: '',
-                  required: true, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input p5' },
-                },
-                {
-                  field: 'numero_nit', type: 'text', label: 'Número NIT', placeholder: '', title: '', help: '',
-                  required: true, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input p5' },
-                },
-                {
-                  field: 'numero:nim', type: 'text', label: 'Número NIM', placeholder: '', title: '', help: '',
-                  required: true, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input p5' },
-                },
-                {
-                  field: 'departamento', type: 'select', label: 'Departamento', placeholder: '', title: '', help: '',
-                  required: true, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input p5' },
-                },
-                {
-                  field: 'municipio', type: 'select', label: 'Municipio', placeholder: '', title: '', help: '',
-                  required: false, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input p5' },
-                },
-              ]
-            },
-            // {
-            //     html_parent : '[__frm_info_opcional_contenedor]',
-            //     title_section: '',//'INFORMACIÓN ADICIONAL (opcional)',
-            //     text_section: '',
-            //     class: { text:"mb10", section:"", title:" quest-titulo"},
-            //     fields:[
-            //         {
-            //             field: 'id_contestado', type: 'hidden', 
-            //         },
-            //         {
-            //             field: 'nombre_apellido', type: 'text', label: 'Nombres y Apellidos (opcional)', placeholder: '', title: '', help: '',
-            //             required: false, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input' },
-            //         },                       
-            //         {
-            //             field: 'mail', type: 'text', label: 'Correo Electrónico y Apellidos (opcional)', placeholder: '', title: '', help: '',
-            //             required: true, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input' },
-            //         },                        
-            //         {
-            //             field: 'telefono', type: 'text', label: 'Número teléfono/ Celular', placeholder: '', title: '', help: '',
-            //             required: false, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input' },
-            //         },
-            //     ]
-            // },
-          ],
-          // columns_fields: ['user_login', 'first_name', 'last_name', 'fecha_nac', 'departamento'],
-        },
+      // let regmodel = {
+      //   model: {
+      //     title: "_",
+      //     desc: "",
+      //     new: true,
+      //     update: true,
+      //     delete: true,
+      //     sections: [
+      //       {
+      //         html_parent: '.__frm_datos_general',
+      //         title_section: 'Datos Generales',
+      //         text_section: 'Información de la Procedencia',
+      //         class: { text: "mb10", section: "", title: " quest-titulo" },
+      //         fields: [
+      //           {
+      //             field: 'numero_form', type: 'text', label: 'Número Formulario', placeholder: '', title: '', help: '',
+      //             required: true, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input p5' },
+      //           },
+      //           {
+      //             field: 'numero_nit', type: 'text', label: 'Número NIT', placeholder: '', title: '', help: '',
+      //             required: true, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input p5' },
+      //           },
+      //           {
+      //             field: 'numero:nim', type: 'text', label: 'Número NIM', placeholder: '', title: '', help: '',
+      //             required: true, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input p5' },
+      //           },
+      //           {
+      //             field: 'departamento', type: 'select', label: 'Departamento', placeholder: '', title: '', help: '',
+      //             required: true, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input p5' },
+      //           },
+      //           {
+      //             field: 'municipio', type: 'select', label: 'Municipio', placeholder: '', title: '', help: '',
+      //             required: false, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input p5' },
+      //           },
+      //         ]
+      //       },
+      //       // {
+      //       //     html_parent : '[__frm_info_opcional_contenedor]',
+      //       //     title_section: '',//'INFORMACIÓN ADICIONAL (opcional)',
+      //       //     text_section: '',
+      //       //     class: { text:"mb10", section:"", title:" quest-titulo"},
+      //       //     fields:[
+      //       //         {
+      //       //             field: 'id_contestado', type: 'hidden', 
+      //       //         },
+      //       //         {
+      //       //             field: 'nombre_apellido', type: 'text', label: 'Nombres y Apellidos (opcional)', placeholder: '', title: '', help: '',
+      //       //             required: false, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input' },
+      //       //         },                       
+      //       //         {
+      //       //             field: 'mail', type: 'text', label: 'Correo Electrónico y Apellidos (opcional)', placeholder: '', title: '', help: '',
+      //       //             required: true, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input' },
+      //       //         },                        
+      //       //         {
+      //       //             field: 'telefono', type: 'text', label: 'Número teléfono/ Celular', placeholder: '', title: '', help: '',
+      //       //             required: false, grid_column_span: 2, class: { group: 'has-primary', label: 'mbn ptn form-label', icon: '', input: 'form-input' },
+      //       //         },
+      //       //     ]
+      //       // },
+      //     ],
+      //     // columns_fields: ['user_login', 'first_name', 'last_name', 'fecha_nac', 'departamento'],
+      //   },
 
-        listasPredefinidas: {
-          departamentos: ['CHUQUISACA', 'LA PAZ', 'COCHABAMBA', 'ORURO', 'POTOSÍ', 'TARIJA', 'SANTA CRUZ', 'BENI', 'PANDO'],
-        },
-        create_fields: (sections) => {
-          _.forEach(sections, (sec) => {
-            let contenedor = $(sec.html_parent);
-            /* Cabecera de cada Seccion Titulo y Texto*/
-            let sectionContainer = $(/*html*/`<div __section_container class="section_container ${sec.class.section}"></div>`);
-            sectionContainer.append(/*html*/ `<h3  __title_section class="title_section ${sec.class.title}" style="">${sec.title_section}</h3>`);
-            sectionContainer.append(/*html*/ `<div __text_section class="fs14 ${sec.class.text}">${sec.text_section}</div>`);
+      //   listasPredefinidas: {
+      //     departamentos: ['CHUQUISACA', 'LA PAZ', 'COCHABAMBA', 'ORURO', 'POTOSÍ', 'TARIJA', 'SANTA CRUZ', 'BENI', 'PANDO'],
+      //   },
+      //   create_fields: (sections) => {
+      //     _.forEach(sections, (sec) => {
+      //       let contenedor = $(sec.html_parent);
+      //       /* Cabecera de cada Seccion Titulo y Texto*/
+      //       let sectionContainer = $(/*html*/`<div __section_container class="section_container ${sec.class.section}"></div>`);
+      //       sectionContainer.append(/*html*/ `<h3  __title_section class="title_section ${sec.class.title}" style="">${sec.title_section}</h3>`);
+      //       sectionContainer.append(/*html*/ `<div __text_section class="fs14 ${sec.class.text}">${sec.text_section}</div>`);
 
-            let htmlFields = '';
-            _.forEach(sec.fields, (field) => {
+      //       let htmlFields = '';
+      //       _.forEach(sec.fields, (field) => {
 
-              field.class = (field.class) ? field.class : {};
-              /* Todos los fields estan para reaccionar al Grid , para volver al estilo clasico descomentar form-horizontal y form-group. etc*/
+      //         field.class = (field.class) ? field.class : {};
+      //         /* Todos los fields estan para reaccionar al Grid , para volver al estilo clasico descomentar form-horizontal y form-group. etc*/
 
-              if (field.type == 'hidden') {
-                htmlFields += /*html*/`
-                                      <div class="section hidden">
-                                              <input class="hidden" id="${field.field}" __rg_field="${field.field}" name="${field.field}" >
-                                      </div>`
-              }
+      //         if (field.type == 'hidden') {
+      //           htmlFields += /*html*/`
+      //                                 <div class="section hidden">
+      //                                         <input class="hidden" id="${field.field}" __rg_field="${field.field}" name="${field.field}" >
+      //                                 </div>`
+      //         }
 
-              if (field.type == 'text' || field.type == 'number' || field.type == 'date' || field.type == 'password' || field.type == 'button') {
-                htmlFields += /*html*/`
-                                          <div class="form-horizontal ${field.class.bloque || ''} ${field.grid_column_span ? 'grid-column-span-2' : ''}" >
-                                          <div class="form-group_      ${field.class.group || ''}  ">
-                                              <label  class="col-xs-11 ${field.grid_column_span ? 'col-md-3' : 'col-md-4'} control-label ${field.class.label || ''}" for="${field.field}">${field.label}</label>
-                                              <div    class="col-xs-11 ${field.grid_column_span ? 'col-md-8' : 'col-md-7'}">
-                                                  <span class="append-icon left"><i class="${field.class.icon}"></i>
-                                                  </span>
-                                                  <input type="${field.type}" class="form-control pl10 ${field.class.input || ''}" id="${field.field}" __rg_field="${field.field}" name="${field.field}"
-                                                  placeholder="${field.placeholder}" title="${field.title}" ${field.required ? 'required' : ''}  >
-                                                  <em class="fs12 text-dark block col-xs-12 ${field.class.em || ''} ">${field.help}</em>
-                                              </div>
-                                          </div>
-                                          </div>`
-              }
+      //         if (field.type == 'text' || field.type == 'number' || field.type == 'date' || field.type == 'password' || field.type == 'button') {
+      //           htmlFields += /*html*/`
+      //                                     <div class="form-horizontal ${field.class.bloque || ''} ${field.grid_column_span ? 'grid-column-span-2' : ''}" >
+      //                                     <div class="form-group_      ${field.class.group || ''}  ">
+      //                                         <label  class="col-xs-11 ${field.grid_column_span ? 'col-md-3' : 'col-md-4'} control-label ${field.class.label || ''}" for="${field.field}">${field.label}</label>
+      //                                         <div    class="col-xs-11 ${field.grid_column_span ? 'col-md-8' : 'col-md-7'}">
+      //                                             <span class="append-icon left"><i class="${field.class.icon}"></i>
+      //                                             </span>
+      //                                             <input type="${field.type}" class="form-control pl10 ${field.class.input || ''}" id="${field.field}" __rg_field="${field.field}" name="${field.field}"
+      //                                             placeholder="${field.placeholder}" title="${field.title}" ${field.required ? 'required' : ''}  >
+      //                                             <em class="fs12 text-dark block col-xs-12 ${field.class.em || ''} ">${field.help}</em>
+      //                                         </div>
+      //                                     </div>
+      //                                     </div>`
+      //         }
 
-              if (field.type == 'select') {
-                htmlFields += /*html*/`
-                                          <div class="form-horizontal ${field.grid_column_span ? 'grid-column-span-2' : ''} ">
-                                          <div class="form-group_     ${field.class.group}  ">
-                                              <label class="col-xs-11 ${field.grid_column_span ? 'col-md-3' : 'col-md-4'} control-label ${field.class.label}" for="${field.field}">${field.label}</label>
-                                              <div class="col-xs-11   ${field.grid_column_span ? 'col-md-8' : 'col-md-7'}">
-                                                  <span class="append-icon left"><i class="fa fa-list-ol"></i>
-                                                  </span>
-                                                  <select class="form-control pl10 col-xs-9  ${field.classinput}" id="${field.field}" __rg_field="${field.field}" name="${field.field}"
-                                                  title="${field.title}"  ${field.required ? 'required' : ''} style="height:auto;" ></select>
-                                                  <em class="fs12 text-dark block col-xs-12">${field.help}</em>
-                                              </div>
-                                          </div>
-                                          </div>`
-              }
+      //         if (field.type == 'select') {
+      //           htmlFields += /*html*/`
+      //                                     <div class="form-horizontal ${field.grid_column_span ? 'grid-column-span-2' : ''} ">
+      //                                     <div class="form-group_     ${field.class.group}  ">
+      //                                         <label class="col-xs-11 ${field.grid_column_span ? 'col-md-3' : 'col-md-4'} control-label ${field.class.label}" for="${field.field}">${field.label}</label>
+      //                                         <div class="col-xs-11   ${field.grid_column_span ? 'col-md-8' : 'col-md-7'}">
+      //                                             <span class="append-icon left"><i class="fa fa-list-ol"></i>
+      //                                             </span>
+      //                                             <select class="form-control pl10 col-xs-9  ${field.classinput}" id="${field.field}" __rg_field="${field.field}" name="${field.field}"
+      //                                             title="${field.title}"  ${field.required ? 'required' : ''} style="height:auto;" ></select>
+      //                                             <em class="fs12 text-dark block col-xs-12">${field.help}</em>
+      //                                         </div>
+      //                                     </div>
+      //                                     </div>`
+      //         }
 
-            });
-            sectionContainer.append(/*html*/`<div __rg_fields_container class="rg_grid_form">${htmlFields}</div>`)
-            $(contenedor).append(sectionContainer);
-          })
+      //       });
+      //       sectionContainer.append(/*html*/`<div __rg_fields_container class="rg_grid_form">${htmlFields}</div>`)
+      //       $(contenedor).append(sectionContainer);
+      //     })
 
 
-          // return contenedor;
-        },
+      //     // return contenedor;
+      //   },
 
-        inicializaControles: () => {
-          let opts = xyzFuns.generaOpcionesArray(regmodel.listasPredefinidas.departamentos, " ");
-          $("[__rg_field=departamento]").html(opts);
+      //   inicializaControles: () => {
+      //     let opts = xyzFuns.generaOpcionesArray(regmodel.listasPredefinidas.departamentos, " ");
+      //     $("[__rg_field=departamento]").html(opts);
 
-          // $.get(`${ctxG.rutabase}/getmunicipios`, function(resp){
-          //     ctxG.municipios = resp.data;
-          // });
+      //     // $.get(`${ctxG.rutabase}/getmunicipios`, function(resp){
+      //     //     ctxG.municipios = resp.data;
+      //     // });
 
-          /* Combos DIa Mes Año*/
-          let dias = _.concat(['01', '02', '03', '04', '05', '06', '07', '08', '09'], _.range(10, 31 + 1));
-          $('[__rg_field=fecha_nacimiento_d]').html(xyzFuns.generaOpcionesArray(dias, " "));
-          /*coloca 01 02 03 etc*/
-          let meses = _.map(_.range(1, 12 + 1), function (elem) { return (`${elem}`).length == 1 ? `0${elem}` : elem });
-          $('[__rg_field=fecha_nacimiento_m]').html(xyzFuns.generaOpcionesArray(meses, " "));
+      //     /* Combos DIa Mes Año*/
+      //     let dias = _.concat(['01', '02', '03', '04', '05', '06', '07', '08', '09'], _.range(10, 31 + 1));
+      //     $('[__rg_field=fecha_nacimiento_d]').html(xyzFuns.generaOpcionesArray(dias, " "));
+      //     /*coloca 01 02 03 etc*/
+      //     let meses = _.map(_.range(1, 12 + 1), function (elem) { return (`${elem}`).length == 1 ? `0${elem}` : elem });
+      //     $('[__rg_field=fecha_nacimiento_m]').html(xyzFuns.generaOpcionesArray(meses, " "));
 
-          let anos = _.range(2012, 1920 + 1);
-          $('[__rg_field=fecha_nacimiento_y]').html(xyzFuns.generaOpcionesArray(anos, " "));
-        },
+      //     let anos = _.range(2012, 1920 + 1);
+      //     $('[__rg_field=fecha_nacimiento_y]').html(xyzFuns.generaOpcionesArray(anos, " "));
+      //   },
 
-        renderForm: () => {
-          let sections = regmodel.model.sections;
-          regmodel.create_fields(sections);
-          regmodel.inicializaControles();
-        },
+      //   renderForm: () => {
+      //     let sections = regmodel.model.sections;
+      //     regmodel.create_fields(sections);
+      //     regmodel.inicializaControles();
+      //   },
 
-        /* verifica los campos requeridos*/
-        pasaCamposRequeridos: (user) => {
-          $("[__rg_field]").closest(".form-horizontal > div ").removeClass('has-error')
-          let pasa = true;
-          _.forEach(regmodel.model.sections, (sec) => {
-            _.forEach(sec.fields, (field) => {
-              if (field.required && (user[field.field] == null || user[field.field] === '')) {
-                $(`[__rg_field=${field.field}]`).closest(".form-horizontal > div ").addClass('has-error');
-                pasa = false;
-              }
-            })
-          })
-          return pasa;
-        }
-      }
+      //   /* verifica los campos requeridos*/
+      //   pasaCamposRequeridos: (user) => {
+      //     $("[__rg_field]").closest(".form-horizontal > div ").removeClass('has-error')
+      //     let pasa = true;
+      //     _.forEach(regmodel.model.sections, (sec) => {
+      //       _.forEach(sec.fields, (field) => {
+      //         if (field.required && (user[field.field] == null || user[field.field] === '')) {
+      //           $(`[__rg_field=${field.field}]`).closest(".form-horizontal > div ").addClass('has-error');
+      //           pasa = false;
+      //         }
+      //       })
+      //     })
+      //     return pasa;
+      //   }
+      // }
 
       let form = {
         elemhtml : {
