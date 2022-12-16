@@ -1,21 +1,72 @@
 <ion-app style="display: flex; justify-content: start;">
-  <ion-header>
 
-    <div style="    height: 50px; display: flex; justify-content: start; padding: 0px 50px; width: 100%;" class="">
-      <h1>CABECERA LOGO</h1>
-    </div>
-
-    <div class="bg-light darker p5 ">
-      <a routerLink="/gestorforms"><span class=" ml10 ph10 fs14   " style="color: #5c6279;">Gestor de Formularios</span></a>
-      <a routerLink="/form"><span class=" ml10 ph10 fs14   " style="color: #5c6279;">Formulario</span></a>
-      <a routerLink="/users"><span class=" ml10 ph10 fs14   " style="color: #5c6279;">Usuarios</span></a>
-      <!-- <a routerLink="/ingenios"><span class=" ml10 ph10 fs14   " style="color: #5c6279;">Ingenios</span></a> -->
+  <!-- HEADER  -->
+  <ion-header *ngIf="userS.isLogged()">
+  <!-- <ion-header *ngIf="isAutenticado()"> -->
+  <!-- <ion-header *ngIf="isLogged"> -->
+    <div class="fondo-header6 flex justify-between align-end ph-80 wp100 pv5_" style="position: relative; height: 90px; border-bottom: 1px solid #c64f4f;">
+      <div id="logos_header" class="flex align-center">
+        <img src="./assets/img/gadch_logo_escudo_tr_lg.png" alt="" style="width: 80px; min-height: 80px; margin-left: 20px;">
+        <!-- <img src="./assets/img/gadch_logo_textodark_tr_lg.png" alt="" class="hidden-xs" style="width: 150px;"> -->
+      </div>
+      <div id="titulo_header" clasS="fw700 text-center wp100" style="font-size: calc(10px + 0.75vw); position: absolute; top:10px">
+        <div class="wp50 center-block font-family text-eee  " style="text-shadow:  2px 2px 8px #000000; letter-spacing: 1px;">SISTEMA DE GESTIÓN DEL FORM. 101</div>
+      </div>
+      <div class="text-eee  p5 pl20 pr20 flex justify-start align-center h-35" style="background-color: #0000003b;">
+        <ion-menu-button class="visible-xs fs28 "></ion-menu-button>
+        <div class="hidden-xs">
+          <span *ngFor="let item of userS.getUserMenu()" [routerLink]="item.redirectTo" routerLinkActive="active-menu-horizontal"
+          class=" ml10 ph10 pv5 fs14 cursor menu_item_horizontal">{{ item.name}}</span>
+          <span class=" ml10 ph10 pv5 fs14 cursor menu_item_horizontal_ " (click)="cerrarSesion()">Salir</span>
+        </div>
+      </div>
     </div>
   </ion-header>
+  <!-- END HEADER -->
 
-  <ion-content>
-    <div class="container-fluid mn phn" style="background-color:  #f3f3ff ;" >
-      <router-outlet></router-outlet>  
+  <!-- CONTENIDO PRINCIPAL -->
+  <ion-content  class="bg-warning">
+
+    <!-- MENU PLEGABLE -->
+    <ion-menu side="end" menuId="first" contentId="menu">
+      <ion-header >
+        <div class="bg-222 text-999 pv10">
+          <ion-title class="">
+            Menú
+            <ion-menu-toggle class="pull-right cursor">
+              <i class="glyphicons glyphicons-remove_2 fa-sm"></i>
+              <!-- <ion-icon name="close"></ion-icon> -->
+            </ion-menu-toggle>
+          </ion-title>
+        </div>
+      </ion-header>
+  
+      <ion-content>
+        <ion-list>
+          <ion-menu-toggle *ngFor="let item of userS.getUserMenu()" class="">            
+            <ion-item   [routerLink]="item.redirectTo" routerLinkActive="active-menu-vertical" detail="" class="text-444">
+              <div class="item-content">
+                <i class="{{item.icon}} ml10 mr20 text-777_"></i> <span>{{ item.name }}</span>
+              </div>
+            </ion-item>
+          </ion-menu-toggle>
+          <ion-menu-toggle (click)="cerrarSesion()" >            
+            <ion-item  class="text-444">
+              <div class="cursor item-content">
+                <i class="glyphicons glyphicons-moon ml10 mr20 text-777_" (click)="cerrarSesion()"></i> <span>Cerrar sesión</span>
+              </div>
+            </ion-item>
+          </ion-menu-toggle>
+        </ion-list>
+      </ion-content>
+    </ion-menu>
+    <!-- END MENU -->
+    
+    <div id="menu"></div>
+    <div class="container-fluid mn phn" style="background-color:  #ffffff !important;">
+      <router-outlet></router-outlet>
     </div>
+
   </ion-content>
+  <!-- END CONTENT -->
   </ion-app>

@@ -18628,6 +18628,15 @@ on tables, feel free to add more*/
 .w450 {
   width: 450px !important;
 }
+.w500 {
+  width: 500px !important;
+}
+.w550 {
+  width: 550px !important;
+}
+.w600 {
+  width: 600px !important;
+}
 .mnw20 {
   min-width: 20px !important;
 }
@@ -25380,13 +25389,13 @@ Copyright (c) 2014 Daniel Eden
 .justify-end{
   justify-content: end;
 }
-.justify-space-around{
+.justify-around{
   justify-content: space-around;  
 }
-.justify-space-between{
+.justify-between{
   justify-content: space-between;
 }
-.justify-space-evenly {
+.justify-evenly {
   justify-content: space-evenly;
 }
 .align-center{
@@ -25448,4 +25457,12 @@ Copyright (c) 2014 Daniel Eden
 }
 .grow-10{
   flex-grow: 10;
+}
+
+/*==================================================
+  GRID
+==================================================== */
+
+.grid{
+  display: grid;
 }

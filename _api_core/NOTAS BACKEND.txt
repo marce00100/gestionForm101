@@ -1,0 +1,23 @@
+- Se ha copiado los archivos dela carpeta public al root 
+    index.php, favicon, htacces, robots.txt
+    TODO si se escribe la url raiz/.env se puede ver el archivo de configuracion, Modificar y solucionar esto
+
+- 
+
+
+
+
+
+
+
+
+
+
+
+- En las tablas el Estado puede ser :
+     A: activo en formularios, en usuarios, 
+     I: inactivo no esta eliminado, puede activarse, 
+     E: eliminado borrado ya no puede activarse, solo se lo mantien por fines historicos, 
+     B: Borrador en caso del formulario, que no hasido enviado aun, 
+     S: enviado o consolidado ya no puede modificarse, 
+     D: descartado de borrador ,  

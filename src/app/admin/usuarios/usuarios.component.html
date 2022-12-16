@@ -1,0 +1,144 @@
+<style>
+	.popup-basic {
+		position: relative;
+		background: #FFF;
+		width: auto;
+		max-width: 900px;
+		margin: 40px auto;
+	}
+
+	.tabla-head thead>th {
+		background-color: rgb(147, 72, 72);
+	}
+</style>
+<ion-app>
+	<ion-content>
+		<div id="users_contenedor" class="bg-content">
+			<div class="pv20 ph5">
+				<div class=" bg-white col-sm-10 col-sm-offset-1 col-lg-8 col-lg-offset-2 col-xs-12" style="    box-shadow: 1px 2px 9px 1px;">
+					<div class="p20 pb10">
+						<h3 class="fw600 text-theme1--30 ">Administrador de Usuarios</h3>
+					</div>
+					
+					<div class="panel">
+						<div class="panel-heading  bg-dark ">
+							<div class="panel-title text-white-dark">
+								<i class="fa-solid fa-users fa-lg"></i> <span class="ml10 " __cabecera_dt>Información de
+									Usuarios</span>
+							</div>
+							<!-- <div class="panel-title text-light">
+						<i class="fa fa-file-alt fa-2x"></i> Información de <span __cabecera_dt>Usuarios</span> <span
+							__cabecera_dt_est></span>
+					</div> -->
+						</div>
+						<div class="panel-body pn">
+							<div class="row">
+								<div class="col-md-12">
+									<button __accion="nuevo" class="btn btn-sm bg-success m5 br4"><i
+											class="fa fa-plus text-white"></i> Agregar </button>
+									<!-- <button  __accion="eliminar" class="btn btn-sm btn-danger dark m5 br4"><i class="fa fa-minus-circle text-white"></i> Eliminar</button>                                 -->
+
+								</div>
+							</div>
+							<div class="">
+								<table __users_list id="dataT" class=" hover row-border tabla-head bg-table" style="margin: 0 0 40px 0">
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+
+
+			<!-- -----------------------------------------          Modal  --------------------------------------------------- -->
+			<div id="modal" class="white-popup-block popup-basic mfp-with-anim mfp-hide">
+				<div class="panel frctl">
+					<!-- panel heading -->
+					<div class="bg-system  text-white frctl flex align-center p15 ">
+						<i class="fa-solid fa-user-pen fa-lg ml10"></i>
+						<h2 class="panel-title ml10" __titulo><span>__</span></h2>
+					</div>
+					<!-- end .panel-heading section -->
+					<!-- panel body -->
+					<div class="panel-body of-a">
+						<div class="row">
+							<div class=" ph10 ">
+								<!-- datos de usuario -->
+								<div __fields_datos_usuario></div>
+								<hr>
+								<!-- cuadro de operador -->
+								<div __wrapper_operador style="display: none">
+									<!-- campos culumnas de operador -->
+									<div __fields_datos_operador></div>
+
+									<!-- CUADRO de NIMs asociados -->
+									<div class="col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10 col-xs-12">
+										<div class="flex align-end justify-between">
+											<span><b>Número(s) de NIM y minerales asosciados</b></span>
+											<button __accion_datos_nim="nuevo_nim" class="btn btn-sm btn-system pull-right br6"><i
+													class="fa fa-plus mr10"></i> Agregar NIM</button>
+										</div>
+										<div class="br-a br-greyer br8">
+											<!-- ENVOLTORIO DEL FORM DATOS_NIM -->
+											<div __wrapper_datos_nim clasS="wp80 center-block br-light  pt20 pl20"
+												style="display: none; background-color: #e9ebff;">
+												<!-- FIELDS  -->
+												<div __fields_datos_nim></div>
+												<!-- FIN FIELDS  -->
+												<!-- BOTONES del cuadro de datos_nim -->
+												<div class="flex justify-evenly pb5 ">
+													<button __accion_datos_nim="cerrar_nim"
+														class="btn_ btn-sm bg-light br6 br-a br-greyer">Descartar</button>
+													<button __accion_datos_nim="aceptar_nim"
+														class="btn_ btn-sm bg-light br6 ph40 br-a br-dark-light">Aceptar</button>
+													<!-- CON ICONOS -->
+													<!-- <button __accion_datos_nim="cerrar_nim" class="btn_ btn-sm bg-light br6 br-a br-greyer"><i class="glyphicons glyphicons-remove_2 mr10"></i>Descartar</button>
+											<button __accion_datos_nim="aceptar_nim" class="btn_ btn-sm bg-light br6 ph40 br-a br-dark-light"><i class="fa fa-plus fa-lg mr10"></i>Aceptar</button> -->
+												</div>
+												<!-- BOTONES del cuadro de datos_nim -->
+											</div>
+											<!-- ENVOLTORIO DEL FORM DATOS_NIM -->
+
+											<!-- DATOS_NIM ACEPTADAS o guardadas -->
+											<div __nims_operador class="br-a br-greyer br8 p10" style="min-height: 60px;" required>
+												<table class="wp100" style="min-height: 60px;">
+													<thead>
+														<tr class="bg-warning lighter" style="border-bottom: 1px solid #ccc!important; ">
+															<th class="p5">Núm NIM</th>
+															<th class="p5">Municipio</th>
+															<th class="p5">Código Mun.</th>
+															<th class="p5">Formulario</th>
+															<th class="p5">Tipo de Mineral</th>
+															<th class="p5">-</th>
+														</tr>
+													</thead>
+													<tbody style="min-height: 50px;"></tbody>
+												</table>
+											</div>
+											<!-- DATOS_NIM ACEPTADAS o guardadas-->
+										</div>
+
+									</div>
+									<!-- END CUADRO de NIMs asociados -->
+
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- panelfooter -->
+					<div class="panel-footer flex justify-evenly">
+						<!-- CON ICONOS -->
+						<!-- <button __cerrar class="btn bg-danger lighter br-a br-dark-light br6 btn-md w150 "><i class="glyphicons glyphicons-bomb mr10"></i>Cancelar</button>
+				<button __save type="submit" class="btn btn-primary br-a br-dark-light btn-md br6 w200"><i class="glyphicons glyphicons-ok_2 mr10"></i>Guardar</button> -->
+						<button __cerrar class="btn bg-danger lighter br-a br-dark-light br6 btn-md w150 ">Cancelar</button>
+						<button __save type="submit" class="btn btn-primary br-a br-dark-light btn-md br6 w200">Guardar</button>
+					</div>
+				</div>
+				<!-- end: .panel -->
+			</div>
+
+		</div>
+	</ion-content>
+</ion-app>

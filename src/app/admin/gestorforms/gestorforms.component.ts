@@ -32,12 +32,12 @@ export class GestorFormsComponent implements OnInit {
         },
         mostrarMensajeFloat:function(obj){
           new PNotify({
-            title: obj.estado == 'ok' ? 'Guardado' : 'Error',
+            title: obj.status== 'ok' ? 'Guardado' : 'Error',
             text: obj.msg,
             shadow: true,
             opacity: 0.9,
                 // addclass: noteStack,
-                type: (obj.estado == 'ok') ? "success" : "danger",
+                type: (obj.status== 'ok') ? "success" : "danger",
                 // stack: Stacks[noteStack],
                 width: obj.width || 300,
                 delay: obj.delay || 2000
@@ -67,7 +67,7 @@ export class GestorFormsComponent implements OnInit {
               <hr style="margin: 10px 0;">
             </div>`,
         pregunta: /*html*/`
-            <div class="__elemento row" __tipo="pregunta" __id="">  
+            <div class="__elemento row pv10" __tipo="pregunta" __id="">  
               <!-- Pregunta y descripcion-->
               <div class="col-xs-9">
                 <textarea type="text" class="__elem_texto quest quest-input quest-pregunta" 
@@ -80,6 +80,7 @@ export class GestorFormsComponent implements OnInit {
                 <span __config_btn="requerido"   class=" text-center bg-light darker br12 p5 ph10"  title="Activar si la respuesta es obligatoria" style="cursor:pointer; z-index: 12"><i class="fa fa-lock "></i></span>
                 <span __config_btn="ayuda"   class=" text-center bg-light darker br12 p5 ph10"  title="Colocar un  mensaje de ayuda" style="cursor:pointer; z-index: 12"><i class="fa fa-question "></i></span>
                 <!--<span __config_btn="depende" class=" text-center bg-light darker br12 p5 ph8"   title="Esta Pregunta depende de una respuesta de otra pregunta anterior" style="cursor:pointer; z-index: 12"><i class="fa-solid fa-reply  "></i></span>-->
+                <input __config_btn="ancho"   class=" text-center bg-light br12 p3 fs10"  title="El ancho de este bloque en porcentaje, pude coloca cualquier valor como 25, 33, 50, 100." style="z-index: 12; width: 35px"  value=100 >
                 
                 <div __config_cuadro class="text-center br8 p3 fs12 hide" style="position:absolute; left: 15px; top: 20px; 
                   z-index: 13; background-color: #0e0e27b5;"> 
@@ -218,6 +219,8 @@ export class GestorFormsComponent implements OnInit {
               objConfig.ayuda = $(elemento).find('[__config=elemento] [__config_input=ayuda]').first().val().trim();
               objConfig.requerido = $(elemento).find('[__config=elemento] [__config_btn=requerido]').first().hasClass('requerido')
               // objConfig.dependencia = $(elemento).find('[__config_input=depende]').first().val().trim();
+              objConfig.ancho = parseInt($(elemento).find('[__config=elemento] [__config_btn=ancho]').first().val().trim());
+              objConfig.ancho = (objConfig.ancho == isNaN || objConfig.ancho < 0 || objConfig.ancho > 100) ? 100 : objConfig.ancho;   
   
               if (_.includes(['single', 'multiple', 'mixta',], objConfig.tipo_respuesta)) {
   
@@ -294,6 +297,7 @@ export class GestorFormsComponent implements OnInit {
                 $(elemento).find('[__config=elemento] [__config_input=ayuda]').val(cnfElem.ayuda);
                 $(elemento).find('[__config=elemento] [__config_btn=requerido]').addClass(cnfElem.requerido ? 'requerido' : '');
                 // $(elemento).find('[__config_input=depende]').val(cnfElem.dependencia);
+                $(elemento).find('[__config=elemento] [__config_btn=ancho]').val(cnfElem.ancho ? cnfElem.ancho : 100  );
   
                 funs.pintaBloqueConfig($(elemento).find('[__config=elemento]'));
   
@@ -604,7 +608,7 @@ export class GestorFormsComponent implements OnInit {
           funs.ejecutaAccionOpcion( $(this).attr('accion'), $(this).closest('li') );
         })
     
-        /* click en la configuraciones de un elemento pregunta (ayuda, depende de) */
+        /* click en la configuraciones de un elemento pregunta (ayuda, depende de,  reqerido) */
         .on('click', '[__config] [__config_btn]', function(e){
           let configBtn = $(this);
           if (configBtn.attr('__config_btn') == 'requerido') {

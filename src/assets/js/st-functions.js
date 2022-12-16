@@ -2,9 +2,9 @@
 window.xyzFuns = {
 	// urlBase: window.location.pathname + (window.location.pathname.charAt(window.location.pathname.length - 1) == '/' ? '../' : '/../'),
 	// urlApi : window.location.pathname + (window.location.pathname.charAt(window.location.pathname.length - 1) == '/' ? '../' : '/../') + 'wp-json/',
-	// urlRestApi   : 'http://62.171.160.162/opermin/coreapi/api' ,
-	// urlRestApi   : 'http://localhost/www/opermin/coreapi/api' ,
-	urlRestApi: 'http://localhost/www/opermin/frontapp/$_apinucleo/api',
+
+	urlRestApi: 'http://localhost/www/gestion101Min/gefor_101/_api_core/api',
+	// urlRestApi: 'http://62.171.160.162/gestion_form101/_api_core/api',
 	// urlRestApi   : '../$coreapi/api' ,
 	// urlRestApiWP : 'http://localhost/www/wp/domain/wp-json/' ,
 
@@ -199,8 +199,10 @@ window.xyzFuns = {
 		// })
 
 	},
-
-
+	/**
+	 * Traduccion para DataTables en españos
+	 * @returns traduccion para DataTables
+	 */
 	dataTablesEspanol: () => {
 		return {
 			"decimal": "",

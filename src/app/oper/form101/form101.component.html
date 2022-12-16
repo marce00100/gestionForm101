@@ -1,0 +1,101 @@
+<style>
+  hr {
+    margin: 20x 0;
+  }
+
+</style>
+<ion-app>
+  <ion-content>
+    <div id="formulario_101" class="bg-content ">
+      <div class="panel">
+        <!-- <div class="panel-heading form-real" style="min-height: 100px; display: flex;">
+          CABECERA SI ES QUE SE VA A USAR UNA PROPIA
+        </div> -->
+
+        <div class="panel-body of-a bg-light_ darker_ fondo_panel" style="position: relative;">
+          <div __select_nims
+            class=" mt20 text-dark-darker br12 p10 bg-white br-a br-greyer col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12 ">
+            <div class="wp90 center-block ">
+              <span class="fw600 fs14">FORMULARIO(s) Y NÚMERO(s) NIM REGISTRADO(s) </span>
+              <select __select_nim="" class="br-h-n br-t-n fs16 wp100 pl20 pv10" style="outline: none;"></select>
+              <em>Si tiene mas de uno seleccione de acuerdo al mineral que se va a transportar</em>
+            </div>
+          </div>
+
+          <div __frm_content
+            class="efecto_sobre_fondo_panel bg-white_ mv30 pt10 br12 col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12 " style="display: none">
+            <div __frms class="" style=" min-height:80vh; overflow-y: auto; align-items: center;">
+
+              <div __frm_cabecera
+                style="background-color: transparent; color: #116e7a;text-align: center; padding: 10px; border-bottom: 1px solid #ccc;">
+                <h1 clasS="fw600 text-theme1--30">FORMULARIO 101</h1>
+                <h4  class="text-theme1--30 fw600 mn ">
+                  PARA MINERALES <span __tipo_mineral></span>
+                </h4>
+                <div class="mt15  text-dark-darker fs12 fw600">FORMULARIO ÚNICO DEPARTAMENTAL PARA CONTROL DE SALIDA,
+                  AUTORIZACIÓN DE TRANSPORTE Y VENTA DE MINERALES <span __tipo_mineral></span>
+                </div>
+              </div>
+
+              <div __card __frm_datos_general class=" wp100 mt30" >
+                <div class="quest-titulo">
+                  DATOS REGISTRADOS
+                </div>
+                <div class="datos-generales">
+                  <div class="item-dato-general">
+                    <em class="item-label">1. Número de Formulario</em>
+                    <div class="item-contenido text-center" __info_general="numero_formulario">Automático</div>
+                  </div>
+                  <div class="item-dato-general">
+                    <em class="item-label">2. Número de NIM</em>
+                    <div class="item-contenido text-center" __info_general="nim"></div>
+                  </div>
+                  <div class="item-dato-general">
+                    <em class="item-label">3. Número de NIT</em>
+                    <div class="item-contenido text-center" __info_general="nit"></div>
+                  </div>
+                  <div class="item-dato-general">
+                    <em class="item-label">4. PERIODO</em>
+                    <div class="item-contenido text-center" __info_general="periodo"></div>
+                  </div>
+                  <div class="item-dato-general" style="flex-basis: 100%;">
+                    <em class="item-label">5. Operador Minero</em>
+                    <div class="item-contenido" __info_general="nombres"></div>
+                  </div>
+                  <div class="item-dato-general" style="flex-basis: 100%;">
+                    <em class="item-label">6. Procedencia</em>
+                    <div class="item-contenido" __info_general="procedencia"></div>
+                  </div>
+                  <!-- <div class="item-dato-general" style="flex-basis: 100%;">
+                    <em class="item-label">7. Tipo de Mineral y Leyes DM %</em>
+                    <div class="item-contenido" __info_general="mineral"></div>
+                  </div> -->
+                </div>
+              </div>
+
+              <div __card __frm_formulario class=" mt30 flex flex-wrap align-end">
+              </div>
+
+              <div __card __frm_enviar class=" text-center  p30 " >
+
+                <div class="fs16 mb20">
+                  <div></div>
+                  <br>
+                  <div class="text-system-darker"><b>Antes de enviar revisa la información proporcionada. Esta se
+                      constituye en una declaración jurada.</b></div>
+                </div>
+                <button __save class="btn btn-primary btn-lg br6 br-a br-dark wp80">
+                  <!-- <i class="fa fa-send mr15"></i> -->
+                  <span> Enviar </span>
+                </button>
+              </div>
+
+              <div id="__qr"></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </ion-content>
+</ion-app>

@@ -30,7 +30,7 @@ textarea.quest-input-line{
   border-bottom: 1px solid grey !important;  
 }
 .quest-input:focus,   .quest-input-line:hover, .quest-input-line:focus{
-  border-bottom: 1px solid #951111 !important;  
+  border-bottom: 1px solid #d25a0a !important;  
 }
 /* para que no salga un borde al rededor feo*/
 .quest-input:focus-visible{
@@ -83,6 +83,12 @@ textarea.quest-input-line{
 }
 .quest-texto{
 	font-size: 14px !important;
+  font-weight: bold;
+  color: #333;
+}
+
+.quest-error-validacion{
+  border: 2px solid rgb(206, 27, 27)!important;
 }
 
 
@@ -98,7 +104,7 @@ textarea.quest-input-line{
 /* Cada elemento */
 .__elemento{
 	margin: 0px 0px 0px 0px;
-	padding: 5px 10px 5px 15px;
+	padding: 0px 15px;
 	position: relative;
   border: 1px solid rgb(0,0,0,0) ;
 }

@@ -1,0 +1,64 @@
+<style>
+  .form-control{
+    display: block;
+    width: 100%;
+    height: 40px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: #212529;
+    background-color: #f8fafc;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: 6px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  }
+  .form-control:focus {
+    border-color: #9ac8ee;
+    outline: 0;
+    box-shadow: 0 0 5px 4px rgb(52 144 220 / 25%);
+  }
+</style>
+<ion-app>
+  <ion-content> 
+    <div id="login_content" class="bg-content _bg-theme1-10" style="position:relative; height: 100%;">
+      <div class="flex justify-center wp100" style="position:absolute; top: 15vw">
+        <div class="panel mn w450 br6 text-333" style="font-family: Arial, Helvetica, sans-serif; box-shadow: 2px 2px 8px -1px #00000099;;">
+          <div class="panel-heading bg-white" style="border-radius: 6px 6px 0 0; min-height: 160px;">
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <img src="./assets/img/logo_tr_direccon_gestion_minera_md.png" class="mh5 text-center" style="width: 70px; " alt="">
+              <img src="./assets/img/gadch_tr_vertical_fontdark_md.png" class="mh5 pull-left" style="width: 200px; " alt="">
+              <img src="./assets/img/logo_laboratorio.png" class="mh5 pull-right" style="width: 80px; " alt="">
+            </div>
+
+          </div>
+          <div class="panel-body" style="border-radius: 0 0 6px 6px;">
+            <h3 class="text-theme1--20 fw400 mb20 mt5">Autenticación de usuario</h3>
+            <div class="" >
+              <div __error_msg clasS="mb20 fs15 text-danger--20" style="display: none"></div>
+              <div>
+                <label class="form-label mb10 {{error_email ? 'text-danger fw600' : ''}}" for="email">Correo Electrónico</label>
+                <input type="text" class="form-control" __lg=email name="email" [(ngModel)]="email" (keydown.enter)="login()" required>
+              </div>
+              <div class="mt20">
+                <label class="form-label mb10 {{error_password ? 'text-danger fw600' : ''}}"  for="password" required>Contraseña</label>
+                <input class="form-control" type="password" __lg=password name="password" [(ngModel)]="password" (keydown.enter)="login()" required >
+              </div>
+            </div>
+            <div class="flex mt30">
+              <button type="submit" class="btn btn-dark btn-lg fs15 wp100 br6 "  (click)="login()">Ingresar</button>
+            </div>
+            <div __output class="w60% "></div>
+          </div>
+        
+        </div>
+      </div>
+    </div>
+      
+  </ion-content>
+</ion-app>
