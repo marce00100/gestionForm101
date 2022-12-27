@@ -1,12 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { SFormService } from 'src/app/shared/sform.service';
+import { UAuthService } from 'src/app/shared/uauth.service';
 
 declare var $: any;
 declare var _: any;
 declare var xyzFuns: any;
-declare var PNotify: any;
+// declare var PNotify: any;
 // declare var DataTable:any;
 declare var moment: any;
+declare var jspdf: any;
+declare var html2canvas: any;
 
 @Component({
   selector: 'app-listaforms',
@@ -15,39 +19,65 @@ declare var moment: any;
 })
 export class ListaformsComponent implements OnInit {
 
-  constructor(private router: Router) { }
+  private frmLleno: any = {};
+
+  constructor(
+    private router: Router, 
+    private uauth: UAuthService,
+    private sform: SFormService) { }
 
   ngOnInit() {
-    this.listforms();
+    this.
+    listforms();
   }
-
+  /**
+   * Cuando se presiona en el boton de nuevo form
+   */
   nuevoFormulario(){
     this.router.navigate(['form101'])
   }
 
+  /**
+   * se llama al Service Para cargar el fomulario lleno con sus respuestas 
+   * @param objFrmLleno Objeto con el Form lleno y respuestas
+   * @returns HTML
+   */
+
+  renderformLleno(content, objFrmLleno){
+    this.frmLleno = objFrmLleno;
+    return this.sform.renderFormLleno("[__frm_content]", objFrmLleno)
+  }
+
+  /**
+   * Para exportar se llama al service,
+   */
+  exportPDF() {
+    this.sform.exportFormPDF();
+  }
+
+  /**
+   * Metodos y funciones JQ
+   */
   listforms() {
-    let component = this;
+    let cmp = this;
     $(function () {
-      /*El id_rol del rol operador */
-      const rol_operador = 3; 
 
       let ctxG: any = {
         rutabase: xyzFuns.urlRestApi,
-        contenedor: '#listaforms_content',
+        content: '#listaforms_content',
         modal: "#modal",
         dataTableTarget: "#dataT",
-        dataList: [],
-        id_rol_operador: rol_operador, 
+        dataList: [], 
         formllenoSel: {}
       }
 
 
-      let conT: any = {
+      let conT = {
         dt: {},
         selectedRow: {},
 
         cargarDatos: function () {
-          $.post(`${ctxG.rutabase}/list-forms-llenos`, {_token: localStorage.getItem('uid_uid') } ,function (resp) {
+          $.post(`${ctxG.rutabase}/forms-llenos-user`, cmp.uauth.addToken({}) ,function (resp) {
             ctxG.dataList = resp.data;
             conT.fillDataT();
           });
@@ -66,7 +96,7 @@ export class ListaformsComponent implements OnInit {
               {
                 title: '_', 
                 render: function (data, type, row, meta) {
-                  return /*html*/`<span __accion_bandeja="mostrar"  __id_form_lleno=${row.id} 
+                  return /*html*/`<span __accion_bandeja="mostrar"  __id_form_lleno=${row.id} __uid_form_lleno=${row.uid}
                                 style="cursor:pointer; display:block; "class="p5 text-dark " title="Editar">
                                 <i class="fa fa-tag fa-lg "></i></span>`
                 }
@@ -85,12 +115,17 @@ export class ListaformsComponent implements OnInit {
                   return `${row.codigo_municipio} - ${row.municipio}`;
                 }
               },
-              { title: 'Mineral', data: 'mineral', },
-              { title: 'Estado',  data: 'estado_form_lleno' },
+              {
+                title: 'Mineral', data: 'id',
+                render: function (data, type, row, meta) {
+                  return "";
+                }
+              },
+              { title: 'Estado', data: 'estado_form_lleno' },
               // {
               //   title: 'Usuario', data: 'username', type: 'html',
               //   render: function (data, type, row, meta) {
-              //     return /*html*/`<span  style="display:block; background-color:${row.estado_usuario == 'Activo' ? '#edf5ff' : '#fff0f0'}" class="ph5 text-dark "><b>${row.username}</b></span>`
+              //     return /*html*/`<span  style="display:block; background-color:${row.estado_usuario == 'ACTIVO' ? '#edf5ff' : '#fff0f0'}" class="ph5 text-dark "><b>${row.username}</b></span>`
               //   }
               // },
               // { title: 'Razon Social', data: 'razon_social', },
@@ -111,97 +146,36 @@ export class ListaformsComponent implements OnInit {
 
       let funs = {
         /** Muestra Modalcon el formulario lleno */
-        mostrarFormlleno: (id_form_lleno) => {
-          xyzFuns.spinner();
-          $.post(ctxG.rutabase + '/formlleno_respuestas', { id_form_lleno: id_form_lleno }, (resp) => {
+        mostrarFormlleno: (uid_form_lleno) => {
+          funs.spinner();
+          $.get(`${ctxG.rutabase}/formenviado-reps`, { fluid: uid_form_lleno }, (resp) => {
             ctxG.formllenoSel = resp.data;
-            console.log('ctxG.formllenoSel', ctxG.formllenoSel)
-            funs.crearDatosGeneral();
-            // funs.renderFormulario();
-
+            cmp.renderformLleno("[__frm_content]", ctxG.formllenoSel);
             xyzFuns.showModal(ctxG.modal);
-            let htmlRespuestas = funs.renderFormRespuestas(ctxG.formllenoSel.elementos_respuestas);
-            $("[__frm_datos_respuestas]").html(htmlRespuestas);
-            xyzFuns.spinner(false);
-
-
+            funs.spinner(false);
           })
         },
-        /** Carga Datos del usuario */
-        crearDatosGeneral: () => {
-          $("[__tipo_mineral]").html(ctxG.formllenoSel.tipo_formulario == 'form1' ? 'METÁLICOS' : 'NO METÁLICOS');
-          $("[__info_general=numero_formulario]").html(`${(ctxG.formllenoSel.numero_formulario) ? ctxG.formllenoSel.numero_formulario : ''}`);
-          $("[__info_general=nim]").html(`${(ctxG.formllenoSel.nim) ? ctxG.formllenoSel.nim : ''}`);
-          $("[__info_general=nit]").html(`${(ctxG.formllenoSel.nit) ? ctxG.formllenoSel.nit : ''}`);
 
-          let periodo = moment(Date.now()).format('DD/MM/YYYY');
-          $("[__info_general=periodo]").html(`${periodo}`);
-
-          let htmlNombres = !_.isEmpty(ctxG.formllenoSel.nombres) ? /*html*/`<span style="font-weight:400; font-size:0.8em">Nombre: </span> <span>${ctxG.formllenoSel.nombres} ${ctxG.formllenoSel.apellidos}</span>` : '';
-          let saltoLinea = !_.isEmpty(htmlNombres) && !_.isEmpty(ctxG.formllenoSel.razon_social) ? "<br>" : "";
-          htmlNombres += !_.isEmpty(ctxG.formllenoSel.razon_social) ? /*html*/`${saltoLinea}<span style="font-weight:400; font-size:0.8em">Razón Social: </span> <span>${ctxG.formllenoSel.razon_social}</span>` : '';
-          $("[__info_general=nombres]").html(htmlNombres);
-
-          let htmlProcedencia = /*html*/`<span>CHUQUISACA</span>`;
-          // let saltoLinea = !_.isEmpty(htmlNombres) && !_.isEmpty(ctxG.formllenoSel.razon_social) ? "<br>" : "";            
-          htmlProcedencia += (ctxG.formllenoSel.municipio) ? /*html*/`<br>Municipio: <span>${ctxG.formllenoSel.municipio} - Cód. Mun.: <span>${ctxG.formllenoSel.codigo_municipio} </span>` : '';
-          $("[__info_general=procedencia]").html(htmlProcedencia);
-          $("[__info_general=mineral]").html(`${(ctxG.formllenoSel.mineral) ? ctxG.formllenoSel.mineral : ''}`);
-
+        spinner: (obj = {}) => {
+          xyzFuns.spinner(obj, ctxG.content)
         },
-        /**Carga el formulario con sus elementos */
-        renderFormRespuestas: (listaPreguntasResp) => {          
-          let htmlResp = "";
-          let tituloSeccion = '';
-  
-          _.forEach(listaPreguntasResp, function (resps, k) {
-            let elemObj = resps[0]; 
-
-            if(elemObj.tipo == 'titulo'){
-              htmlResp += /* html*/`<h3 class="wp100 quest-titulo">${elemObj.texto}</h3>`
-            }
-            if(elemObj.tipo == 'pregunta'){
-              let cnfElem = JSON.parse(elemObj.config) || {};
-              let respuesta = resps.length == 1 ? resps[0].respuesta ?? '' : _.reduce(resps, (result, resp, k) => `${result}, ${resp.respuesta} ?? '' `);
-              
-              htmlResp += /* html*/`
-                              <div class="flex justify-start align-start" style="width: ${cnfElem.ancho}%; border-bottom: 1px solid #ccc">
-                                <span class=" p5 fw600" style="/*flex-grow:1*/">${elemObj.texto}:</span>  
-                                <span class="p5" style="/*flex-grow:1*/">${respuesta}</span>  
-                              </div>`
-            }
-          })
-          return  htmlResp;
-        },
-
-
-
-        limpiarModal: () => {
-          // $(`${ctxG.modal} [__rg_field]`).val('').removeClass('br-a br-danger');
-          // $(`${ctxG.modal} [__op_field]`).val('').removeClass('br-a br-danger');;
-          // funs.functionsNims.limpiarFieldsNims();
-          // $("[__nims_operador] table tbody").html('');
-          // $("[__wrapper_operador]").hide();
-          
-          // /* Quita las clases de error en todos los campos requeridos  */
-          // $("[required]").removeClass(regmodel.model.classError);
-        }
       }
 
-      //-------------------- Listeners  --------------------------------
+      //______________________________________ LISTENERS ________________________________________
 
       let listen = () => {
         /* DEL CONTENEDOR */
-        $(ctxG.contenedor)
+        $(ctxG.content)
           /** Click en botones de accion como editar nuevo */
           .on('click', '[__accion_bandeja]', (e) => {
             let accion = $(e.currentTarget).attr('__accion_bandeja');
             // funs.limpiarModal();
             if (accion == 'nuevo')
-              component.nuevoFormulario();
+              cmp.nuevoFormulario();
             if (accion == 'mostrar') {
-              let id = $(e.currentTarget).attr('__id_form_lleno');
-              funs.mostrarFormlleno(id)
+              let uid = $(e.currentTarget).attr('__uid_form_lleno');
+              // let id = $(e.currentTarget).attr('__id_form_lleno');
+              funs.mostrarFormlleno(uid)
             }
             
           })
@@ -218,9 +192,6 @@ export class ListaformsComponent implements OnInit {
           // })
       }
 
-      /**
-       * Inicializa 
-       */  
       let init = () => {
         conT.cargarDatos();
       }

@@ -212,4 +212,17 @@ return [
         // 'ExampleClass' => App\Example\ExampleClass::class,
     ])->toArray(),
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Secret key for encript and decript (ADDBYMFG)
+    |--------------------------------------------------------------------------
+    |
+    | This key is used in auth Class for create token and validate it
+    | Is used for encript and decript users token
+    |
+    */
+
+    'pwt_secret' => 'jwt-ciCQ31y3vY1aVlt6yyueccQQB7LqcQEP==', // (ADDBYMFG)
+
 ];

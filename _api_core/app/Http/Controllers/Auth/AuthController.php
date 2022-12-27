@@ -2,59 +2,59 @@
 
 namespace App\Http\Controllers\Auth;
 
-// use Auth;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\MasterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+// use App\Models\User;
 use Exception;
+use PharIo\Manifest\AuthorCollection;
 
-// use Validator;
 
 /**
- *  ADD_MFG Make for Authentication; all class was made for MFG dev. tools.  
+ *  (ADDBYMFG) Make for Authentication; all class was made for MFG dev. tools.  
  */
-class AuthController extends Controller {
-	/**
-	 * private variable for camparate with token decripted request.
-	 */
-	private $secret = 'jwt-ciCQ31y3vY1aVlt6yyueccQQB7LqcQEP==';
+class AuthController extends MasterController {
 
-
-	/**
-	 * Registrar
-	 */
-	// public function register(Request $req) {
-	// 	$validator = Validato::make();
-	// }
+	private $tokenUserInfo;
 
 	/**
 	 * POST  Funcion para autenticar al usuario 
 	 */
 	public function login(Request $request) {
-		/* TODO Validar con otro metodo*/
-		// $request->validate([
-		// 	'email' => 'required|string|max:255',
-		// 	'password' => 'required|string|min:8'
-		// ]);
 
-		
+		/** Verifica con el usuario y password */
+		$username = trim(strtolower($request->username));
 		try {
-			if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])){
+			if (!Auth::attempt(['username' => $username, 'password' => $request->password])){
 				return response()->json([
 					'status' => 'error',
 					'msg' => 'Las Credenciales de autenticación son incorrectas.'
 				]);
 			}
 			
+			$user = Auth::user();
 			$time1     =  microtime(true);
-			$newToken  = $this->generateUserToken();
-			$newToken2 = $this->generateRolToken();
+			$newToken  = $this->generateUserToken($user);
+			$newToken2 = $this->generateRolToken($user);
 			$duration  = microtime(true) - $time1;
+
+			/** Para inicializar el objeto tokenUserInfo */
+			$this->tokenUserInfo =  AuthController::verifyUserToken($newToken);
+
+			$user = (object)[
+				'username'       => $user->username,
+				'email'          => $user->email,
+				'nombres'        => $user->nombres,
+				'apellidos'      => $user->apellidos,
+				'razon_social'   => $user->razon_social,
+				'ultimo_ingreso' => $user->ultimo_ingreso,
+				'rol'            => $user->rol,
+			];
 
 			return response()->json([
 				'data' => [
-					'user'     => Auth::user(),
+					'user'     => $user,
 					'token'    => $newToken,
 					'token2'   => $newToken2,
 					'duration' => $duration,
@@ -72,41 +72,13 @@ class AuthController extends Controller {
 			
 	}
 
-
-	public function obtener(Request $request) {
-
-		$infoToken = $this->verifyUserToken($request->_token);
-
-		return response()->json([
-			'data' => $infoToken,
-		]);
-	}
-
-
 	/**
-	 * Generate Token after root string id|id_rol|email|time|hashComparision
+	 *  DE CLASE: Verifica si un token enviado es valido, Normalmente viene desde el frontend,
+	 * pasa por el middleware y aqui se verifica comparando con el pwt_secret
+	 * If unathorized token return false, 
+	 * If authorize token return object whit simple info of User
 	 */
-	private function generateUserToken() {
-		$user = Auth::user();
-		$currentTime = date("Y-m-d H:i:s", time() - 4 * 60 * 60);
-		$vector = implode('|', [$user->id, $user->id_rol, $user->email, $currentTime, $this->secret]);
-		return \Crypt::encrypt($vector);
-	}
-
-	/**
-	 * Generate 2nd token for Frontend key 
-	 */
-	private function generateRolToken() {
-		$rolTokenize = \Crypt::encrypt(Auth::id());
-		/* Replace  9th psition by rol*/
-		$rolTokenize[8] = Auth::user()->id_rol;
-		return $rolTokenize;
-	}
-
-	/**
-	 * Obtiene la info del token
-	 */
-	private function verifyUserToken($token) {
+	public static function verifyUserToken($token) {
 		$decrypToken = '';
 		try {
 			$decrypToken = \Crypt::decrypt($token);
@@ -116,26 +88,78 @@ class AuthController extends Controller {
 
 		$vector = explode('|', $decrypToken);
 
-		if ($vector[4] != $this->secret)
+		if ($vector[0] != config('pwt_secret'))
 			return false;
 
-		$tokenInfo = (object)[
-			'id'               => $vector[0],
-			'id_rol'           => $vector[1],
-			'email'            => $vector[2],
-			'token_created_at' => $vector[3],
+		return (object)[
+			'id'               => $vector[1],
+			'id_rol'           => $vector[2],
+			'email'            => $vector[3],
+			'username' 				 => $vector[4],
+			'token_created_at' => $vector[5],
 		];
+	}
 
-		return $tokenInfo;
+	/**
+	 * get logout
+	 */
+	public function logout(){
+		$this->setUserLogged(false);
+		return response()->json([
+			'data' => $this->getUserLogged(),
+			'status' => 'ok',
+			'msg' => 'logout'
+		]);
+	}
+
+	/**
+	 * DE CLASE: Generate token after attribute union in root string  
+	 * secret|id|id_rol|email|username|time|hashComparision
+	 */
+	private function generateUserToken($user) {
+		$currentTime = date("Y-m-d H:i:s", time() - 4 * 60 * 60);
+		$vector = implode('|', [config('pwt_secret'), $user->id, $user->id_rol, $user->email, $user->username, $currentTime, ]);
+		return \Crypt::encrypt($vector);
+	}
+
+	/**
+	 *  DE CLASE: Generate 2nd token for Frontend key 
+	 */
+	private function generateRolToken($user) {
+		$rolTokenize = \Crypt::encrypt($user->id);
+		/* Replace  9th position by rol*/
+		$rolTokenize[8] = $user->id_rol;
+		return $rolTokenize;
 	}
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	/** POST Envia mesajes SMS a traves una conexion con celular por la misma red.
+	 * TODO paramtrizar
+	 */
 	public function sms(Request $req) {
 		$mensaje = $req->email;
 
 		//open connection
 		$ch = curl_init();
-
 
 		curl_setopt($ch, CURLOPT_URL, "http://192.168.1.253:8081/sendSMS");
 		curl_setopt($ch, CURLOPT_POST, true);

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { UserService } from './shared/user.service';
+import { UAuthService } from './shared/uauth.service';
 
+declare var $: any;
 declare var xyzFuns: any;
 declare var _: any;
 
@@ -14,24 +15,23 @@ declare var _: any;
 
 export class AppComponent implements OnInit {
   
-  constructor(public userS: UserService, private router: Router ) {}
+  userCtx: any = {}
+
+  constructor(public uAuth: UAuthService, private router: Router ) {}
   
   ngOnInit(){ 
-    this.userS.generaUserCtx();
+    this.uAuth.getUserCtx$().subscribe(userCtx => {
+      this.userCtx = userCtx;
+    })
+    this.uAuth.generaUserCtx();
   }  
 
   cerrarSesion(){
-    this.userS.logout();
+    this.uAuth.logout();
+    xyzFuns.spinner(false);
     this.router.navigate(['login']);
   }
 
 
-}
-
-interface MenuItem {
-  name      : string,
-  icon      : string,
-  redirectTo: string,
-  rol       : [number],
 }
 

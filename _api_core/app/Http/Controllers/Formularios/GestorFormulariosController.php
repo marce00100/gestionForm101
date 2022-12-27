@@ -7,22 +7,24 @@ use Illuminate\Http\Request;
 
 class GestorFormulariosController extends MasterController
 {
-    /* config for the llop or survey  */
     // public $id_formulario = 2; /**/
     
+    /**
+     * GET : Lista de los formularios activos
+     */
     public function getFormularios(){
-        $forms = \DB::select("SELECT * FROM formularios where estado_formulario = 'Activo' order by nombre");
+        $forms = \DB::select("SELECT * FROM formularios where estado_formulario ilike '%ACTIVO%' order by nombre");
         return response()->json([
             'data' => $forms,
             'status'=> 'ok'
         ]);
     }
     /**
-     *  DE RUtA : Obtiene un Formulario con todas sus elementos-opciones de ID */
+     *  POST : Obtiene un Formulario con todas sus elementos-opciones de ID 
+     */
     public function getFormularioElementos(Request $req) {
         // $req->id_f = 1;
         $formulario = $this->formularioElementos($req->id_formulario);
-        $formulario->id = $this->encrypt($formulario->id);
         return response()->json([
             'data'   => $formulario,
             'status'=> 'ok'
@@ -31,11 +33,10 @@ class GestorFormulariosController extends MasterController
 
 
     /**
-     *  DE CLASE: Obtiene un Formulario con todas sus elementos-opciones */
+     *  DE CLASE: Obtiene un Formulario con todas sus elementos-opciones 
+     */
     public function formularioElementos($id_formulario)
     {
-        // $id_formulario = $this->id_formulario;
-        // $id_formulario = $this->decrypt($id_formulario);
         $formulario = collect(\DB::select("SELECT * FROM formularios WHERE id = {$id_formulario}"))->first();
         if(!$formulario) {
             return response()->json([ 'status'=>'error', 'msg' => 'No existe el identificador' ]);
@@ -58,7 +59,6 @@ class GestorFormulariosController extends MasterController
 
     /* POST: Guarda un formulario con sus elementos y sus opciones respectivas*/
     public function saveFormularioElementos(Request $req) {
-        // $req->id = $this->decrypt($req->id);
         $formulario = new \stdClass();
         $formulario->id = $req->id_formulario;
         // $formulario->id = $req->id;
@@ -79,7 +79,6 @@ class GestorFormulariosController extends MasterController
         }
 
         $formulario = $this->formularioElementos($formulario->id);
-        $formulario->id = $this->encrypt($formulario->id);
         return response()->json([
             'data'   => $formulario,
             'status'=> 'ok',

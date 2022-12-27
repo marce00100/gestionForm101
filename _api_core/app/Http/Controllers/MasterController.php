@@ -5,11 +5,43 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-use Illuminate\Support\Facades\Auth;
-
 class MasterController extends Controller {
 
-	// public $usuario = ''; /* Variable Global con el contexto de Usuario*/
+	private $usuario;
+	private $keySession = 'usuario';
+
+	/**
+	 * 
+	 */
+	public function setUserLogged($idUser){
+		if(!$idUser){
+			session()->forget($this->keySession);
+			return;
+		}
+		/** Si no hay sesin o el id almacenado es diferente del que se esta loggeando */
+		if (!session()->has($this->keySession) || session($this->keySession)->id != $idUser) {
+			$user = collect(\DB::select("SELECT  * FROM users where id = {$idUser} "))->first();
+			session([$this->keySession => $user]);
+		}
+
+		return;
+	} 
+
+	/**
+	 * Retorna la sesion del Ussuario Logged
+	 */
+	public function getUserLogged(){
+		return session($this->keySession);
+	}
+
+	/*
+	 * Obtiene toda el registro de un usuario
+	 * return User;
+	 */
+	public function getUsuario($id_user){
+		return collect(\DB::select("SELECT  * FROM users where id = {$id_user} "))->first();
+	}
+
 	/**
 	 * Funcion Generica para incsertar o modificar las tablas
 	 * (se usa cuando el id se autogenera en la BD, autonumerico, serial, trigger, etc)
@@ -81,7 +113,9 @@ class MasterController extends Controller {
 		}
 	}
 
-
+	/**
+	 * Elimina el registro con id de una tabla 
+	 */
 	protected function eliminarDeTabla($id, $tabla) {
 		try {
 			\DB::table($tabla)->where('id', $id)->delete();
@@ -106,6 +140,9 @@ class MasterController extends Controller {
 		return $collectionADiffCollectionB;
 	}
 
+	/**
+	 * Retorna la fecha y hora en zona horaria -4  BOLIVIA
+	 */
 	protected function now() {
 		return date("Y-m-d H:i:s", time() - 4 * 60 * 60);
 	}
@@ -115,33 +152,6 @@ class MasterController extends Controller {
 		$usuario = collect(\DB::select("SELECT u.id, u.codigo_entidad, u.id_rol, r.rol FROM usuarios u, roles r WHERE u.id_rol = r.id AND u.id = {$id}"))->first();
 		return $usuario;
 	}
-
-	protected function generaClave() {
-		$cadena = $this->usuario->id . '||' . $this->usuario->rol . '||' . $this->now();
-		$clave = $this->encrypt($cadena);
-		// substr_replace($oldstr, $str_to_insert, $pos, 0);
-		return $clave;
-	}
-
-	protected function retroClave($clave) {
-		$array = explode('||', $this->decrypt($clave));
-		return (object)$array;
-	}
-
-	protected function encrypt($id) {
-		if (strlen($id) > 100)
-			return $id;
-		else
-			return \Crypt::encrypt($id);
-	}
-
-	protected function decrypt($id) {
-		if (strlen($id) > 100)
-			return \Crypt::decrypt($id);
-		else
-			return $id;
-	}
-
 
 }
 

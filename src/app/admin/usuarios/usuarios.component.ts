@@ -1,6 +1,7 @@
-import { HttpParams } from '@angular/common/http';
+// import { HttpParams } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { IonItem } from '@ionic/angular';
+import { UAuthService } from 'src/app/shared/uauth.service';
 // import { ResthttpService } from 'src/app/shared/resthttp.service';
 declare var $: any;
 declare var _: any;
@@ -18,17 +19,16 @@ declare var moment: any;
 })
 export class UsersComponent implements OnInit {
 
-  constructor(/*private http: ResthttpService*/) { }
+  constructor(private uAuth: UAuthService) { }
 
   ngOnInit(): void {
     this.user();
   }
 
   user() {
-    // let http = this.http;
-
+    let cmp = this;
     $(function () {
-
+      
       let ctxG: any = {
         rutabase: xyzFuns.urlRestApi,
         contenedor: '#users_contenedor',
@@ -36,7 +36,6 @@ export class UsersComponent implements OnInit {
         dataTableTarget: "#dataT",
         usersList: [],
         municipios: [],
-        minerales: [],
         id_rol_operador: 3, /*El id_rol del rol operador */
       }
 
@@ -47,7 +46,7 @@ export class UsersComponent implements OnInit {
           new: true,
           update: true,
           delete: true,
-          classError: 'br-a br-danger',
+          classError: 'error-validacion',
           sections: [
             {
               html_parent: '[__fields_datos_usuario]',
@@ -83,6 +82,10 @@ export class UsersComponent implements OnInit {
                 },
                 {
                   field: 'estado_usuario', type: 'select', label: 'Estado', placeholder: '', title: '', help: '',
+                  required: true, grid_column_span: 2, class: { bloque:'', group: 'has-primary', label: 'form-label', icon: '', input: 'form-input p5 wp50' },
+                },
+                {
+                  field: 'numero_celular', type: 'text', label: 'Núm. de Celular', placeholder: '', title: '', help: '',
                   required: true, grid_column_span: 2, class: { bloque:'', group: 'has-primary', label: 'form-label', icon: '', input: 'form-input p5 wp50' },
                 },
 
@@ -121,11 +124,7 @@ export class UsersComponent implements OnInit {
                   required: true, grid_column_span: 2, class: { bloque:'', group: '', label: 'form-label', icon: '', input: 'form-input p5 wp90' },
                 },
                 {
-                  field: 'tipo_formulario_chain_mineral', type: 'select', label: 'Tipo de Formulario', placeholder: '', title: '', help: '',
-                  required: true, grid_column_span: 2, class: { bloque:'', group: '', label: 'form-label', icon: '', input: 'form-input p5 wp90' },
-                },
-                {
-                  field: 'mineral', type: 'select', label: 'Tipo de Mineral', placeholder: '', title: '', help: '',
+                  field: 'id_formulario', type: 'select', label: 'Tipo de Formulario', placeholder: '', title: '', help: '',
                   required: true, grid_column_span: 2, class: { bloque:'', group: '', label: 'form-label', icon: '', input: 'form-input p5 wp90' },
                 },
               ]
@@ -213,19 +212,19 @@ export class UsersComponent implements OnInit {
           //   let opts = xyzFuns.generaOpciones(res.data, 'id', 'descripcion');
           //   $("[__rg_field=id_rol]").html(opts).val(""); /* inicializa en vacio para que se seleccione */
           // });
-          $.post(`${ctxG.rutabase}/datafrom`, { t: 'roles', o: 'id desc' }, (res) => {
+          $.post(`${ctxG.rutabase}/datafrom`, cmp.uAuth.addToken({ t: 'roles', o: 'id desc' }), (res) => {
             let opts = xyzFuns.generaOpciones(res.data, 'id', 'descripcion');
             $("[__rg_field=id_rol]").html(opts).val(""); /* inicializa en vacio para que se seleccione */
           });
 
           /* tipos de formulario */
-          $.post(`${ctxG.rutabase}/params-activos-dominio`, { dominio: 'tipo_formulario' }, (res) => {
-            let opts = xyzFuns.generaOpciones(res.data, 'codigo', 'nombre');
-            $("[__op_field=tipo_formulario_chain_mineral]").html(opts).val(""); /* inicializa en vacio para que se seleccione */
+          $.post(`${ctxG.rutabase}/datafrom`, cmp.uAuth.addToken({ t: 'formularios', w:[` estado_formulario = 'ACTIVO' `], o: 'id' }), (res) => {
+            let opts = xyzFuns.generaOpciones(res.data, 'id', 'nombre');
+            $("[__op_field=id_formulario]").html(opts).val(""); /* inicializa en vacio para que se seleccione */
           });
 
           /*  municipios*/
-          $.get(`${ctxG.rutabase}/municipiosch`, (res) => {
+          $.get(`${ctxG.rutabase}/municipiosch`, cmp.uAuth.addToken({})  ,(res) => {
             ctxG.municipios = res.data;
             let opts = xyzFuns.generaOpciones(res.data, 'id_municipio', 'municipio');
             $("[__op_field=id_municipio]").html(opts).val(""); /* inicializa en vacio para que se seleccione */
@@ -250,9 +249,7 @@ export class UsersComponent implements OnInit {
               if ($(elemInput).val() == null || $(elemInput).val().trim() == '') {
                 noCumplen.push($(elemInput).attr('id'));
                 $(elemInput).addClass(regmodel.model.classError);
-              }
-
-            
+              }            
           })   
 
           /* personalizado para tabla nims*/
@@ -274,9 +271,11 @@ export class UsersComponent implements OnInit {
         selectedRow: {},
 
         cargarDatos: function () {
-          $.get(`${ctxG.rutabase}/get-usuarios`, function (resp) {
+          xyzFuns.spinner();
+          $.get(`${ctxG.rutabase}/get-usuarios`, cmp.uAuth.addToken({}), (resp) => {
             ctxG.usersList = resp.data;
             conT.fillDataT();
+            xyzFuns.spinner(false);
           });
         },
         fillDataT: function () {
@@ -294,25 +293,27 @@ export class UsersComponent implements OnInit {
                 title: '_', 
                 render: function (data, type, row, meta) {
                   return /*html*/`<span __accion="editar"  __id_usuario=${row.id_usuario} 
-                                style="cursor:pointer; display:block; "class="p5 text-dark " title="Editar">
+                                style="display:block; "class="p5 text-dark cursor " title="Editar">
                                 <i class="fa-solid fa-user-pen fa-lg 
-                                ${row.estado_usuario == 'Activo' ? 'text-success-20' : 'text-danger-20'}  "></i></span>`
+                                ${row.estado_usuario == 'ACTIVO' ? 'text-success-20' : 'text-danger-20'}  "></i></span>`
                 }
               },
-              { title: 'Email', data: 'email', },
               {
                 title: 'Usuario', data: 'username', type: 'html',
                 render: function (data, type, row, meta) {
-                  return /*html*/`<span  style="display:block; background-color:${row.estado_usuario == 'Activo' ? '#edf5ff' : '#fff0f0'}" class="ph5 text-dark "><b>${row.username}</b></span>`
+                  return /*html*/`<span __accion="editar"  __id_usuario=${row.id_usuario}  style="display:block; background-color:${row.estado_usuario == 'ACTIVO' ? '#edf5ff' : '#fff0f0'}" class="ph5 text-dark cursor">
+                                    <b>${row.username}</b>
+                                  </span>`
                 }
               },
               { title: 'Nombres ', data: 'nombres', },
               { title: 'Apellidos', data: 'apellidos', },
               { title: 'Razon Social', data: 'razon_social', },
+              { title: 'Email', data: 'email', },
               {
-                title: 'Fecha Registro', data: 'created_at', 
+                title: 'Fecha Registro', data: 'fecha_registro', 
                 render: function (data, type, row, meta) {
-                  return (row.created_at != null && row.created_at != "") ? moment(row.created_at).format('DD/MM/YYYY') : "";
+                  return (row.fecha_registro != null && row.fecha_registro != "") ? moment(row.fecha_registro).format('DD/MM/YYYY') : "";
                 }
               },
               { title: 'Rol',  data: 'rol' },
@@ -336,36 +337,22 @@ export class UsersComponent implements OnInit {
           regmodel.create_fields(regmodel.model.sections);
           regmodel.inicializaControles();
           
-          /* Carga los minerales del dominio que empieza con form  para form1 o fomr2*/
-          $.post(`${ctxG.rutabase}/datafrom`, {t: 'parametros', w: [" dominio ilike 'form%' ", "activo"], o: "orden"} ,function(resp){
-            ctxG.minerales = resp.data;
-          });
-
-
         },
 
         /** opciones propias de la venta de Datos Nim */
         functionsNims: {
-          /* Cuando se selecciona la opcion Otro*/
-          mineralOtro: () => {
-            let inputOtro = /*html*/`<input type="text" class="form-input p5 wp90 form-control pl10 " id="mineral_otro" __op_field="mineral_otro" name="mineral_otro" placeholder="Especifique ..." title="" required="">`
-            let bloqueMineral = $("[__op_field=mineral]").closest('div').append(inputOtro);
-          },
-          /* Obtiene los datos del formulario Datos nim __op_fieed */
+          /* Obtiene los datos del formulario Datos nim op_field */
           getDatosNimFromFields: ()=> {
             let objDataNims = xyzFuns.getData__fields('__op_field');
 
-            /* Se obtiene el txto del tipo_formulario_chain */
-            objDataNims.tipo_formulario =  $("[__op_field=tipo_formulario_chain_mineral]").val();
+            objDataNims.id_formulario        =  $("[__op_field=id_formulario]").val();
+            objDataNims.tipo_formulario_nombre =  $('[__op_field=id_formulario]').find(":selected").text();
 
             let municipioSelected = _.find(ctxG.municipios, item => item.id_municipio == objDataNims.id_municipio);
             objDataNims.municipio = municipioSelected.municipio;
             objDataNims.codigo_municipio = municipioSelected.codigo_municipio;
-            /** Si se ha seleccionado la opcion Otroentonces se carga el valor del input mineral_otro */
-            if(objDataNims.mineral.toLowerCase() == 'otro' )
-              objDataNims.mineral = $("[__op_field=mineral_otro]").val();
 
-            objDataNims.estado_nim = 'Activo';
+            objDataNims.estado_nim = 'ACTIVO';
             return objDataNims;
           },
           /* Agrega las opciones del NIM al cuadro  */
@@ -374,21 +361,20 @@ export class UsersComponent implements OnInit {
             if(noCumplenValidacion.length > 0)
               return;
               
-              let objDatosNim = funs.functionsNims.getDatosNimFromFields();
-              let row = funs.functionsNims.agregaRowDatosNim(objDatosNim); 
-                      
-              $("[__wrapper_datos_nim]").toggle(200);
+            let objDatosNim = funs.functionsNims.getDatosNimFromFields();
+            let row = funs.functionsNims.agregaRowDatosNim(objDatosNim); 
+                    
+            $("[__wrapper_datos_nim]").toggle(200);
           },
           /* Genera el htmlpara agregar al cuadro / tabla de Nims del operador */
           agregaRowDatosNim: (obj) => {
             let row = /*html*/`
                       <tr __id="${obj.id || ''}" __nim="${obj.nim}" __id_municipio="${obj.id_municipio}"  
-                          __tipo_formulario="${obj.tipo_formulario}" __mineral="${obj.mineral}" __estado_nim="${obj.estado_nim}"  class="" style="border-bottom: 1px solid #ccc">
+                          __id_formulario="${obj.id_formulario}"  __estado_nim="${obj.estado_nim}"  class="" style="border-bottom: 1px solid #ccc">
                         <td class="p5">${obj.nim}</td>  
                         <td class="p5">${obj.municipio}</td>  
                         <td class="p5">${obj.codigo_municipio}</td>  
-                        <td class="p5">${obj.tipo_formulario}</td>  
-                        <td class="p5">${obj.mineral}</td>  
+                        <td class="p5">${obj.tipo_formulario_nombre}</td>  
                         <td class="p5"><span __accion_datos_nim=quitar class="fa fa-trash ph5 cursor "></span></td>  
                       </tr>`;
             $("[__nims_operador] table tbody").append(row);              
@@ -402,8 +388,7 @@ export class UsersComponent implements OnInit {
               obj.id              = elemRow.attr("__id");
               obj.nim             = elemRow.attr("__nim");
               obj.id_municipio    = elemRow.attr("__id_municipio");
-              obj.tipo_formulario = elemRow.attr("__tipo_formulario");
-              obj.mineral         = elemRow.attr("__mineral");
+              obj.id_formulario   = elemRow.attr("__id_formulario");
               obj.estado_nim      = elemRow.attr("__estado_nim");
 
               objNims.push(obj);
@@ -460,13 +445,15 @@ export class UsersComponent implements OnInit {
         /** MuestraModal con datos del usuario  */
         editar: (id) => {
           let id_usuario = id;
-          $.post(ctxG.rutabase + '/get-user', { id_usuario: id_usuario }, (resp) => {
+          xyzFuns.spinner();
+          $.post(ctxG.rutabase + '/get-user', cmp.uAuth.addToken({ id_usuario: id_usuario }), (resp) => {
             let user = resp.data;
             funs.setData(user);
             $("#modal [__titulo] span").html(`Modificar Usuario`);
             xyzFuns.showModal(ctxG.modal);
             /* Muestra la parte de operador o no, segun id_rol*/
             (user.id_rol == ctxG.id_rol_operador) ? $("[__wrapper_operador]").show() : $("[__wrapper_operador]").hide();
+            xyzFuns.spinner(false)
           })
         },
         /** Guarda al usuario */
@@ -480,11 +467,17 @@ export class UsersComponent implements OnInit {
             cumpleRequireds = regmodel.noCumplenValidacion(ctxG.modal, '[__rg_field]').length == 0 && regmodel.noCumplenValidacion(ctxG.modal, "[__nims_operador]").length == 0;
           }
           /* Comprueba si el nim asigando es vacio*/
-          if (!cumpleRequireds)
+          if (!cumpleRequireds){
+            xyzFuns.alertMsg("[__error]", `Se deben llenar los campos requeridos`, ' alert-danger br-a br-danger pastel   fs14 p5  mv10', '', '', true);
             return;          
-          
-          $.post(ctxG.rutabase + '/save-user', obj, function (resp) {
+          }
+          xyzFuns.spinner();
+          $.post(ctxG.rutabase + '/save-user', cmp.uAuth.addToken(obj), function (resp) {
+            if(resp.status=='error'){
+              xyzFuns.alertMsg("[__error]", `Error: ${resp.msg}`, ' alert-danger br-a br-danger pastel   fs14 p5  mv10', '', '', true);
+            }
             obj.id_usuario ? conT.refreshRow(resp.data) : conT.refreshDataT();
+            xyzFuns.spinner(false);
             new PNotify({
               title: resp.status== 'ok' ? 'Guardado' : 'Error',
               text: resp.msg,
@@ -506,6 +499,8 @@ export class UsersComponent implements OnInit {
           
           /* Quita las clases de error en todos los campos requeridos  */
           $("[required]").removeClass(regmodel.model.classError);
+          xyzFuns.alertMsgClose('[__error]');
+
         }
       }
 
@@ -540,18 +535,6 @@ export class UsersComponent implements OnInit {
             (id_rol_selected == ctxG.id_rol_operador) ? $("[__wrapper_operador]").show(400) : $("[__wrapper_operador]").hide(400);
           })
 
-          /** Al cambiar el combo tipo de formulario 1 o 2 , se actualizan los minerales disponibles de cada uno */
-          .on('change', '[__op_field=tipo_formulario_chain_mineral]', (e) => {
-            let minerales = _.filter(ctxG.minerales, item => item.dominio == $(e.currentTarget).val());
-            let opts = xyzFuns.generaOpciones(minerales, 'nombre', 'nombre');
-            $("[__op_field=mineral]").html(opts);
-          })
-
-          /** Al cambiar el combo minerales si se selecciona la opcion otro */
-          .on('change', '[__op_field=mineral]', (e) => {
-            ($(e.currentTarget).val() == 'Otro') ? funs.functionsNims.mineralOtro() : $("[__op_field=mineral_otro]").remove();  
-          })
-          
           /** Al hacer click en botones para agregar opciones del numero nim , se abre o se cierra el cuadro de agregar numero nim */
           .on('click', "[__accion_datos_nim]", (e) => {
             let accion_datos_nim = $(e.currentTarget).attr('__accion_datos_nim');
@@ -566,7 +549,7 @@ export class UsersComponent implements OnInit {
             /* Click en el icono de eliminar quita la fila,  */
             if(accion_datos_nim == 'quitar'){
               let row = $(e.currentTarget).closest('tr');
-              (_.isEmpty($(row).attr('__id'))) ? $(row).remove() :  $(row).hide().attr('__estado_nim','Eliminado');
+              (_.isEmpty($(row).attr('__id'))) ? $(row).remove() :  $(row).hide().attr('__estado_nim','ELIMINADO');
             }            
           })
 
@@ -577,6 +560,10 @@ export class UsersComponent implements OnInit {
 
           .on('click', "[__save]", () => {
             funs.saveData();
+          })
+          /* del alert */
+          .on('click', "[__alert_msg] .close", (e) => {
+            $(e.currentTarget).closest('[__alert_msg]').remove();
           })
           
 

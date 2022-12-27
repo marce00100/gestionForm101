@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Formularios;
 
+use App\Http\Controllers\Config\ConfigController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\MasterController;
 
@@ -10,34 +11,74 @@ use App\Http\Controllers\MasterController;
 
 class FormularioController extends MasterController {
 
-	private $numFormBase = 100000;
+	/**
+	 * POST Obtiene un USUARIO con sus NIMs y sus datos (municipio, cod_municipios, etc)
+	 * Se lo usa en Form101 para obtener los NIMS dispoiblesdel usuario que ingresa
+	 */
+	public function nimsFormsActivosUser(Request $req) {
+
+		$userLogged = $this->getUserLogged();
+		$id_usuario = $userLogged->id;
+		$user = \DB::select("SELECT u.id as id_usuario, u.email, u.nombres, u.apellidos, u.razon_social, u.nit, u.estado_usuario, u.formularios_disponibles, 
+                            n.id as id_nim, n.nim, n.estado_nim, n.id_formulario,
+                            f.nombre as tipo_formulario_nombre, 
+                            r.id as id_municipio, r.nombre as municipio, r.codigo_numerico as codigo_municipio
+                                FROM users u 
+                                LEFT JOIN user_nims  n on u.id = n.id_usuario
+                                LEFT JOIN regiones r ON n.id_municipio = r.id 
+                                left JOIN formularios f on n.id_formulario = f.id
+                                WHERE u.estado_usuario = 'ACTIVO' and n.estado_nim = 'ACTIVO'
+                                AND f.estado_formulario = 'ACTIVO'
+                                AND u.id = {$id_usuario}
+                                order by n.id_formulario");
+
+		return  response()->json([
+			'data'      => $user,
+			'status'   => 'ok'
+		]);
+	}
+
 	/**
 	 * POST Guardar las respuestas del Formulario en las tablas consolidadas
 	 */
 	public function saveRespuestas(Request $req) {
 
+		$id_usuario = $this->getUserLogged()->id;
+
+		/** Obtiene el valor base de la configuracion  */
+		$numFormBase = ConfigController::getValorConfig('numero_formulario_base');
 		/**Obtiene el MAximo Numero deFormulario */
 		$maxNumeroForm = collect(\DB::select("SELECT max(numero_formulario) as numero_formulario
                                         FROM forms_llenos"))->first()->numero_formulario;
-		$numeroFormulario = $maxNumeroForm + 1  > $this->numFormBase ? $maxNumeroForm + 1 : $this->numFormBase + 1;
+
+		$numeroFormulario = $maxNumeroForm + 1  > $numFormBase ? $maxNumeroForm + 1 : $numFormBase + 1;
 
 		$form_contestado                    = (object)[];
 		$form_contestado->id                = $req->id ?? null;
 		$form_contestado->id_formulario     = $req->id_formulario;
-		$form_contestado->id_usuario        = $req->id_usuario; //Auth::user() ? Auth::user()->id : 0;
+		$form_contestado->id_usuario        = $id_usuario; //Auth::user() ? Auth::user()->id : 0;
 		$form_contestado->numero_formulario = $numeroFormulario;
 		$form_contestado->tiempo_seg        = $req->tiempo_seg;
-		$form_contestado->estado_form_lleno = 'Enviado';
+		$form_contestado->estado_form_lleno = 'ENVIADO';
 		$form_contestado->ip                = $this->getIp();
 		$form_contestado->fecha_registro    = $this->now();
-		$form_contestado->nombres           = $req->nombres;
-		$form_contestado->apellidos         = $req->apellidos;
-		$form_contestado->razon_social      = $req->razon_social;
+		$form_contestado->nombres           = strtoupper(trim($req->nombres));
+		$form_contestado->apellidos         = strtoupper(trim($req->apellidos));
+		$form_contestado->razon_social      = strtoupper(trim($req->razon_social));
 		$form_contestado->nit               = $req->nit;
 		$form_contestado->nim               = $req->nim;
 		$form_contestado->id_municipio      = $req->id_municipio;
-		$form_contestado->tipo_formulario   = $req->tipo_formulario;
-		$form_contestado->mineral           = $req->mineral;
+		$form_contestado->periodo						= $this->now();
+		$form_contestado->uid   						= rand(1, 9999) . uniqid();
+
+
+		//TODO:start QUITAR next code 
+		return (object)[
+			'data'   => $form_contestado,
+			'status' => "ok",
+			'msg'    => 'Se guardó correctamente'
+		];
+		//TODO:end
 
 		try {
 			$form_contestado->id              = $this->guardarObjetoTabla($form_contestado, 'forms_llenos');
@@ -70,16 +111,15 @@ class FormularioController extends MasterController {
 	}
 
 	/**
-	 * POST obtiene una lista de lols formularios llenos segun parametros
+	 * POST LISTA DE FORMULARIOS LLENOS del USUARIO   segun parametros
 	 */
-	public function listFormsLlenos(Request $req){
-		/* TODO hacer que token de decifre y obtener el usuaurio */
-		$token = $req->_token;
-		$id_usuario = $token;
+	public function formsLlenosUser(Request $req){
+
+		$id_usuario = $this->getUserLogged()->id;
 		$list = \DB::select("SELECT f.*, r.nombre as municipio, r.codigo_numerico as codigo_municipio 
 												FROM forms_llenos f, regiones r 
 												WHERE f.id_municipio = r.id 
-												AND id_usuario = {$id_usuario} AND estado_form_lleno = 'Enviado' 
+												AND id_usuario = {$id_usuario} AND estado_form_lleno = 'ENVIADO' 
 												ORDER BY fecha_registro DESC ");
 
 		return response()->json([
@@ -90,29 +130,30 @@ class FormularioController extends MasterController {
 	}
 
 	/**
-	 * POST obtiene un formulario con sus respuestas a partr del id_form_lleno
+	 * GET no necesita TOKEN 
+	 * Obtiene un FORMULARIO CON RESPUESTAS  a partr del UID_form_lleno
 	 */
 	public function formLlenoRespuestas(Request $req){
-		$id_form_lleno = $req->id_form_lleno;
-		$formLleno  = collect(\DB
-				::select("SELECT f.*, r.nombre as municipio, r.codigo_numerico as codigo_municipio 
-									FROM forms_llenos f, regiones r 
-									WHERE f.id_municipio = r.id 
-									AND f.id = {$id_form_lleno} "))->first();
+		$form_lleno_uid = $req->fluid;
+		$formLleno  = collect(\DB::select("SELECT fl.*, 
+														r.nombre as municipio, r.codigo_numerico as codigo_municipio, f.nombre as tipo_formulario_nombre 
+														FROM forms_llenos fl, regiones r, formularios f
+														WHERE fl.id_municipio = r.id AND fl.id_formulario = f.id 
+														AND fl.uid = '{$form_lleno_uid}' "))->first();
 									
 		/* se agegan las respuestas al formulario lleno , se ordenan por los elementos para conseguir todas las preguntas y titulos etc, y se completan con LEFT JOIN con las respustas (aunque esten vacias se tendra el formulario completo con sus respuestas ) */
-		$respuestaslista = collect(\DB
-												::select("SELECT e.id as id_elemento, e.texto, e.descripcion, e.tipo, e.orden, e.config, 
+		$respuestaslista = collect(\DB::select("SELECT e.id as id_elemento, e.texto, e.descripcion, e.tipo, e.orden, e.config, 
 																	fr.id_form_lleno, fr.respuesta, fr.respuesta_opcion 
 																	FROM elementos e  
 																	LEFT JOIN forms_llenos_respuestas fr on e.id = fr.id_elemento AND fr.id_form_lleno =  {$formLleno->id} 
 																	WHERE e.id_formulario = {$formLleno->id_formulario} 
-																	ORDER BY e.orden"	))->groupBy('orden')->toArray();	
+																	ORDER BY e.orden"	))
+															->groupBy('orden')->toArray();	
 
-		$formLleno->elementos_respuestas = $respuestaslista;
+		$formLleno->respuestas = $respuestaslista;
 		return response()->json([
 			'data' => $formLleno,
-			'status' => 'ok'
+			'status' => 'ok',
 		]);
 
 
@@ -171,7 +212,9 @@ class FormularioController extends MasterController {
 		]);
 	}
 
-
+	/**
+	 * DE CLASE:  PARA OBTENER EL IP 
+	 */
 	private function getIp() {
 
 		if (!empty($_SERVER['HTTP_CLIENT_IP']))

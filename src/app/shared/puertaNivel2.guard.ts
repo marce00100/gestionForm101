@@ -1,27 +1,26 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
-import { UserService } from './user.service';
+import { UAuthService } from './uauth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PuertaNivel2 implements CanActivate {
   constructor(
-    private userS: UserService,
+    private uAuth: UAuthService,
     private router : Router
     ){}
 
   canActivate(): boolean {
-    let idRol = this.userS.getIdRol();
-    /** permite roles 1 y 2 */ 
-    if(idRol <= 2)
-      return true;
+    let idRol = this.uAuth.getIdRol();
+    /** permite roles 1 y 2 */
+    if (idRol != 2 && idRol != 1) {
+      this.router.navigate(['home']);
+      return false;
+    }
 
-    this.router.navigate(['home']);
-    return false;
-    
-
+    return true;
   }
   
 }

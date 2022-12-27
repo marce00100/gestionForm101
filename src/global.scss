@@ -53,6 +53,10 @@ table.bg-table thead tr th {
 /*-------------------------------------
 *  Fondos de Cabecera para el Logo 
 * ___________________________________*/
+.fondo-header{
+	background-repeat: no-repeat;
+	background-size: cover;
+}
 
 .fondo-header1 {
 	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' version='1.1' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns:svgjs='http://svgjs.com/svgjs' width='1440' height='560' preserveAspectRatio='none' viewBox='0 0 1440 560'%3e%3cg mask='url(%26quot%3b%23SvgjsMask1791%26quot%3b)' fill='none'%3e%3crect width='1440' height='560' x='0' y='0' fill='url(%23SvgjsLinearGradient1792)'%3e%3c/rect%3e%3cpath d='M1440 0L801.07 0L1440 132.33z' fill='rgba(255%2c 255%2c 255%2c .1)'%3e%3c/path%3e%3cpath d='M801.07 0L1440 132.33L1440 231.86L771.58 0z' fill='rgba(255%2c 255%2c 255%2c .075)'%3e%3c/path%3e%3cpath d='M771.58 0L1440 231.86L1440 323.95000000000005L661.27 0z' fill='rgba(255%2c 255%2c 255%2c .05)'%3e%3c/path%3e%3cpath d='M661.27 0L1440 323.95000000000005L1440 419.81000000000006L213.19 0z' fill='rgba(255%2c 255%2c 255%2c .025)'%3e%3c/path%3e%3cpath d='M0 560L511.88 560L0 557.89z' fill='rgba(0%2c 0%2c 0%2c .1)'%3e%3c/path%3e%3cpath d='M0 557.89L511.88 560L993.53 560L0 298.66999999999996z' fill='rgba(0%2c 0%2c 0%2c .075)'%3e%3c/path%3e%3cpath d='M0 298.66999999999996L993.53 560L1160.55 560L0 252.91999999999996z' fill='rgba(0%2c 0%2c 0%2c .05)'%3e%3c/path%3e%3cpath d='M0 252.91999999999996L1160.55 560L1355.57 560L0 99.41999999999996z' fill='rgba(0%2c 0%2c 0%2c .025)'%3e%3c/path%3e%3c/g%3e%3cdefs%3e%3cmask id='SvgjsMask1791'%3e%3crect width='1440' height='560' fill='white'%3e%3c/rect%3e%3c/mask%3e%3clinearGradient x1='15.28%25' y1='139.29%25' x2='84.72%25' y2='-39.29%25' gradientUnits='userSpaceOnUse' id='SvgjsLinearGradient1792'%3e%3cstop stop-color='rgba(14%2c 42%2c 71%2c 1)' offset='0'%3e%3c/stop%3e%3cstop stop-color='rgba(253%2c 191%2c 136%2c 1)' offset='0'%3e%3c/stop%3e%3cstop stop-color='rgba(255%2c 121%2c 0%2c 1)' offset='0.28'%3e%3c/stop%3e%3cstop stop-color='rgba(255%2c 150%2c 56%2c 1)' offset='0.49'%3e%3c/stop%3e%3cstop stop-color='rgba(255%2c 121%2c 0%2c 1)' offset='0.64'%3e%3c/stop%3e%3cstop stop-color='rgba(255%2c 121%2c 0%2c 1)' offset='1'%3e%3c/stop%3e%3c/linearGradient%3e%3c/defs%3e%3c/svg%3e");
@@ -125,18 +129,21 @@ _______________________________________________*/
 
 .item-dato-general .item-label {
 	display: inline-block;
-	font-size: 0.8em;
+	font-size: 0.9em;
 }
 
 .item-dato-general .item-contenido {
 	border: 2px solid rgb(31, 166, 137);
 	min-height: 30px;
 	border-radius: 6px;
-	padding: 5px;
+	padding: 5px 10px;
 	font-weight: 600;
 }
 
-
+.error-validacion{
+	border: 1px solid var(--op-danger)!important;
+	background-color: #fff5f5!important;
+}
 
 
 
@@ -227,7 +234,7 @@ _______________________________________________*/
 	--op-warning: var(--op-amarillo-oscuro);
 	--op-success: var(--op-success);
 	--op-system: #3a8976;
-	--op-info: #d3ff7a;
+	--op-info: #28bec6;
 	--op-dark: #3e3f3c;
 	--op-light: #f3f3f3;
 
@@ -398,6 +405,20 @@ _______________________________________________*/
 	--op-alert-dark-80: #140a14;
 	--op-alert-dark-90: #0a050a;
 
+
+	--op-system: #3a8976;
+	--op-system-light-10: #4db39b;
+	--op-system-light-20: #60c0aa;
+	--op-system-light-30: #66cbb4;
+	--op-system-light-40: #8fd6c6;
+	--op-system-light-50: #abeadb;
+	--op-system-light-60: #cdf8ee;
+	--op-system-dark-10: #2e8671;
+	--op-system-dark-20: #297e6a;
+	--op-system-dark-30: #236253;
+	--op-system-dark-40: #1d6756;
+	--op-system-dark-50: #175d4c;
+	--op-system-dark-60: #0c3f33;
 
 	--op-marron: #7b4f2e;
 	--op-marron-light-10: #886143;
@@ -1643,3 +1664,270 @@ _______________________________________________*/
 .text-marron--80 {
 	color: var(--op-marron-dark-80) !important;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*--------------------------------------------
+*              DE STYLE-FORMS
+* Para manipularlo
+______________________________________________*/
+
+.quest{
+  color: rgba(19, 19, 19) !important;
+}
+.quest-input{	
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: none !important; 
+  width: 90%;
+  resize: none; 
+}
+.quest-input-line{
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: 1px solid #444 !important;  
+  width: 90%;
+  resize: none; 
+}
+textarea.quest-input-line{
+  border: 1px solid #444 !important; 
+  width: 90%;
+  resize: none !important; 
+}
+.quest-input.adorno{
+	border-bottom: 1px dashed grey !important;
+}
+.quest-input:hover{
+  border-bottom: 1px solid grey !important;  
+}
+.quest-input:focus,   .quest-input-line:hover, .quest-input-line:focus{
+  border-bottom: 1px solid #d25a0a !important;  
+}
+/* para que no salga un borde al rededor feo*/
+.quest-input:focus-visible{
+  outline: none;
+}
+.quest-h1{
+	font-size: 30px !important;
+  height: 40px;  
+}
+.quest-h2{
+	font-size: 20px !important;
+  height: 30px;  
+}
+
+.quest-md{
+  font-size: 14px !important;
+}
+.quest-sm{
+	font-size: 11px !important;
+}
+
+/** los textos de la encueta */
+.quest-titulo{
+	font-size: 18px !important;
+	font-weight: bold;
+	text-align: left;
+  margin-bottom: 10px !important;
+  color: var(--op-theme1-dark-40) !important;
+  // color: #303030 !important; // text-333
+  // color: #116e7a !important; // original
+}
+
+/* para los titulos colocados y para los titulos que son generados*/
+.quest-titulo, .quest-titulo .__elem_texto{
+  margin-left: 20px;
+}
+
+.quest-descripcion{
+  font-size: 12px !important;
+  /* color: #b54633 !important; */
+  font-style: italic;
+  font-weight: 600;
+}
+
+.quest-pregunta{
+	font-size: 16px !important;
+}
+
+.quest-opcion{
+  font-size: 14px !important;
+  font-weight: normal;
+}
+.quest-texto{
+	font-size: 14px !important;
+  font-weight: bold;
+  color: #333;
+}
+
+.quest-error-validacion{
+  border: 2px solid rgb(206, 27, 27)!important;
+}
+
+
+.quest-label{
+	font-size: 14px !important;
+	font-weight: normal;	
+}
+.quest-input-label{
+  padding: 5px 20px ;
+  height: 32px;
+}
+
+/* Cada elemento */
+.__elemento{
+	margin: 0px 0px 0px 0px;
+	padding: 0px 15px;
+	position: relative;
+  border: 1px solid rgb(0,0,0,0) ;
+}
+.elemento_over{
+	border: 1px solid #ddd !important;
+}
+.elemento_sel{
+	border: 2px solid #bbb !important;
+	border-left: 3px solid #d1b00e !important;
+}
+
+/*En edicion coloca un bullet redondo o cuadrado como radio o checkbox*/
+.quest_option_single li>bullet:before
+{
+  content: "\2609";
+  margin-right: 5px;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.quest_option_multiple li>bullet:before
+{
+  content: "\2610";
+  margin-right:5px;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.quest_option_single [__config_btn=checkbox], .quest_option_multiple [__config_btn=checkbox]{
+  display: none;
+}
+
+.quest_option_mixta li>bullet:before
+{
+  content: "\2609";
+  margin-right: 5px;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.quest_option_mix_radio bullet:before
+{
+  content: "\2609";
+  margin-right: 5px;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.quest_option_mixta .quest_option_mixta_check bullet:before
+{
+  content: "\2610"!important;
+  margin-right:5px;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.select_tres_oculto{
+  display: none;;
+}
+
+
+.activoPri {
+  background-color: #444449 !important;
+  /* 4c5064 dark-dark */
+  color: #f1f1f1 !important;
+  border-color: #aed248;
+}
+.activoSub {
+  background-color: #ABEBC6 !important;
+  border-color: #aed248;
+}
+
+
+
+
+/* mINPUTS PARA QUE SE VEAN MAS PEQUEÑOS */
+.admin-form .select > select {
+/*    -moz-appearance: none;
+    background: #fff none repeat scroll 0 0;
+    border: 1px solid #ddd;
+    color: #626262;
+    display: block;
+    margin: 0;
+    outline: medium none;*/
+    padding: 8px 10px;
+/*    text-indent: 0.01px;
+    text-overflow: "";
+    z-index: 10;*/
+}
+
+/*********************************/
+/** Para fondo del formulario ***/
+// .fondo_panel{
+//   background: linear-gradient(to bottom, rgb(236 236 236 / 88%) 0%,rgb(231 231 231 / 83%) 100%),
+//   url(../img/bluelightspot.jpg) repeat center top;
+//   /* url(../img/data-mining.jpg) repeat center top; */
+//   background-size: contain;
+// }
+// /* transparencia*/
+// .efecto_sobre_fondo_panel{
+//   box-shadow: 0px -1px 14px 0px;
+//     background-color: rgb(255 255 255 / 68%);
+
+// }
+
+
+/*********************************************************/
+/************** los FIELDS AUTOGENERADOS ****************
+	/* Estilos del Formulario Inicial de Datos del encuestado autogenerado*/
+	/*  estilo CSS Para maquetar en grid */
+	.rg-grid-form {
+		display: grid!important;
+		grid-template-columns: 1fr 1fr;
+		gap: 10px 0px;
+		align-items: start;
+	}
+
+	/* cuando el field abarca dos espacios Fr */
+	.grid-column-span-2 {
+		grid-column: span 2;
+	}
+
+
+  .form-label{
+    font-size: 14px !important;
+    font-weight: normal;	
+  }
+  .form-input{
+    padding: 16px ;
+    height: 36px;
+    border-radius: 6px;
+  }

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { UAuthService } from 'src/app/shared/uauth.service';
 declare var $: any;
 declare var _: any;
 declare var xyzFuns: any;
@@ -11,16 +12,18 @@ declare var PNotify: any;
 })
 export class GestorFormsComponent implements OnInit {
 
-  constructor() { }
+  constructor(private uAuth: UAuthService) { }
 
   ngOnInit() {
     let gestor = this.gestorformularios;
     gestor();
+    // this.gestorformularios();
   }
 
-  gestorformularios = function(){
+  gestorformularios = () => {
+    let cmp = this; 
 
-    return $(function(){
+    $(function(){
       /*----   ctxG variable que contiene el contexto global, variables globales */
       let ctxG = {
         rutabase: xyzFuns.urlRestApi,
@@ -354,7 +357,7 @@ export class GestorFormsComponent implements OnInit {
         save: function () {
           let objSend: any = ctxMain.getData();
           xyzFuns.spinner(true, { texto: 'Guardando ...' });
-          $.post(ctxG.rutabase + '/save-form-elems', objSend, function (res) {
+          $.post(ctxG.rutabase + '/save-form-elems', cmp.uAuth.addToken(objSend), function (res) {
             xyzFuns.spinner(false);
             ctxMain.setData(res.data);
   
@@ -371,19 +374,20 @@ export class GestorFormsComponent implements OnInit {
     
       let funs = {
         cargarComboFomularios: () => {
-          $.get(`${ctxG.rutabase}/get-forms`, (res) => {
+          $.get(`${ctxG.rutabase}/get-forms`, cmp.uAuth.addToken({}), 
+          res => {
             let comboFormularios = $("[__rg_field=id_formulario]");
             let optsForms = xyzFuns.generaOpciones(res.data, 'id', 'nombre');
             comboFormularios.append(optsForms);
             funs.cargarFormulario(comboFormularios.val());
-
           })
         },
 
         /** Carga el formulario seleccionado */
         cargarFormulario: (id_formulario) => {
           xyzFuns.spinner();
-          $.post(`${ctxG.rutabase}/get-form-elems`, { id_formulario: id_formulario }, function (res) {
+
+          $.post(`${ctxG.rutabase}/get-form-elems`, cmp.uAuth.addToken({ id_formulario: id_formulario }), function (res) {
             ctxMain.setData(res.data);
             /* Para que se acomoden los tamaños*/
             $("[__tipo=pregunta] textarea").trigger('keydown');
@@ -545,7 +549,6 @@ export class GestorFormsComponent implements OnInit {
         $("#gestor_formulario")
         /** Seleccionar Formulario */
         .on('change', "[__rg_field='id_formulario']", function() {
-          console.log($("[__rg_field=id_formulario]").val());
           funs.cargarFormulario($("[__rg_field=id_formulario]").val());
         })
     

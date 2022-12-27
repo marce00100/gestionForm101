@@ -51,66 +51,21 @@
 
 			<!-- -----------------------------------------          Modal  --------------------------------------------------- -->
 			<div id="modal" class="white-popup-block popup-basic mfp-with-anim mfp-hide">
-        <div class="panel">  
-          <div class="panel-body of-a bg-light_ darker_ fondo_panel" style="position: relative;">
-  
-            <div __frm_content
-              class="efecto_sobre_fondo_panel_ bg-white mv30 pt10 pb20 br12 col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12 " >
-              <div __frms class="" style=" min-height:80vh; overflow-y: auto; align-items: center;">
-  
-                <div __frm_cabecera
-                  style="background-color: transparent; color: #116e7a;text-align: center; padding: 10px; border-bottom: 1px solid #ccc;">
-                  <h1 clasS="fw600 text-theme1--30">FORMULARIO 101</h1>
-                  <h4  class="text-theme1--30 fw600 mn ">
-                    PARA MINERALES <span __tipo_mineral></span>
-                  </h4>
-                  <div class="mt15  text-dark-darker fs12 fw600">FORMULARIO ÚNICO DEPARTAMENTAL PARA CONTROL DE SALIDA,
-                    AUTORIZACIÓN DE TRANSPORTE Y VENTA DE MINERALES <span __tipo_mineral></span>
-                  </div>
-                </div>
-  
-                <div __card __frm_datos_general class=" wp100 mt30" >
-                  <div class="quest-titulo">
-                    DATOS REGISTRADOS
-                  </div>
-                  <div class="datos-generales">
-                    <div class="item-dato-general">
-                      <em class="item-label">1. Número de Formulario</em>
-                      <div class="item-contenido text-center" __info_general="numero_formulario"></div>
-                    </div>
-                    <div class="item-dato-general">
-                      <em class="item-label">2. Número de NIM</em>
-                      <div class="item-contenido text-center" __info_general="nim"></div>
-                    </div>
-                    <div class="item-dato-general">
-                      <em class="item-label">3. Número de NIT</em>
-                      <div class="item-contenido text-center" __info_general="nit"></div>
-                    </div>
-                    <div class="item-dato-general">
-                      <em class="item-label">4. PERIODO</em>
-                      <div class="item-contenido text-center" __info_general="periodo"></div>
-                    </div>
-                    <div class="item-dato-general" style="flex-basis: 100%;">
-                      <em class="item-label">5. Operador Minero</em>
-                      <div class="item-contenido" __info_general="nombres"></div>
-                    </div>
-                    <div class="item-dato-general" style="flex-basis: 100%;">
-                      <em class="item-label">6. Procedencia</em>
-                      <div class="item-contenido" __info_general="procedencia"></div>
-                    </div>
-                    <!-- <div class="item-dato-general" style="flex-basis: 100%;">
-                      <em class="item-label">7. Tipo de Mineral y Leyes DM %</em>
-                      <div class="item-contenido" __info_general="mineral"></div>
-                    </div> -->
-                  </div>
-                </div>
-  
-                <div __card __frm_datos_respuestas class=" mt10 flex flex-wrap align-start">
-                </div>
-                <div id="__qr"></div>
-              </div>
-  
+        <div class="panel"> 
+          <div class="panel-heading h-50 bg-222 text-999 flex align-center">
+            <div class="ml30">
+              <button __pdf (click)="exportPDF()" class="btn  bg-222 btn-sm mh10" title="Descargar como PDF"><i class="glyphicons glyphicons-download_alt"></i> PDF</button>
+              <button class="btn  bg-222 btn-sm mh10 ph10" title="Copiar Link de visualización"><i class="glyphicons glyphicons-link"></i></button>
             </div>
+            <button class="btn bg-222 ph10 close text-fff" style="position: absolute; right: 0px; text-shadow:none; opacity: 0.8;">
+              <i class="glyphicons glyphicons-remove_2"></i>
+            </button>
+          </div> 
+          <div class="panel-body of-a bg-light_ darker_ fondo_panel" style="position: relative;">
+            <div __frm_content id="__frm_content" class="efecto_sobre_fondo_panel_ bg-white  pt10 pb20 br12 col-md-8 
+            col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12 _text-111 "  >
+            </div>
+
           </div>
         </div>
 				<!-- end: .panel -->

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { UserService } from './user.service';
+import { UAuthService } from './uauth.service';
 
 declare var $: any;
 
@@ -9,7 +9,7 @@ declare var $: any;
 })
 export class ResthttpService {
 
-  constructor(private http: HttpClient, private authS: UserService) { }
+  constructor(private http: HttpClient, private authS: UAuthService) { }
 
 
   // public send(verbo: string, url: string, obj: any, fn: Function) {

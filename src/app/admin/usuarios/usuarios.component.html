@@ -34,10 +34,8 @@
 						<div class="panel-body pn">
 							<div class="row">
 								<div class="col-md-12">
-									<button __accion="nuevo" class="btn btn-sm bg-success m5 br4"><i
-											class="fa fa-plus text-white"></i> Agregar </button>
-									<!-- <button  __accion="eliminar" class="btn btn-sm btn-danger dark m5 br4"><i class="fa fa-minus-circle text-white"></i> Eliminar</button>                                 -->
-
+									<button __accion="nuevo" class="btn btn-sm bg-success  m5 br4 ph30 br-a br-dark">
+										<i class="fa fa-plus "></i> Agregar </button>
 								</div>
 							</div>
 							<div class="">
@@ -56,7 +54,7 @@
 			<div id="modal" class="white-popup-block popup-basic mfp-with-anim mfp-hide">
 				<div class="panel frctl">
 					<!-- panel heading -->
-					<div class="bg-system  text-white frctl flex align-center p15 ">
+					<div class="bg-system text-333 frctl flex align-center p15 ">
 						<i class="fa-solid fa-user-pen fa-lg ml10"></i>
 						<h2 class="panel-title ml10" __titulo><span>__</span></h2>
 					</div>
@@ -76,7 +74,7 @@
 									<!-- CUADRO de NIMs asociados -->
 									<div class="col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10 col-xs-12">
 										<div class="flex align-end justify-between">
-											<span><b>Número(s) de NIM y minerales asosciados</b></span>
+											<span><b>Número(s) de NIM</b></span>
 											<button __accion_datos_nim="nuevo_nim" class="btn btn-sm btn-system pull-right br6"><i
 													class="fa fa-plus mr10"></i> Agregar NIM</button>
 										</div>
@@ -110,7 +108,6 @@
 															<th class="p5">Municipio</th>
 															<th class="p5">Código Mun.</th>
 															<th class="p5">Formulario</th>
-															<th class="p5">Tipo de Mineral</th>
 															<th class="p5">-</th>
 														</tr>
 													</thead>
@@ -128,10 +125,9 @@
 						</div>
 					</div>
 					<!-- panelfooter -->
-					<div class="panel-footer flex justify-evenly">
+					<div class="panel-footer flex flex-wrap justify-evenly">
+						<div __error class="wp100"></div>
 						<!-- CON ICONOS -->
-						<!-- <button __cerrar class="btn bg-danger lighter br-a br-dark-light br6 btn-md w150 "><i class="glyphicons glyphicons-bomb mr10"></i>Cancelar</button>
-				<button __save type="submit" class="btn btn-primary br-a br-dark-light btn-md br6 w200"><i class="glyphicons glyphicons-ok_2 mr10"></i>Guardar</button> -->
 						<button __cerrar class="btn bg-danger lighter br-a br-dark-light br6 btn-md w150 ">Cancelar</button>
 						<button __save type="submit" class="btn btn-primary br-a br-dark-light btn-md br6 w200">Guardar</button>
 					</div>

@@ -5,11 +5,13 @@ import { FormsModule } from '@angular/forms';
 
 import { PublicRoutingModule } from './public-routing.module';
 import { LoginComponent } from './login/login.component';
+import { ViewformComponent } from './viewform/viewform.component';
 
 
 @NgModule({
   declarations: [
-    LoginComponent
+    LoginComponent,
+    ViewformComponent
   ],
   imports: [
     CommonModule,

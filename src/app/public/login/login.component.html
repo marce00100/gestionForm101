@@ -43,7 +43,7 @@
               <div __error_msg clasS="mb20 fs15 text-danger--20" style="display: none"></div>
               <div>
                 <label class="form-label mb10 {{error_email ? 'text-danger fw600' : ''}}" for="email">Correo Electrónico</label>
-                <input type="text" class="form-control" __lg=email name="email" [(ngModel)]="email" (keydown.enter)="login()" required>
+                <input type="text" class="form-control" __lg=email name="username" [(ngModel)]="username" (keydown.enter)="login()" required>
               </div>
               <div class="mt20">
                 <label class="form-label mb10 {{error_password ? 'text-danger fw600' : ''}}"  for="password" required>Contraseña</label>

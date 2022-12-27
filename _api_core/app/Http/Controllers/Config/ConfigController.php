@@ -65,6 +65,15 @@ class ConfigController extends MasterController
     }
 
     /**
+     * DE CLASE : 
+     * Obtiene el valor de un parametro
+     */
+    public static function getValorConfig($configNombre, $dominio = 'config') {
+        $parametro = collect(\DB::select("SELECT * from parametros where dominio = '$dominio' AND nombre = '$configNombre' AND activo "))->first();
+        return $parametro->valor ?? null;
+    }
+
+    /**
      * POST  Obtiene la data  (*) from Table wher condiciones
      * {t: 'table', w: ['cond1', 'cond2'], o: ' lo que viene despues de order by '}
      */

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { UserService }        from '../../shared/user.service';
+import { UAuthService }        from '../../shared/uauth.service';
 import { AppComponent }      from '../../app.component';
 import { Router }            from '@angular/router';
 import { HttpClient }        from '@angular/common/http';
@@ -17,46 +17,46 @@ declare var xyzFuns: any;
 })
 
 export class LoginComponent implements OnInit {
-  email:string = '';
+  username:string = '';
   password:string = '';
   error_email:boolean = false;
   error_password:boolean = false;
 
   constructor(
-    private userS: UserService,
+    private uAuth: UAuthService,
     private router: Router,
     private appComponent: AppComponent,
     private http : HttpClient,
   ) { }
 
   ngOnInit(): void {
-      if (this.userS.isLogged()){
+    if (this.uAuth.isLogged()) {
         this.router.navigate(['home']);    
       }
   }
 
   login(){
     $("[__error_msg]").hide();
-    let email = this.email.trim().toLowerCase();
+    let username = this.username.trim().toLowerCase();
     let password = this.password;
-    this.error_email = email == '';
-    this.error_password = password == '';
+    this.error_email = (username == '');
+    this.error_password = (password == '');
     if(this.error_email || this.error_password){
       this.mostrarError(' ** Los campos son requeridos.');
       return;
     }
 
     let user = {
-      email: email,
+      username: username,
       password: password
     }
     
     //$("[__output]").append(`<p>Envio a ${xyzFuns.urlRestApi}/auth -> ${user.email}  ${user.password}</P>`);
     
-    // xyzFuns.spinner();
+    xyzFuns.spinner();
     this.http.post<any>(`${xyzFuns.urlRestApi}/auth`, user).subscribe({
       next: res => {
-        // console.log(" Todo Success :", res.msg);
+        // console.log("  Success :", res.msg);
         // $("[__output]").append(`<p>Todo Success : ${res.msg} </P>`);
         if (res.status == 'error') {
           this.mostrarError(' **' + res.msg);
@@ -65,16 +65,20 @@ export class LoginComponent implements OnInit {
         }
 
         let dt = res.data;
-        this.userS.login({
+        this.uAuth.login({
           token: dt.token,
           token2: dt.token2,
           user: dt.user
         });
-
+        /** Se subscribe el observable de ctxUser */
+        this.appComponent.ngOnInit();
+        
         xyzFuns.spinner(false);
+        // this.appComponent.colocaUsername();
         this.router.navigate(['/home']);
       },
       error: error => {
+          xyzFuns.spinner(false);
           $("[__output]").append(`<p>Error post: ${error} </P>`);
           console.log(arguments);
           console.log("Error post: " + error);

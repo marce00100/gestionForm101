@@ -1,19 +1,19 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
-import { UserService } from './user.service';
+import { UAuthService } from './uauth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PuertaAuthGuard implements CanActivate {
   constructor(
-    private userS: UserService,
+    private uAuth: UAuthService,
     private router : Router
     ){}
 
   canActivate(): boolean  {
-    if(!this.userS.isLogged()){
+    if(!this.uAuth.isLogged()){
       this.router.navigate(['login']);
       return false;
     }

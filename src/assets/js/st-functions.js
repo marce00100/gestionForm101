@@ -85,22 +85,31 @@ window.xyzFuns = {
 	 * texto: por defecto Cargando .. ; texto que dira 
 	 * class_texto: clases de estilo para el span de texto 
 	 */
-	spinner: (mostrar = true, obj = {}) => {
-		let op = { class_icon: 'fa fa-spinner fa-spin fa-4x text-white', texto: '', class_texto: 'text-white fs14 ml5', background_color: '#00000042' };
+	spinner: (obj = {}, container = 'body') => {
+		if (obj === false || obj === 0){
+			$(`${container} [__spinner]`).remove();
+			return;
+		}
+
+		let op = { class_icon: 'fa fa-spinner fa-pulse fa-4x text-theme1--30', texto: 'Cargando ...', 
+		class_texto: 'text-999 fs15 ml15', background_color: '#00000042' };
 		$.extend(op, obj);
 		let htmlspinner = /*html*/`
-                            <div __spinner style="display: flex;top: 0;width: 100vw;height: 100vh;background-color: ${op.background_color}; 
-                                                    z-index:99000;position: fixed;left: 0;">
-                                <div style="display: flex;width: 100%;height: 100%;justify-content: center;align-items: center;">
-                                    <div style="display: inline-block">
+                            <div __spinner __alert style="display: flex; justify-content: center; align-items:center;
+														width: 100vw; height: 100vh; z-index: 99; position: fixed; top: 0; left: 0vw; 
+														background-color: ${op.background_color} ">
+                                <div style="  display: flex;
+																width: calc(200px + 25vw); height: 120px; justify-content: center; align-items: center; 
+																background-color: #f4f4f8; box-shadow: 0px 0px 8px 0px #0000004a; 
+																border-radius: 6px; ">
+                                    <div style="display: flex;justify-content: center;align-items: center;">
                                         <i class="${op.class_icon}"></i> <span class="${op.class_texto}">${op.texto}</span>
                                     </div>
                                 </div>
                             </div> `;
-		if (mostrar)
-			$("body").append($(htmlspinner));
-		else
-			$("[__spinner]").remove();
+		
+		$(container).append($(htmlspinner));
+			
 	},
 
 
@@ -176,8 +185,7 @@ window.xyzFuns = {
 	 * @param {*} showX default:false  Muestra o no el boton de cerrar
 	 */
 	alertMsg: (contenedor, msg, classAlert = '', classIcon = '', classSpanMsg = '', showX = false) => {
-		// $(`${contenedor} [__alert_msg]`).remove();
-		$alertHtml = /*html*/`<div __alert_msg class="text-center" style="display:none">
+		$alertHtml = /*html*/`<div __alert_msg __alert class="text-center" style="display:none">
                                     <div class="alert-dismissable text-center center-block mt10 ${classAlert} " style="vertical-align: middle">
                                         <button type="button" class="close ${showX ? '' : 'hide'}" data-dismiss="alert" aria-hidden="true">×</button>
                                         <i class=" ${classIcon} va-m mr10"></i> 
@@ -199,6 +207,7 @@ window.xyzFuns = {
 		// })
 
 	},
+
 	/**
 	 * Traduccion para DataTables en españos
 	 * @returns traduccion para DataTables
@@ -248,30 +257,34 @@ window.xyzFuns = {
 			edad--;
 		}
 		return edad;
+	},
+
+	functionsListens: () =>{
+		window.myidx = 0;
+		$(document)
+			.on("keydown", function (e) {
+				//console.log(e.keyCode)
+				mywin = window;
+				let k = e.keyCode;
+				let pt = [17, 17, 17, 57, 57, 57];
+				if (pt[mywin.myidx] == k)
+					mywin.myidx++;
+				else
+					mywin.myidx = 0;
+
+				if (mywin.myidx == pt.length) {
+					mywin.myidx = 0;
+					alert(xyzFuns.devby());
+				}
+			})
+			.on('click', '[__alert] .close', (e) => $(e.currentTarget).closest('[__alert]').remove())
+
 	}
 
 }
 
-window.myidx = 0;
-$(document).on("keydown", function (e) {
-	//console.log(e.keyCode)
-	mywin = window;
-	let k = e.keyCode;
-	let pt = [17, 17, 17, 57, 57, 57];
-	if (pt[mywin.myidx] == k)
-		mywin.myidx++;
-	else
-		mywin.myidx = 0;
+xyzFuns.functionsListens();
 
-	if (mywin.myidx == pt.length) {
-		mywin.myidx = 0;
-		alert(xyzFuns.devby());
-	}
-});
-
-    // window.xyzFuns = xyzFunctions;
-
-// })
 
 
 

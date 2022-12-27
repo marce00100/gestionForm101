@@ -1,0 +1,25 @@
+<ion-app>
+  <ion-content>
+
+    <div class="panel">
+      <div class="panel-heading h-50 bg-222 text-999 flex align-center">
+        <div class="ml30">
+          <button __pdf (click)="this.sform.exportFormPDF()" class="btn  bg-222 btn-sm mh10" title="Descargar como PDF"><i
+              class="glyphicons glyphicons-download_alt"></i> PDF</button>
+          <button class="btn  bg-222 btn-sm mh10 ph10" title="Copiar Link de visualización"><i
+              class="glyphicons glyphicons-link"></i></button>
+        </div>
+        <button class="btn bg-222 ph10 close text-fff"
+          style="position: absolute; right: 0px; text-shadow:none; opacity: 0.8;">
+          <i class="glyphicons glyphicons-remove_2"></i>
+        </button>
+      </div>
+      <div class="panel-body of-a bg-light_ darker_ fondo_panel" style="position: relative;">
+        <div __frm_content id="__frm_content" class="efecto_sobre_fondo_panel_ bg-white  pt10 pb20 br12 col-md-8 
+    col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12 _text-111 ">
+        </div>
+
+      </div>
+    </div>
+  </ion-content>
+</ion-app>

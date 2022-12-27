@@ -8,7 +8,8 @@ import { HttpClientModule }                from '@angular/common/http';
 /** SERVICIOS Y GUARDS */
 import { AppComponent }      from './app.component';
 import { AppRoutingModule }  from './app-routing.module';
-import { UserService }       from './shared/user.service';
+import { UAuthService }      from './shared/uauth.service';
+import { SFormService }      from './shared/sform.service';
 import { PuertaAuthGuard }   from './shared/puertaAuth.guard';
 import { PuertaNivel1 }      from './shared/puertaNivel1.guard';
 import { PuertaNivel2 }      from './shared/puertaNivel2.guard';
@@ -29,16 +30,18 @@ import { HomeComponent }    from './shared/home.component';
     BrowserModule, 
     IonicModule.forRoot(), 
     AppRoutingModule,
+    HttpClientModule,
     FormsModule,
+    
     PublicModule,
     OperModule,
     AdminModule,
-    HttpClientModule
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     AppComponent,
-    UserService,
+    UAuthService,
+    SFormService,
     // ResthttpService,
 
     PuertaAuthGuard,

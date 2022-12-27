@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { UAuthService } from 'src/app/shared/uauth.service';
 
 declare var $: any;
 declare var _: any;
@@ -14,33 +15,28 @@ declare var xyzFuns: any;
 })
 export class Form101Component implements OnInit {
 
-  constructor(private router: Router) { }
+  constructor(private uauth: UAuthService, private router: Router) { }
 
   ngOnInit(): void {
     this.form();
     // form();
   }
 
-  volverInicio(){
+  volverInicio() {
     this.router.navigate(['listaforms']);
   }
 
-  form = function () {
+  form() {
     let component = this;
     $(function () {
 
       let ctxG: any = {
         rutabase: xyzFuns.urlRestApi,
+        content: "#formulario_101",
         timeIni: new Date(), /* Para calcular tiempo*/
         municipios: [],
         datosUserNims: [],
         nimSel: {},
-        token: localStorage.getItem('uid_uid'),
-      }
-
-      let temp = {
-        // id_usuario: 6, // 3 4 6
-        id_formulario: 1
       }
 
       let form = {
@@ -183,7 +179,7 @@ export class Form101Component implements OnInit {
 
               /* Si es requerido */
               if(cnfElem.requerido)
-                $(elemento).attr('require', true);
+                $(elemento).attr('required', true);
               
                 /* Modifica el ancho */
               if(cnfElem.ancho)
@@ -338,13 +334,13 @@ export class Form101Component implements OnInit {
         /** Carga los Formularios inicialmente */
         cargarComboUserNims: () => {
           funs.stateView('inicial')
-          xyzFuns.spinner();
-          $.post(`${ctxG.rutabase}/operador-nims`, {_token : ctxG.token}, (res) => {
+          funs.spinner();
+          $.post(`${ctxG.rutabase}/nimsforms-activos-for-user`, component.uauth.addToken({}), (res) => {
             ctxG.datosUserNims = _.map(res.data, (item) => {
-                    item.resumen = `NIM: ${item.nim}, Mineral: ${item.mineral}, Municipio: ${item.municipio}`;
+                    item.concat = `FORM-101 ${item.tipo_formulario_nombre} - NIM: ${item.nim} - Municipio: ${item.municipio}`;
                     return item;
                   });
-            let optsForms = xyzFuns.generaOpciones(res.data, 'nim', 'resumen', ' ');
+            let optsForms = xyzFuns.generaOpciones(res.data, 'nim', 'concat', ' ');
             $("[__select_nim]").append(optsForms);  
             /** Si solo es una opcion se bloquea el combo */
             if(res.data.length == 1) {
@@ -353,29 +349,36 @@ export class Form101Component implements OnInit {
             }
             if(res.data.length == 0){
               $("[__select_nim]").prop('disabled', true); 
-              funs.stateView('error_critico', `<br><b>No se tiene ningún Número de NIM registrado.</b><br>
+              funs.mostrarError(/*html*/`<br><b>No se tiene ningún Número de NIM registrado.</b><br>
               Es posible que haya caducado o no se realizó el registro con la documentación correspondiente. 
               <br><br>Por favor contáctese con las oficinas de la Gobernación de Chuquisaca.<br>` )
             }
 
-            xyzFuns.spinner(0);
+            funs.spinner(0);
           });
           
         },
         /**Carga el formulario con sus elementos */
         renderFormulario: () => {
-          xyzFuns.spinner();
+          ctxG.nimSel = _.find(ctxG.datosUserNims, item => item.nim == $("[__select_nim]").val());
+          funs.spinner();
           funs.crearDatosGeneral();
-          $.post(`${ctxG.rutabase}/get-form-elems`, { id_formulario: temp.id_formulario }, function (res) {
+          $.post(`${ctxG.rutabase}/get-form-elems`, component.uauth.addToken({ id_formulario: ctxG.nimSel.id_formulario }), function (res) {
+            if(res.status == 'error'){
+              funs.mostrarError(res.msg);
+              funs.spinner(false);
+              return;
+            }
+
             $("[__frm_formulario]").html("");
             form.renderizarElementos(res.data, "[__frm_formulario]");
-            xyzFuns.spinner(false);
             funs.stateView('mostrar_formulario')
+            funs.spinner(false);
           });
         },
         /** Carga Datos del usuario */
         crearDatosGeneral: () => {
-          $("[__tipo_mineral]").html(ctxG.nimSel.tipo_formulario == 'form1' ? 'METÁLICOS' : 'NO METÁLICOS');
+          $("[__tipo_mineral]").html(ctxG.nimSel.tipo_formulario_nombre);
           $("[__info_general=nim]").html(`${(ctxG.nimSel.nim) ? ctxG.nimSel.nim : ''}`);
           $("[__info_general=nit]").html(`${(ctxG.nimSel.nit) ? ctxG.nimSel.nit : ''}`);
 
@@ -394,62 +397,123 @@ export class Form101Component implements OnInit {
           $("[__info_general=mineral]").html(`${(ctxG.nimSel.mineral) ? ctxG.nimSel.mineral : ''}`);
 
         },
-        save() {
-          let noCumplenValidacion = funs.noCumplenValidacion('#formulario_101', 'input', 'br-a br-danger bg-danger-80');
-          console.log('nocumplen',noCumplenValidacion)
+        /** Mjuestra ventana emergente para confirmar el evio del form */
+        confirmar(){
+          let noCumplenValidacion = funs.noCumplenValidacion(ctxG.content, '.__elemento[required]', 'error-validacion');
           if(noCumplenValidacion.length > 0)
             return;
 
-          xyzFuns.spinner();
+          let op:any = { 
+            background_color:'#00000060', 
+            class_icon: '',
+            class_texto: '',
+            texto: /*html*/`
+            <div class="panel mn"   style="">
+              <div class="panel-heading h-50 bg-marron--20 bg-system_ bg-success--40_ bg-666_ text-fff _darker">
+                <h5><i class="fa fa-send mr10"></i>Confirmar envío</h5>           
+                <span class="glyphicons glyphicons-remove_2 p3 close fs15" style="position: absolute; top: 5px; right: 10px; color: inherit; text-shadow: none; opacity: 0.8"></span>     
+              </div>
+              <div class="panel-body">
+                <div class="p20 fs14 bg-light text-center_ text-primary--60" style="text-align:justify; border-bottom: 1px solid #afafaf;" >
+                  <p>El presente Formulario 101, tiene el carácter de declaración jurada y es de uso obligatorio para los operadores mineros, personas naturales y jurídicas que realicen el transporte y comercialización de minerales metálicos y no metálicos.</b></p>
+                  <p><b>A partir de su emisión tiene 3 días para su utilización, caso contrario el mismo quedará sin efecto.</b></p>
+                </div>
+                <h4 class="text-center text-theme1--20 fw600">Desea enviar la información ? </h4>
+                <div class="flex justify-evenly p10">
+                  <button __accion_form="close" class="btn bg-eee ph20 br6 br-a br-dark">Cerrar</button>
+                  <button __accion_form="save" class="btn btn-primary ph20 br6 br-a br-dark">Confirmar</button>
+                </div>
+              </div>
+            </div>`
+          }
+          let alert = /*html*/`
+                <div __alert style="display:none; z-index: 99000"> 
+                  <div class="flex justify-center align-center wp100 " style="height: 100vh; z-index: 99000; position: fixed; top: 0px; left: 0vw; 
+                  background-color: ${op.background_color} ">
+                    <div class="flex justify-center align-center br3"style="  width: calc(300px + 25vw); max-width: 90%; 
+                      background-color: #f4f4f8; box-shadow: 0px 0px 8px 0px #0000004a; position: relative; top: -50px">                        
+                          ${op.texto}
+                    </div>
+                  </div>
+                </div> `;
+          $(ctxG.content).append(alert);
+          $("[__alert]").show(300);
+
+        },
+        /** Guarda el Form */
+        save() {
+          let noCumplenValidacion = funs.noCumplenValidacion(ctxG.content, '.__elemento[required]', 'error-validacion');
+          if(noCumplenValidacion.length > 0)
+            return;
+
+          funs.spinner();
           let dataSend: any = form.getData();
           $.extend(dataSend, ctxG.nimSel);
-          dataSend.id_formulario = ctxG.nimSel.tipo_formulario == 'form1' ? 1 : 1; // 2 //Esta quemado el formulario a que siempre sea el 1, solo cambian los titulos
-          console.log('save', dataSend);
-          $.post(`${ctxG.rutabase}/save-respuestas`, dataSend, function (res) {
-            xyzFuns.spinner(false);
-            if (res.status== 'ok') {
-              funs.stateView('guardado');              
+          dataSend.id_formulario = ctxG.nimSel.id_formulario;
+          console.log('Obj enviar save', dataSend);
+
+          $.post(`${ctxG.rutabase}/save-respuestas`, component.uauth.addToken(dataSend), (res) => {
+            if(res.status == 'error'){
+              funs.mostrarError(res.msg);
+              funs.spinner(false);
+              return;
             }
+
+            funs.spinner(false);
+            funs.stateView('guardado'); 
           }).fail(function (r) {
             funs.mostrarError("Hubo un error inesperado.");
-            xyzFuns.spinner(false);
+            funs.spinner(false);
           })
         },
         /* Verifica requeridos */
         noCumplenValidacion: (container, selectorFieds, classError) => {
+          //TODO  qutar
+          return [];
+          //TODO end
           let noCumplen = [];
-          $(`${container} ${ selectorFieds }`).removeClass(classError);
+          $(`${container} ${ selectorFieds }`).find("[__tipo_respuesta]").removeClass(classError);
 
           // verifica los inputs y textareas
-          _.forEach($(`${container} ${selectorFieds}`), function(elemInput){
-            let tagHlml = $(elemInput).prop("tagName").toLowerCase();
-            if ((tagHlml == 'input' || tagHlml == 'textarea' || tagHlml == 'select') && ($(elemInput).attr('type') !='checkbox') && $(elemInput).attr('__opcion_otro') == 'no') /*se pone una var temporal para que pase*/
-              if ($(elemInput).val() == null || $(elemInput).val().trim() == '') {
-                noCumplen.push($(elemInput).attr('id'));
-                $(elemInput).addClass(classError);
+          _.forEach($(`${container} ${selectorFieds}`), (elemRequired) => {
+            let tipo_respuesta = $(elemRequired).find("[__tipo_respuesta]").first().attr('__tipo_respuesta');
+            if (tipo_respuesta == 'single' || tipo_respuesta == 'multiple' || tipo_respuesta == 'mixta') {
+              if ($(elemRequired).find("input:checked").length <= 0) {
+                noCumplen.push($(elemRequired).attr('__pregunta_numero'));
+                $(elemRequired).find('[__tipo_respuesta]').addClass(classError);
               }
-
-            
-          })  
-
+              if (!$(elemRequired).find('[__opcion_otro]').hasClass('hide') && $(elemRequired).find('[__opcion_otro]').val() == '') {
+                noCumplen.push($(elemRequired).attr('__pregunta_numero'));;
+                $(elemRequired).find('input').addClass(classError);
+              }
+            }
+            else if(elemRequired == 'select_numbers' && $(elemRequired).find('select').first().val().length <= 0){
+                noCumplen.push($(elemRequired).attr('__pregunta_numero'));            
+                $(elemRequired).find('select').addClass(classError);
+            }
+            else if(_.includes(['open_sm', 'number', 'date', 'open_lg'], tipo_respuesta) && $(elemRequired).find('input, textarea').val().length <= 0){
+              noCumplen.push($(elemRequired).attr('__pregunta_numero'));  
+              $(elemRequired).find('input, textarea').addClass(classError);
+            }
+          })
           return  noCumplen;
         },
         /* Configura los elementos de la vista segun el contexto,solo en caso de error se requiere msg */
         stateView: (stateview, msg = '') => {
           if(stateview == 'inicial'){
-            $("[__frm_content]").hide();
+            // $("[__frm_content]").hide();
             $("[__frm_datos_general]").hide();
             $("[__frm_formulario]").hide();
             $("[__frm_enviar]").hide();
           }
           if(stateview == 'mostrar_formulario'){
-            $("[__frm_content]").show();
+            // $("[__frm_content]").show();
             $("[__frm_datos_general]").show();
             $("[__frm_formulario]").show();
             $("[__frm_enviar]").show();
           }
           if (stateview == 'guardado') {
-            $("[__frm_content]").show();
+            // $("[__frm_content]").show();
             $("[__frm_datos_general]").hide();
             $("[__frm_formulario]").hide();
             $("[__frm_enviar]").hide();
@@ -460,63 +524,61 @@ export class Form101Component implements OnInit {
                       <div class="flex justify-center p20" >
                         <div id="codigo_qr" __codigo_qr class="p5 bg-white" style="border: 5px solid #333333"></div>
                         <div class="flex flex-y justify-between">
-                          <i __accion_after_save="share" class="glyphicon glyphicon-share-alt fa-2x p5 text-dark cursor"></i>
-                          <i __accion_after_save="download" class="glyphicons glyphicons-download_alt fa-2x p5 text-dark cursor"></i>
+                          <i __accion_form="share" class="glyphicon glyphicon-share-alt fa-2x p5 text-dark cursor"></i>
+                          <i __accion_form="download" class="glyphicons glyphicons-download_alt fa-2x p5 text-dark cursor"></i>
                         </div>
                       </div>
-                      <div><button __btn_home class="btn btn-lg btn-info br6 wp66" >Volver a Inicio</button></div>
+                      <div><button __accion_form="home" class="btn btn-lg btn-info br6 wp66" >Volver a Inicio</button></div>
                   `;
             xyzFuns.alertMsg("[__frms]", alert, ' alert-success br-a br-success pastel   fs15 p20 br12 mt50', 'fa fa-check-circle fa-3x', '', false);
             
             funs.mostrarQR('62.171.160.162');            
           }
 
-          if (stateview == 'error_critico') {
-            $("[__frm_content]").show();
-            $("[__frm_datos_general]").hide();
-            $("[__frm_formulario]").hide();
-            $("[__frm_enviar]").hide();
+          // if (stateview == 'error_critico') {
+          //   $("[__frm_content]").show();
+          //   $("[__frm_datos_general]").hide();
+          //   $("[__frm_formulario]").hide();
+          //   $("[__frm_enviar]").hide();
 
-            let alert = /*html*/`
-                      <div class="text-center">${msg}</div>
-                      <div>
-                        <button __btn_home class="btn btn-lg btn-info br-a br-dark mt20 br6 wp66">Volver a Inicio</button>
-                      </div>
-                  `;
-            xyzFuns.alertMsg("[__frms]", alert, ' alert-danger br-a br-danger pastel   fs15 p20 br12 mt50', 'fa fa-exclamation-circle fa-2x', '', false);
+          //   let alert = /*html*/`
+          //             <div class="text-center">${msg}</div>
+          //             <div>
+          //               <button __btn_home class="btn btn-lg btn-info br-a br-dark mt20 br6 wp66">Volver a Inicio</button>
+          //             </div>
+          //         `;
+          //   xyzFuns.alertMsg("[__error]", alert, ' alert-danger br-a br-danger pastel   fs15 p20 br12 mt50', 'fa fa-exclamation-circle fa-2x', '', false);
 
-          }
+          // }
         },
         /* Genera QR a artir de un texto o url */
         mostrarQR: (text) => {
-          let containerQR = $("[__codigo_qr]")[0];
-            let qrcode = new QRCode(containerQR, {
-              // text: "https://escueladigital.ga/curzar",
-              width: 128,
-              height: 128,
-              colorDark : "#333333",
-              colorLight : "#ffffff",
-              correctLevel : QRCode.CorrectLevel.H
-            });
-            qrcode.makeCode(text);
+          let containerQR = $("#codigo_qr")[0];
+          // let containerQR = $("[__codigo_qr]");
+          let qrcode = new QRCode(containerQR, {
+            // text: "https://escueladigital.ga/curzar",
+            width: 128,
+            height: 128,
+            colorDark : "#333333",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+          });
+          qrcode.makeCode(text);
         },
-        accionesAfterSave: (accion) => {
-          if(accion == 'share'){
-            
-          }
-          if(accion == 'download'){
-            let dataUrl = document.querySelector('#codigo_qr').querySelector('img').src;
-            downloadURI(dataUrl, 'qrcode.png');
-            function downloadURI(uri, name) {
-              var link = document.createElement("a");
-              link.download = name;
-              link.href = uri;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              // delete link;
-            };
-          }          
+
+        /* Descargar la imagen del QR*/
+        downloadQR: ()=> {
+          let dataUrl = document.querySelector('#codigo_qr').querySelector('img').src;
+          downloadURI(dataUrl, 'qrcode.png');
+          function downloadURI(uri, name) {
+            var link = document.createElement("a");
+            link.download = name;
+            link.href = uri;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            // delete link;
+          };
         },
 
         /* Loscuadros de ayuda con su fondo */
@@ -539,22 +601,29 @@ export class Form101Component implements OnInit {
             $(ayuda).find('.cuadro_fondo').addClass('hide');
           }
         },
-
+        /** Muestra ventana alert con mensajes de error , usado como error critico al no haber NIMS o rol no permitido */
         mostrarError: (msg) => {
-          $("[__error]").html(msg).removeClass('hide');
+          if (msg && msg.trim().length > 0)
+            xyzFuns.alertMsg('[__error]', msg, 'mv10 alert-danger pastel pv15 br-a br-danger br6 fs15 wp90 ', '', '', true);
+          else
+            xyzFuns.alertMsgClose('[__error]');
         },
+        /** Oculta ventana alert de error  */
         ocultarError: () => {
-          $("[__error]").html('').addClass('hide')
+          xyzFuns.alertMsgClose('body');
         },
+        spinner: (obj = {}) => {
+          xyzFuns.spinner(obj, ctxG.content)
+        }
+
 
       }
       
       /** LISTENS */
       let listeners = () => {
-        $("#formulario_101")
+        $(ctxG.content)
           /** Selecciona NIM */
           .on('change', "[__select_nim]", function (e) {
-            ctxG.nimSel = _.find(ctxG.datosUserNims, item => item.nim == $(e.currentTarget).val());
             ($(e.currentTarget).val() != '') ? funs.renderFormulario() : false;
           })
           /* Tamaño de los textareas*/
@@ -571,10 +640,26 @@ export class Form101Component implements OnInit {
             let municipioOpts = xyzFuns.generaOpciones(municipios, 'municipio', 'municipio');
             $("[__rg_field=municipio]").html(municipioOpts);
           })
+          
+          /* Al hacer click los botones de acciones_form ENVIAR GUARDAR CERRAR etc*/
+          .on('click', "[__accion_form]", function (e) {
+            let accion = $(e.currentTarget).attr("__accion_form");
+            if(accion == 'home')            
+              component.volverInicio()
 
-          /* Al hacer click en boton GUARDAR*/
-          .on('click', "[__save]", function () {
-            funs.save();
+            if(accion == 'send')
+              funs.confirmar();
+
+            if(accion == 'save'){
+              funs.save();
+              $(e.currentTarget).closest("[__alert]").remove();
+            }
+            if(accion == 'download'){
+              funs.downloadQR();
+            }
+            if(accion == 'close'){
+              $(e.currentTarget).closest("[__alert]").remove();
+            }
           })
 
           /* Para controlar la opcion OTRO , click en cualquier opcion,  */
@@ -613,22 +698,8 @@ export class Form101Component implements OnInit {
           .on('click', '.cuadro_fondo, [__ayuda_texto]', function (e) {
             let ayuda = $(e.currentTarget).closest('[__ayuda]');
             funs.mostrarOcultarAyuda('ocultar', ayuda);
-          })
+          })       
 
-          /* Al hacer click en los botones de navegacion */
-          .on('click', '[__btn_navegar]', function (e) {
-            let navegar = $(e.currentTarget).attr('__btn_navegar');
-            // funs.navegacion(navegar);
-          })
-          
-          /* Acciones despuesr de guardar:compartir o guardar etc*/
-          .on('click', '[__accion_after_save]', (e)=>{
-            let accion = $(e.currentTarget).attr('__accion_after_save');
-            funs.accionesAfterSave(accion);
-          })
-          
-          /* Click en boton volver inicio */
-          .on('click', '[__btn_home]', () => { component.volverInicio()})
 
       }
 

@@ -18,13 +18,15 @@ class UsuariosController extends MasterController {
 	 */
 	public function getUsuarios(Request $req) {
 		$usuariosList = collect(\DB::select("SELECT u.id as id_usuario, u.username, u.email, u.nombres, u.apellidos, u.carnet, u.nit, u.razon_social
-                                    , u.estado_usuario, u.created_at
+                                    , u.estado_usuario, u.fecha_registro
                                     , u.id_rol, r.rol 
                                     FROM users u 
-                                    LEFT JOIN roles r ON u.id_rol = r.id ORDER BY u.nombres "));
+                                    LEFT JOIN roles r ON u.id_rol = r.id ORDER BY u.fecha_registro desc "));
+
 		return response()->json([
 			'data'   => $usuariosList,
-			'status' => 'ok'
+			'status' => 'ok',
+			'logged' => $this->getUserLogged()
 		]);
 	}
 
@@ -33,15 +35,15 @@ class UsuariosController extends MasterController {
 	 */
 	public function getUser(Request $req) {
 		$user = collect(\DB::select("SELECT u.id as id_usuario, u.username, u.email, u.nombres, u.apellidos, u.carnet, u.nit, u.razon_social
-                                , u.estado_usuario, u.created_at 
+                                , u.estado_usuario, u.fecha_registro, u.numero_celular
                                 , u.id_rol, r.rol 
                                 FROM users u 
                                 LEFT JOIN roles r ON u.id_rol = r.id
                                 WHERE u.id = {$req->id_usuario}"))->first();
-		$user->nims = collect(\DB::select("SELECT u.*, r.nombre as municipio, r.codigo_numerico as codigo_municipio 
-                                        FROM users_nims u, regiones r 
-                                        WHERE u.id_usuario = {$user->id_usuario} AND u.estado_nim != 'Eliminado'
-                                        AND u.id_municipio = r.id 
+		$user->nims = collect(\DB::select("SELECT un.*, r.nombre as municipio, r.codigo_numerico as codigo_municipio, f.nombre as tipo_formulario_nombre 
+                                        FROM user_nims un, regiones r, formularios f 
+                                        WHERE un.id_usuario = {$user->id_usuario} AND un.estado_nim != 'ELIMINADO'
+                                        AND un.id_municipio = r.id AND un.id_formulario = f.id  
                                         ORDER BY fecha_registro DESC"));
 
 		return response()->json([
@@ -51,46 +53,24 @@ class UsuariosController extends MasterController {
 	}
 
 	/**
-	 * POST Obtiene un USUARIO con sus NIMs y sus datos (municipio, cod_municipios, etc)
-	 */
-	public function userNimsActivos(Request $req) {
-
-		/** TODO Realizar las operaciones para obtener el Id apartir de un token recibido */
-		$id_usuario = $req->_token;
-		// $id_usuario = $req->id_usuario;
-		$user = \DB::select("SELECT u.id as id_usuario, u.email, u.nombres, u.apellidos, u.razon_social, u.nit, u.estado_usuario, u.formularios_disponibles, 
-                            n.id as id_nim, n.nim, n.estado_nim, n.tipo_formulario,
-                            p.nombre as tipo_formulario_nombre, 
-                            r.id as id_municipio, r.nombre as municipio, r.codigo_numerico as codigo_municipio
-                                FROM users u 
-                                LEFT JOIN users_nims  n on u.id = n.id_usuario
-                                LEFT JOIN regiones r ON n.id_municipio = r.id 
-                                left JOIN parametros p on n.tipo_formulario = p.codigo
-                                WHERE u.estado_usuario = 'Activo' and n.estado_nim = 'Activo'
-                                AND p.activo
-                                AND u.id = {$id_usuario}
-                                order by n.tipo_formulario, n.mineral");
-
-		return  response()->json([
-			'data'      => $user,
-			'status'   => 'ok'
-		]);
-	}
-
-	/**
 	 * POST PAra insertar o actualizar a un usuario
 	 */
 	public function saveUser(Request $req) {
+
 		$userObj                  = (object)[];
 		$userObj->id              = $req->id_usuario ?? null;
-		$userObj->username        = strtolower($req->username);
-		$userObj->email           = strtolower($req->email);
+		$userObj->username        = trim(strtolower($req->username)); 
+		$userObj->email           = trim(strtolower($req->email));
 		$userObj->id_rol          = $req->id_rol;
 		$userObj->nombres         = $req->nombres;
 		$userObj->apellidos       = $req->apellidos;
 		$userObj->estado_usuario  = $req->estado_usuario;
 		$userObj->razon_social    = $req->id_rol == 3 ? $req->razon_social : '';
 		$userObj->nit             = $req->id_rol == 3 ? $req->nit : '';
+		$userObj->numero_celular  = $req->numero_celular;
+
+		/** Encaso de ser update no deben actualizarse los siguiente */
+		!($req->id_usuario) ? $userObj->fecha_registro = $this->now() : false; 
 
 		/* Verifica si existe otra coincidencia de email o username con los demas users, para ello se toman solo losIDs diferentes del actual,
         Si no tiene id, se toma un numero negativo para comparar con los demas usuarios, porque con valor null no selecciona nada  */
@@ -109,7 +89,7 @@ class UsuariosController extends MasterController {
 		if (isset($req->password))
 			$userObj->password = bcrypt($req->password);
 
-		$userObj->id_usuario = $this->guardarObjetoTabla($userObj, 'users', true);
+		$userObj->id_usuario = $this->guardarObjetoTabla($userObj, 'users');
 
 		if (isset($req->nims) && count($req->nims) > 0) {
 			foreach ($req->nims as $item) {
@@ -119,16 +99,15 @@ class UsuariosController extends MasterController {
 				$objDatosNim->id_usuario       = $userObj->id_usuario;
 				$objDatosNim->nim              = $item->nim;
 				$objDatosNim->id_municipio     = $item->id_municipio;
-				$objDatosNim->tipo_formulario  = $item->tipo_formulario;
-				$objDatosNim->mineral          = $item->mineral;
+				$objDatosNim->id_formulario  	 = $item->id_formulario;
 				$objDatosNim->estado_nim       = $item->estado_nim;
 				(!$objDatosNim->id) ? $objDatosNim->fecha_registro = $this->now() : false;
-				$this->guardarObjetoTabla($objDatosNim, 'users_nims');
+				$this->guardarObjetoTabla($objDatosNim, 'user_nims');
 			}
 		}
 
 		$user = collect(\DB::select("SELECT u.id as id_usuario, u.username, u.email, u.nombres, u.apellidos, u.carnet, u.nit, u.razon_social
-                                , u.estado_usuario, u.created_at /*u.departamento, u.municipio, u.codigo_municipio, u.id_municipio, */
+                                , u.estado_usuario, u.fecha_registro
                                 , u.id_rol, r.rol 
                                 FROM users u 
                                 LEFT JOIN roles r ON u.id_rol = r.id
