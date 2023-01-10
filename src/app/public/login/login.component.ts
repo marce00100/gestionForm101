@@ -30,9 +30,9 @@ export class LoginComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    if (this.uAuth.isLogged()) {
-        this.router.navigate(['home']);    
-      }
+    // if (this.uAuth.isLogged()) {
+    //     this.router.navigate(['home']);    
+    //   }
   }
 
   login(){
@@ -56,8 +56,6 @@ export class LoginComponent implements OnInit {
     xyzFuns.spinner();
     this.http.post<any>(`${xyzFuns.urlRestApi}/auth`, user).subscribe({
       next: res => {
-        // console.log("  Success :", res.msg);
-        // $("[__output]").append(`<p>Todo Success : ${res.msg} </P>`);
         if (res.status == 'error') {
           this.mostrarError(' **' + res.msg);
           xyzFuns.spinner(false);
@@ -74,7 +72,6 @@ export class LoginComponent implements OnInit {
         this.appComponent.ngOnInit();
         
         xyzFuns.spinner(false);
-        // this.appComponent.colocaUsername();
         this.router.navigate(['/home']);
       },
       error: error => {

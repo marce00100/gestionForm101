@@ -36,7 +36,8 @@ export class SFormService {
     $(container).html(frm);
 
     if (qr) {
-      let url = this.getUrlFormPublic();
+      let url = this.getUrlPublicForm();
+      console.log('________',url);
       this.generarQR("[__codigo_qr]", url);
     }
 
@@ -126,6 +127,7 @@ export class SFormService {
    */
   private htmlRenderRespuestas(respuestas: any) {          
     let htmlResp = "";
+    let time = Date();
 
     _.forEach(respuestas, function (resps, k) {
       let elemObj = resps[0]; 
@@ -135,7 +137,17 @@ export class SFormService {
       }
       if(elemObj.tipo == 'pregunta'){
         let cnfElem = JSON.parse(elemObj.config) || {};
-        let respuesta = resps.length == 1 ? resps[0].respuesta ?? '' : _.reduce(resps, (result, resp, k) => `${result}, ${resp.respuesta} ?? '' `);
+        /* si es arraydeuno*/
+        let respuesta = resps.length == 1 ? resps[0].respuesta ?? '' 
+          : _.chain(resps)
+          .sortBy('id_form_lleno_respuesta')
+          .reduce( 
+            function (result, resp) { 
+              let item = resp.respuesta;
+              if(resp.nombre_dimension && resp.nombre_dimension.length>0 )
+                item += ` ${resp.valor_dimension}(${resp.nombre_dimension})`;
+              
+            return result + `${item}, `}, '');
         
         htmlResp += /* html*/`
                         <div class="flex justify-start align-start" style="width: ${cnfElem.ancho}%; border-bottom: 1px solid #ccc">
@@ -208,10 +220,32 @@ export class SFormService {
     });
   }
 
+
+
   /**
-   * URL del formLleno Publico
+   * Copia la Url publica al portapapeles :URL del formLleno Publico
    */
-  public getUrlFormPublic() {
-    return  'httpa/ecueladigital.cyrzar.ga/miscursos/excel-avanzado/capitulocuartro/nivel/inicial/exmane;'
+  public copyUrlPublicForm() {
+    let url = this.getUrlPublicForm();
+    navigator.clipboard.writeText(url);
+  }
+
+  /**
+   * Abre el formLleno en una nueva ventana
+   */
+  public gotoUrlPublicForm() {
+    let url = this.getUrlPublicForm();
+    window.open(url);
+  }
+
+  /**
+   * Para ontener la direccion publica
+   * @param uid 
+   * @returns Url del form publico
+   */
+  public getUrlPublicForm(uid = null) {
+    let currentUrl =  window.location.href;
+    let url = currentUrl.split('#')[0] + '#/verformulario/' + ((uid) ? uid : this.objFrmLleno.uid);
+    return url;
   }
 }

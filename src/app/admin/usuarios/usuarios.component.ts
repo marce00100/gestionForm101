@@ -1,8 +1,5 @@
-// import { HttpParams } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { IonItem } from '@ionic/angular';
 import { UAuthService } from 'src/app/shared/uauth.service';
-// import { ResthttpService } from 'src/app/shared/resthttp.service';
 declare var $: any;
 declare var _: any;
 declare var xyzFuns: any;

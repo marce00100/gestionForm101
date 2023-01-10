@@ -19,7 +19,6 @@ import { PublicModule }     from './public/public.module';
 import { OperModule }       from './oper/oper.module';
 import { AdminModule }      from './admin/admin.module';
 import { HomeComponent }    from './shared/home.component';
-// import { ResthttpService } from './shared/resthttp.service';
 
 @NgModule({
   declarations: [

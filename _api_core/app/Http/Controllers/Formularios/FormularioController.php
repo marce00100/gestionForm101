@@ -13,7 +13,7 @@ class FormularioController extends MasterController {
 
 	/**
 	 * POST Obtiene un USUARIO con sus NIMs y sus datos (municipio, cod_municipios, etc)
-	 * Se lo usa en Form101 para obtener los NIMS dispoiblesdel usuario que ingresa
+	 * Se lo usa en Form101 para obtener los NIMS disponibles del usuario que ingresa
 	 */
 	public function nimsFormsActivosUser(Request $req) {
 
@@ -59,7 +59,7 @@ class FormularioController extends MasterController {
 		$form_contestado->id_usuario        = $id_usuario; //Auth::user() ? Auth::user()->id : 0;
 		$form_contestado->numero_formulario = $numeroFormulario;
 		$form_contestado->tiempo_seg        = $req->tiempo_seg;
-		$form_contestado->estado_form_lleno = 'ENVIADO';
+		$form_contestado->estado_form_lleno = 'EMITIDO';
 		$form_contestado->ip                = $this->getIp();
 		$form_contestado->fecha_registro    = $this->now();
 		$form_contestado->nombres           = strtoupper(trim($req->nombres));
@@ -72,27 +72,29 @@ class FormularioController extends MasterController {
 		$form_contestado->uid   						= rand(1, 9999) . uniqid();
 
 
-		//TODO:start QUITAR next code 
-		return (object)[
-			'data'   => $form_contestado,
-			'status' => "ok",
-			'msg'    => 'Se guardó correctamente'
-		];
-		//TODO:end
+		// //TODO:start QUITAR next code - solo es para hacer pasar sin guardar- para pruebas
+		// return (object)[
+		// 	'data'   => $form_contestado,
+		// 	'status' => "ok",
+		// 	'msg'    => 'Se guardó correctamente'
+		// ];
+		// //TODO:end
 
 		try {
 			$form_contestado->id              = $this->guardarObjetoTabla($form_contestado, 'forms_llenos');
 			/* se recorren las respuestas */
 			if ($req->respuestas) {
-
+				
 				foreach ($req->respuestas as $resp) {
-					$respuesta                   = (object)[];
-					$resp                        = (object)($resp);
-					$respuesta->id_form_lleno    = $form_contestado->id;
-					$respuesta->id_elemento      = $resp->id_elemento;
-					$respuesta->id_opcion        = isset($resp->id_opcion) ? $resp->id_opcion : null;
-					$respuesta->respuesta_opcion = isset($resp->respuesta_opcion) ? $resp->respuesta_opcion : null;
-					$respuesta->respuesta        = $resp->respuesta;
+					$respuesta                          = (object)[];
+					$resp                               = (object)($resp);
+					$respuesta->id_form_lleno           = $form_contestado->id;
+					$respuesta->id_elemento             = $resp->id_elemento;
+					$respuesta->respuesta               = $resp->respuesta;
+					$respuesta->respuesta_opcion        = isset($resp->respuesta_opcion) ? $resp->respuesta_opcion : null;
+					$respuesta->dimensiones             = $resp->dimensiones ?? null;
+					$respuesta->nombre_dimension        = $resp->nombre_dimension ?? null;
+					$respuesta->valor_dimension         = $resp->valor_dimension ?? null;
 					$this->guardarObjetoTabla($respuesta, 'forms_llenos_respuestas');
 				}
 			}
@@ -111,17 +113,49 @@ class FormularioController extends MasterController {
 	}
 
 	/**
+	 * Funcion para filtrar formularios llenos con sus respuestas
+	 */
+	private function formsLlenosQuery($obj){
+		$query = '';
+		$query .= isset($obj->id_usuario) ? " AND fl.id_usuario = {$obj->id_usuario} " : "";
+		$query .= isset($obj->uid) ? " AND fl.uid = '{$obj->uid}' " : "";
+		$query .= isset($obj->id_municipio) ? " AND fl.id_municipio = {$obj->id_municipio} " : "";
+		// $query .= $obj->periodo ? " AND fl.id_usuario = {$obj->id_usuario} " : "";
+		// $query .= $obj->id_usuario ? " AND fl.id_usuario = {$obj->id_usuario} " : "";
+
+		$formsLlenos  = collect(\DB::select(
+												"SELECT fl.*, 
+														r.nombre as municipio, r.codigo_numerico as codigo_municipio, 
+														f.nombre as tipo_formulario_nombre 
+														FROM forms_llenos fl, regiones r, formularios f
+														WHERE fl.id_municipio = r.id AND fl.id_formulario = f.id 
+														{$query} 
+														ORDER BY fl.id DESC"));
+		
+		foreach ($formsLlenos as $k => $formlleno) {
+			$respuestas = collect(\DB::select("SELECT e.id as id_elemento, e.texto, e.tipo, e.alias, e.orden, 
+																	fr.id_form_lleno, fr.respuesta, fr.respuesta_opcion
+																	FROM elementos e  
+																	LEFT JOIN forms_llenos_respuestas fr on e.id = fr.id_elemento AND fr.id_form_lleno =  {$formlleno->id} 
+																	WHERE e.id_formulario = {$formlleno->id_formulario} 
+																	ORDER BY e.orden"))->groupBy('alias')->toArray();
+																	
+			foreach ( $respuestas as $alias => $respta) {
+
+			}
+		}
+		
+		return $formsLlenos;
+	}
+
+
+	/**
 	 * POST LISTA DE FORMULARIOS LLENOS del USUARIO   segun parametros
 	 */
 	public function formsLlenosUser(Request $req){
 
 		$id_usuario = $this->getUserLogged()->id;
-		$list = \DB::select("SELECT f.*, r.nombre as municipio, r.codigo_numerico as codigo_municipio 
-												FROM forms_llenos f, regiones r 
-												WHERE f.id_municipio = r.id 
-												AND id_usuario = {$id_usuario} AND estado_form_lleno = 'ENVIADO' 
-												ORDER BY fecha_registro DESC ");
-
+		$list = $this->formsLlenosQuery((object)['id_usuario' => $id_usuario]);
 		return response()->json([
 			'data' => $list,
 			'status' => 'ok'
@@ -142,15 +176,15 @@ class FormularioController extends MasterController {
 														AND fl.uid = '{$form_lleno_uid}' "))->first();
 									
 		/* se agegan las respuestas al formulario lleno , se ordenan por los elementos para conseguir todas las preguntas y titulos etc, y se completan con LEFT JOIN con las respustas (aunque esten vacias se tendra el formulario completo con sus respuestas ) */
-		$respuestaslista = collect(\DB::select("SELECT e.id as id_elemento, e.texto, e.descripcion, e.tipo, e.orden, e.config, 
-																	fr.id_form_lleno, fr.respuesta, fr.respuesta_opcion 
+		$respuestas = collect(\DB::select("SELECT e.id as id_elemento, e.texto, e.descripcion, e.tipo, e.orden, e.config, 
+																	fr.id as id_form_lleno_respuesta, fr.id_form_lleno, fr.respuesta, fr.respuesta_opcion, fr.dimensiones, fr.nombre_dimension, fr.valor_dimension 
 																	FROM elementos e  
 																	LEFT JOIN forms_llenos_respuestas fr on e.id = fr.id_elemento AND fr.id_form_lleno =  {$formLleno->id} 
 																	WHERE e.id_formulario = {$formLleno->id_formulario} 
 																	ORDER BY e.orden"	))
 															->groupBy('orden')->toArray();	
 
-		$formLleno->respuestas = $respuestaslista;
+		$formLleno->respuestas = $respuestas;
 		return response()->json([
 			'data' => $formLleno,
 			'status' => 'ok',
@@ -179,38 +213,7 @@ class FormularioController extends MasterController {
 	}
 
 
-	/** ------------------------- FORMULARIO ---------------------------------------- */
-	/**
-	 * GET : Obtiene el cuestionario los elementos y las respuestas agrupadas*/
-	public function getCuestionarioResultados(Request $req) {
-		$id_cuestionario = $req->id_c;
-		// $id_cuestionario = $this->decrypt($req->id_c);
-		$pruebareal = isset($req->pruebareal) ? $req->pruebareal : 'real';
-		$cuestionario = collect(\DB::select("SELECT * from encuestados WHERE id = {$id_cuestionario}"))->first();
-		if (!$cuestionario) {
-			return response()->json(['status' => 'error', 'msg' => 'No existe el identificador']);
-		}
 
-		$elementos = collect(\DB::select("SELECT * FROM elementos WHERE id_cuestionario = {$id_cuestionario} ORDER BY orden "))
-			->map(function ($el, $k) use ($id_cuestionario, $pruebareal) {
-				if ($el->tipo == 'pregunta') {
-					$el->config = json_decode($el->config);
-					$el->respuestas = \DB::select("SELECT r.respuesta, count(r.respuesta) as cantidad FROM encuestados d,  encuestados_respuestas r 
-                                                                WHERE d.id_cuestionario = {$id_cuestionario} AND r.id_contestado = d.id 
-                                                                AND  r.id_elemento = {$el->id} AND d.estado = '{$pruebareal}' GROUP BY respuesta ");
-				}
-				return $el;
-			});
-		$cuestionario->elementos = $elementos;
-
-		$contestadosProm = collect(\DB::select("SELECT count(*) as n , sum(tiempo_seg) as suma FROM encuestados WHERE id_cuestionario = {$id_cuestionario}  "))->first();
-		$cuestionario->tiempo_promedio = ($contestadosProm->n == 0) ? 0 : $contestadosProm->suma / $contestadosProm->n;
-
-		return response()->json([
-			'data'  => $cuestionario,
-			'nprom' => $contestadosProm
-		]);
-	}
 
 	/**
 	 * DE CLASE:  PARA OBTENER EL IP 

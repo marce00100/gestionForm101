@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SFormService } from 'src/app/shared/sform.service';
 import { UAuthService } from 'src/app/shared/uauth.service';
+
 
 declare var $: any;
 declare var _: any;
@@ -24,12 +25,36 @@ export class ListaformsComponent implements OnInit {
   constructor(
     private router: Router, 
     private uauth: UAuthService,
-    private sform: SFormService) { }
+    public sform: SFormService,
+    private routeurl: ActivatedRoute,
+  ) { }
 
   ngOnInit() {
-    this.
-    listforms();
+    let uid = this.routeurl.snapshot.paramMap.get('uid');
+    if (uid && uid.length > 0) {
+      xyzFuns.spinner({}, '#listaforms_content')
+      $.get(`${xyzFuns.urlRestApi}/formenviado-resp`, { fluid: uid }, (resp) => {
+        let formlleno = resp.data;
+        this.sform.renderFormLleno("[__frm_content]", formlleno);
+        xyzFuns.showModal("#modal");
+        xyzFuns.spinner(false)
+      })
+    }
+
+
+    this.listforms();
   }
+  
+  /**
+   * se llama al Service Para cargar el fomulario lleno con sus respuestas 
+   * @param objFrmLleno Objeto con el Form lleno y respuestas
+   * @returns HTML
+   */
+  renderformLleno(content, objFrmLleno){
+    this.frmLleno = objFrmLleno;
+    return this.sform.renderFormLleno(content, objFrmLleno)
+  }
+
   /**
    * Cuando se presiona en el boton de nuevo form
    */
@@ -38,22 +63,16 @@ export class ListaformsComponent implements OnInit {
   }
 
   /**
-   * se llama al Service Para cargar el fomulario lleno con sus respuestas 
-   * @param objFrmLleno Objeto con el Form lleno y respuestas
-   * @returns HTML
+   * Muestra mensaje temporal de .. Copiado al CLipboard
    */
-
-  renderformLleno(content, objFrmLleno){
-    this.frmLleno = objFrmLleno;
-    return this.sform.renderFormLleno("[__frm_content]", objFrmLleno)
+  mostrarCopiado(){
+    let el = $("[__copyUrl] [__copiado]");
+    el.fadeIn(400);
+    setTimeout(() => {
+      el.fadeOut(300);
+    }, 2000);
   }
 
-  /**
-   * Para exportar se llama al service,
-   */
-  exportPDF() {
-    this.sform.exportFormPDF();
-  }
 
   /**
    * Metodos y funciones JQ
@@ -148,7 +167,7 @@ export class ListaformsComponent implements OnInit {
         /** Muestra Modalcon el formulario lleno */
         mostrarFormlleno: (uid_form_lleno) => {
           funs.spinner();
-          $.get(`${ctxG.rutabase}/formenviado-reps`, { fluid: uid_form_lleno }, (resp) => {
+          $.get(`${ctxG.rutabase}/formenviado-resp`, { fluid: uid_form_lleno }, (resp) => {
             ctxG.formllenoSel = resp.data;
             cmp.renderformLleno("[__frm_content]", ctxG.formllenoSel);
             xyzFuns.showModal(ctxG.modal);
@@ -169,12 +188,11 @@ export class ListaformsComponent implements OnInit {
           /** Click en botones de accion como editar nuevo */
           .on('click', '[__accion_bandeja]', (e) => {
             let accion = $(e.currentTarget).attr('__accion_bandeja');
-            // funs.limpiarModal();
+
             if (accion == 'nuevo')
               cmp.nuevoFormulario();
             if (accion == 'mostrar') {
               let uid = $(e.currentTarget).attr('__uid_form_lleno');
-              // let id = $(e.currentTarget).attr('__id_form_lleno');
               funs.mostrarFormlleno(uid)
             }
             
@@ -182,14 +200,10 @@ export class ListaformsComponent implements OnInit {
         
         /** DEL MODAL */
         $(ctxG.modal)
-          // /* Cancel Modal*/
-          // .on('click', "[__cerrar]", () => {
-          //   xyzFuns.closeModal();
-          // })
+          .on('click', "[__click_form]", (e) => {
+            let accion = $(e.currentTarget).attr("__click_form");
 
-          // .on('click', "[__save]", () => {
-          //   // funs.saveData();
-          // })
+          })
       }
 
       let init = () => {

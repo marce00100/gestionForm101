@@ -1,9 +1,7 @@
 <ion-app style="display: flex; justify-content: start;">
 
   <!-- HEADER  -->
-  <ion-header *ngIf="userCtx.islogged">
-  <!-- <ion-header *ngIf="isAutenticado()"> -->
-  <!-- <ion-header *ngIf="isLogged"> -->
+  <ion-header *ngIf="userCtx.islogged && !userCtx.enteringPublicPage">
     <div class="fondo-header fondo-header6 flex justify-between align-end ph-80 wp100 pv5_" style="position: relative; height: 90px; border-bottom: 1px solid #c64f4f;">
       <div id="logos_header" class="flex align-center">
         <img src="./assets/img/gadch_logo_escudo_tr_lg.png" alt="" style="width: 80px; min-height: 80px; margin-left: 20px;">
@@ -14,7 +12,9 @@
       </div>
       <div style="display: flex; flex-wrap: wrap; flex-direction: column; align-items: end;">
         <div style="    max-width: 112px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;" class="mb20 mr20">
-          <i class="glyphicons  glyphicons-user  fs13 text-tp mr5"></i><span __username class="text-fff ">{{userCtx.username}}</span></div>
+          <i class="glyphicons  glyphicons-user  fs13 text-tp mr5"></i>
+          <span __username class="text-fff ">{{userCtx.username}}</span>
+        </div>
         <div class="text-eee  p5 pl20 pr20 flex justify-start align-center h-35" style="background-color: #0000003b;">
           <div class="hidden-xs">
             <span *ngFor="let item of userCtx.userItemsMenu" [routerLink]="item.redirectTo" routerLinkActive="active-menu-horizontal"
@@ -56,7 +56,7 @@
             <ion-menu-toggle (click)="cerrarSesion()" >
               <ion-item  class="text-444">
                 <div class="cursor item-content">
-                  <i class="glyphicons glyphicons-moon ml10 mr20 text-777_" (click)="cerrarSesion()"></i> <span>Cerrar sesión</span>
+                  <i class="fa fa-sign-out fa-lg ml10 mr20 text-777_" (click)="cerrarSesion()"></i> <span>Salir</span>
                 </div>
               </ion-item>
             </ion-menu-toggle>

@@ -27,12 +27,7 @@ export class GestorFormsComponent implements OnInit {
       /*----   ctxG variable que contiene el contexto global, variables globales */
       let ctxG = {
         rutabase: xyzFuns.urlRestApi,
-        c : {   
-          activoPri : 'activoPri',
-          activoSub : 'activoSub',
-          bgSub : 'bg-dark-dark',
-          bgHeaderSub : 'bg-dark-light',
-        },
+        content: '#gestor_formulario',
         mostrarMensajeFloat:function(obj){
           new PNotify({
             title: obj.status== 'ok' ? 'Guardado' : 'Error',
@@ -51,10 +46,10 @@ export class GestorFormsComponent implements OnInit {
     
       let elemshtml = {
         acciones_elemento: /*html*/`
-            <div class="__acciones_elemento pull-right" style="position:absolute; top: 20px; right: 5px">
-              <span accion="subir" class=" text-muted p5" style="cursor: pointer; " title="Subir posición"><i class="fa fa-chevron-up fa-lg"></i></span>
-              <span accion="bajar" class=" text-muted p5" style="cursor: pointer; " title="Bajar posición"><i class="fa fa-chevron-down fa-lg"></i></span>
-              <span accion="quitar" class=" text-muted ml10 p5" style="cursor: pointer; " title="Quitar elemento"><i class="fa fa-trash-o fa-lg"></i></span>
+            <div class="__acciones_elemento pull-right" style="position:absolute; top: 2px; right: 0px; display:flex; flex-direction: column">
+              <span accion="subir" class=" text-muted p5 pr10" style="cursor: pointer; " title="Subir posición"><i class="fa fa-chevron-up fa-lg"></i></span>
+              <span accion="bajar" class=" text-muted p5 pr10" style="cursor: pointer; " title="Bajar posición"><i class="fa fa-chevron-down fa-lg"></i></span>
+              <span accion="quitar" class=" text-muted ml10_ p5 pr10" style="cursor: pointer; " title="Quitar elemento"><i class="fa fa-trash-o fa-lg"></i></span>
             </div>`,
         titulo: /*html*/`
             <div class="__elemento row" __tipo="titulo" __id="">
@@ -79,7 +74,7 @@ export class GestorFormsComponent implements OnInit {
               </div>
     
               <!-- Ayuda y depende de-->
-              <div __config=elemento class="col-xs-3 fs12 " style="position:relative;">
+              <div __config=elemento class="col-xs-3 fs12 " style="position:relative; right:18px">
                 <span __config_btn="requerido"   class=" text-center bg-light darker br12 p5 ph10"  title="Activar si la respuesta es obligatoria" style="cursor:pointer; z-index: 12"><i class="fa fa-lock "></i></span>
                 <span __config_btn="ayuda"   class=" text-center bg-light darker br12 p5 ph10"  title="Colocar un  mensaje de ayuda" style="cursor:pointer; z-index: 12"><i class="fa fa-question "></i></span>
                 <!--<span __config_btn="depende" class=" text-center bg-light darker br12 p5 ph8"   title="Esta Pregunta depende de una respuesta de otra pregunta anterior" style="cursor:pointer; z-index: 12"><i class="fa-solid fa-reply  "></i></span>-->
@@ -97,17 +92,17 @@ export class GestorFormsComponent implements OnInit {
               <!-- seleccion de tipo de respuesta -->					
               <div class="col-xs-12">
                 <select __select_tipo_pregunta class=" form-control" style="height: 24px; padding: 0 15px;  width: auto;">
-                  <option value="single">Selección simple</option>
-                  <option value="multiple">Selección multiple</option>
-                  <option value="mixta">Selección mixta</option>
-                  <option value="open_sm">Respuesta corta</option>
-                  <option value="open_lg">Respuesta larga</option>
-                  <option value="number">Numero</option>
-                  <option value="date">Fecha</option>
+                  <option value="single"        >Selección simple</option>
+                  <option value="multiple"      >Selección multiple</option>
+                  <option value="mixta"         >Selección mixta</option>
+                  <option value="open_sm"       >Respuesta corta</option>
+                  <option value="open_lg"       >Respuesta larga</option>
+                  <option value="number"        >Número</option>
+                  <option value="date"          >Fecha</option>
                   <option value="select_numbers">Selector de números</option>
                 </select>
               </div>
-              <div class="__elem_respuesta pl20 col-xs-12 fs14">
+              <div class="__elem_respuesta pl5 col-xs-12 fs14">
               </div>	
             </div>`,
     
@@ -152,7 +147,7 @@ export class GestorFormsComponent implements OnInit {
                 </div>
               </div>	
             </span>
-            <span class="m">
+            <span class="ml30">
               <input  type="checkbox" __opcion_ninguno ><span class="ml5">"Ninguno"</span>
               <!--Para opcion Ninguno Ayuda y salta a otra pregunta -->
               <!--<div __config=opcion_ninguno class="w75 fs10 " style="position:relative; display: inline-block">
@@ -165,6 +160,21 @@ export class GestorFormsComponent implements OnInit {
                 <div class="cuadro_fondo hide " style="position:fixed; top:0; left:0; width:100vw; height:100vh; background-color: #33333333; z-index:11">
                 </div>
               </div>-->	
+            </span>
+            <span class="ml30">
+              <div style="    display: inline-flex; flex-direction: column;">
+                <span>
+                    <input  type="checkbox" __agregar_opcion_columna_dimension ><span class="ml5">Agregar columna dimensión</span>
+                </span>
+                <span>
+                  <input type="text" __nombre_dimension placeholder="Nombre dimensión" style="display:none">
+                  <select __tipo_dimension style="display:none">
+                    <option value="text">Texto</option>
+                    <option value="number">Numero</option>
+                    <option value="date">Fecha</option>
+                  </select>
+                </span>
+              </div>
             </span>`,
         /*Opciones de seleccion mixta*/
         opcion_seleccion: /*html*/`					
@@ -225,7 +235,7 @@ export class GestorFormsComponent implements OnInit {
               objConfig.ancho = parseInt($(elemento).find('[__config=elemento] [__config_btn=ancho]').first().val().trim());
               objConfig.ancho = (objConfig.ancho == isNaN || objConfig.ancho < 0 || objConfig.ancho > 100) ? 100 : objConfig.ancho;   
   
-              if (_.includes(['single', 'multiple', 'mixta',], objConfig.tipo_respuesta)) {
+              if (_.includes(['single', 'multiple', 'mixta'], objConfig.tipo_respuesta)) {
   
                 objConfig.opcion_otro = $(elemento).find('[__opcion_otro]').first().is(':checked');
                 objConfig.opcion_otro_ayuda = $(elemento).find('[__config=opcion_otro] [__config_input=ayuda]').val();
@@ -235,7 +245,12 @@ export class GestorFormsComponent implements OnInit {
                 objConfig.opcion_ninguno = $(elemento).find('[__opcion_ninguno]').first().is(':checked');
                 // if (objConfig.opcion_ninguno)
                 //   objConfig.opcion_ninguno_goto = $(elemento).find('[__config=opcion_ninguno] [__config_input=goto]').val();
-  
+
+                /* Para la columna dimension si esta cheked*/
+                if($(elemento).find('[__agregar_opcion_columna_dimension]').first().is(':checked') && $(elemento).find('[__nombre_dimension]').val().trim().length > 0 ){
+                  objConfig.nombre_dimension = $(elemento).find('[__nombre_dimension]').val();
+                  objConfig.tipo_dimension = $(elemento).find('[__tipo_dimension]').val();
+                }
   
                 objElem.opciones = [];
   
@@ -344,6 +359,12 @@ export class GestorFormsComponent implements OnInit {
                     // $(elemento).find('[__config=opcion_ninguno] [__config_input=goto]').val(cnfElem.opcion_ninguno_goto);
                     funs.pintaBloqueConfig($(elemento).find("[__config=opcion_ninguno]"));
                   }
+                  /* Si tiene campo opcion nombredimension*/
+                  if (cnfElem.nombre_dimension) {
+                    $(elemento).find('[__agregar_opcion_columna_dimension]').prop('checked', true).trigger('change');
+                    $(elemento).find('[__nombre_dimension]').val(cnfElem.nombre_dimension);
+                    $(elemento).find('[__tipo_dimension]').val(cnfElem.tipo_dimension);
+                  }
                 }
   
                 if (cnfElem.tipo_respuesta == 'select_numbers') {
@@ -356,9 +377,9 @@ export class GestorFormsComponent implements OnInit {
         },
         save: function () {
           let objSend: any = ctxMain.getData();
-          xyzFuns.spinner(true, { texto: 'Guardando ...' });
+          funs.spinner(true);
           $.post(ctxG.rutabase + '/save-form-elems', cmp.uAuth.addToken(objSend), function (res) {
-            xyzFuns.spinner(false);
+            funs.spinner(false);
             ctxMain.setData(res.data);
   
             res.delay = 3000;
@@ -366,7 +387,7 @@ export class GestorFormsComponent implements OnInit {
             /* Para que se acomoden los tamaños*/
             $("[__tipo=pregunta] textarea").trigger('keydown');
           }).fail(function (r) {
-            xyzFuns.spinner(false);
+            funs.spinner(false);
             ctxG.mostrarMensajeFloat({ estado: 'error', msg: 'Hubo un error inesperado' });
           });
         },
@@ -385,13 +406,13 @@ export class GestorFormsComponent implements OnInit {
 
         /** Carga el formulario seleccionado */
         cargarFormulario: (id_formulario) => {
-          xyzFuns.spinner();
+          funs.spinner();
 
           $.post(`${ctxG.rutabase}/get-form-elems`, cmp.uAuth.addToken({ id_formulario: id_formulario }), function (res) {
             ctxMain.setData(res.data);
             /* Para que se acomoden los tamaños*/
             $("[__tipo=pregunta] textarea").trigger('keydown');
-            xyzFuns.spinner(false);
+            funs.spinner(false);
           });
           /* Para que se acomoden los tamaños*/
           $("[__tipo=pregunta] textarea").trigger('keydown ');
@@ -539,6 +560,9 @@ export class GestorFormsComponent implements OnInit {
             $(config).find(("[__config_btn=requerido]")).removeClass(classNormal).addClass(classRequerido)
             : $(config).find(("[__config_btn=requerido]")).removeClass(classRequerido).addClass(classNormal);
 
+        },
+        spinner: (obj = {}) => {
+          xyzFuns.spinner(obj, ctxG.content)
         }
     
     
@@ -628,6 +652,11 @@ export class GestorFormsComponent implements OnInit {
         .on('click', '.cuadro_fondo', function(e){
           funs.ocultaCuadroConfig($(this).closest('[__config]'));
           funs.pintaBloqueConfig($(this).closest('[__config]'))
+        })
+        /* alhacer click en habilitar colunna dimension , Mostrar opciones de dimension */
+        .on('change', '[__agregar_opcion_columna_dimension]', function(e){
+          $(e.currentTarget).closest('.__elemento').find('[__nombre_dimension]').toggle();
+          $(e.currentTarget).closest('.__elemento').find('[__tipo_dimension]').toggle();
         })
     
         /* botones acciones de la formulario guardar  ... */

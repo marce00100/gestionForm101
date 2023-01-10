@@ -8,12 +8,14 @@ import { AdminComponent } from './admin.component';
 
 import { UsersComponent } from './usuarios/usuarios.component';
 import { GestorFormsComponent } from './gestorforms/gestorforms.component';
+import { GestionContenidosComponent } from './gestion-contenidos/gestion-contenidos.component';
 
 @NgModule({
   declarations: [
     AdminComponent,
     UsersComponent,
     GestorFormsComponent,
+    GestionContenidosComponent,
 
   ],
   imports: [

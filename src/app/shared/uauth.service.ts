@@ -15,8 +15,9 @@ export class UAuthService {
   private keyU = 'current';
   
   private itemsMenu: any[] = [
-    { name: "Editor de Form.",  redirectTo: "gestorforms", icon: "glyphicons glyphicons-magic fa-lg ", roles: [1] },
     { name: "Adm. Usuarios",    redirectTo: "usuarios",    icon: "glyphicons glyphicons-group fa-lg ", roles: [1] },
+    { name: "Adm. Contenidos",  redirectTo: "contenidos",    icon: "fa fa-paperclip fa-lg ", roles: [1] },
+    { name: "Editor de Form.",  redirectTo: "gestorforms", icon: "glyphicons glyphicons-magic fa-lg ", roles: [1] },
     { name: "Historial envíos", redirectTo: "listaforms",  icon: "glyphicons glyphicons-cargo fa-lg ", roles: [3] },
     { name: "Formulario 101",   redirectTo: "form101",     icon: "glyphicons glyphicons-notes_2 fa-lg ", roles: [3] },
   ];
@@ -57,7 +58,8 @@ export class UAuthService {
       this.userCtx = {
         userItemsMenu: _.filter(this.itemsMenu, item => item.roles.includes(idRol)),
         username: this.getUsername(),
-        islogged: true
+        islogged: true,
+        enteringPublicPage: false
       }
       this.userCtx$.next(this.userCtx);
     }
@@ -69,19 +71,28 @@ export class UAuthService {
    * Cerrar sesion, elimina variables almacenadas
    */
   public logout() {
-      localStorage.removeItem(this.keyTk);
-      localStorage.removeItem(this.keyTk2);
-      localStorage.removeItem(this.keyU);
-      this.userCtx = {};
-      this.userCtx$.next(this.userCtx);
-    }
+    localStorage.removeItem(this.keyTk);
+    localStorage.removeItem(this.keyTk2);
+    localStorage.removeItem(this.keyU);
+    this.userCtx = {};
+    this.userCtx$.next(this.userCtx);
+  }
+
+  /**
+   * Si esta ingresando a una pagina publica ,para no mostrar el Menu
+   * @param isPublic Lapagina es publica boolean
+   */
+  public setEnteringPublicPage(isPublic: boolean = true){
+    this.userCtx.enteringPublicPage = isPublic;
+    this.userCtx$.next(this.userCtx);
+  }
   
   /**
-   * Verifica si esta Loggueado
+   * Verifica si esta Logueado
    * @returns Bool true or false
    */
   public isLogged(): boolean {
-    return (this.userCtx.username != null );
+    return (localStorage.getItem(this.keyTk) != null );
   }
 
   /**
@@ -125,16 +136,16 @@ export class UAuthService {
 /**
  * Interface TIpo AUTH, con datos básicos de la autenticación
  */
-interface Auth {
-  token: string,
-  idRol: number,
-  username?: string,
-  email?: string,
-}
+// interface Auth {
+//   token: string,
+//   idRol: number,
+//   username?: string,
+//   email?: string,
+// }
 
-interface ItemMenu{
-  name: string,   
-  redirectTo: string,     
-  icon: string, 
-  roles: number[],
-}
+// interface ItemMenu{
+//   name: string,   
+//   redirectTo: string,     
+//   icon: string, 
+//   roles: number[],
+// }

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { SFormService } from 'src/app/shared/sform.service';
 import { UAuthService } from 'src/app/shared/uauth.service';
 
 declare var $: any;
@@ -15,16 +16,25 @@ declare var xyzFuns: any;
 })
 export class Form101Component implements OnInit {
 
-  constructor(private uauth: UAuthService, private router: Router) { }
+  constructor(
+    private router: Router,
+    private uauth: UAuthService,
+    private sform:SFormService, 
+  ) { }
 
   ngOnInit(): void {
     this.form();
     // form();
   }
 
-  volverInicio() {
-    this.router.navigate(['listaforms']);
-  }
+  // navigate(ruta,params = '') {
+  //   if (ruta == 'home') {
+  //     this.router.navigate(['listaforms'])
+  //   }
+  //   if (ruta == 'listaforms') {
+  //     this.router.navigate(['listaforms/' + params])
+  //   }
+  // }
 
   form() {
     let component = this;
@@ -43,10 +53,10 @@ export class Form101Component implements OnInit {
         elemhtml : {
           /* Elementos */
           pregunta_rend: /*html*/`
-                            <div __card class="__elemento row  " __tipo="pregunta" __id_elemento="" __pregunta_numero __titulo_principal_seccion>                          
+                            <div __card class="__elemento row mnw150 grow-1 " __tipo="pregunta" __id_elemento="" __pregunta_numero __titulo_principal_seccion>                          
                                 <div class="__elem_texto quest quest-pregunta  "  ></div>
                                 <div class="__elem_descripcion quest quest-descripcion "  ></div>
-                                <div class="__elem_respuesta pl20 col-md-12"  __tipo_respuesta="" __dependencia>
+                                <div class="__elem_respuesta pl5 col-md-12"  __tipo_respuesta="" __dependencia>
                                 </div>  
                             </div>`,
           titulo_rend: /*html*/`  
@@ -64,44 +74,50 @@ export class Form101Component implements OnInit {
   
           /* tipos de respuesta*/
           respuesta_corta_rend: /*html*/` 
-                                <div class="mt5 mb20">
+                                <div class="mt5 mb15">
                                         <input type="text" class="bg-white  form-control quest-input-line quest-texto __open_sm" placeholder="" style="width:80%" autocomplete="no__autocompletar" >
                                 </div>`,
           respuesta_numero_rend: /*html*/` 
-                                <div class="mt5 mb20">
+                                <div class="mt5 mb15">
                                         <input type="number" class="bg-white  form-control quest-input-line quest-texto __number" placeholder="" style="width:150px" autocomplete="no-autocompletar-" >
                                 </div>`,
           respuesta_fecha_rend: /*html*/` 
-                                <div class="mt5 mb20">
+                                <div class="mt5 mb15">
                                         <input type="date" class="bg-white  form-control quest-input-line quest-texto __date" placeholder="" style="width:150px"autocomplete="no__autocompletar"  >
                                 </div>`,
           respuesta_larga_rend: /*html*/` 
-                                <div class="mt5 mb20">
+                                <div class="mt5 mb15">
                                         <textarea class="bg-white  form-control quest-input-line quest-texto __open_lg" placeholder="" style="width:80%" rows="2"  ></textarea>
                                 </div>`,
   
           respuesta_select_numbers_rend: /*html*/` 
-                                <div class="mt5 mb20">
+                                <div class="mt5 mb15">
                                         <select class="form-control w100 ph15 __select_numbers"></select>
                                 </div>`,
 
   
           respuesta_seleccion_rend: /*html*/` 
                                 <ul class="__opciones_respuesta mv10 pl15" style="list-style: none;"></ul>`,
-  
+
           /* Opcion de seleccion*/
           opcion_seleccion_rend: /*html*/`
-                                <li class="mt5 " style="display:flex; align-items: flex-start; gap: 5px" > 
-                                    <input __id_opcion __opcion_texto __opcion_numero id="" type="" name="" class="" title="" value="" >
-                                    <label class=" quest quest-opcion" for=""></label> 
-                                </li>`,
-  
+                                <li class="mt5 flex justify-around align-start flex-wrap" __opcion> 
+                                    <div class="flex align-start grow-1 " style="flex-basis:50%">
+                                      <input __id_opcion __opcion_texto __opcion_numero id="" type="" name="" class="" title="" value="" >
+                                      <label class=" quest quest-opcion ml5" for=""></label>
+                                    </div>                                    
+                                </li>`,  
+
           /* Opcion  "Otro... "*/
           opcion_otro_rend:   /*html*/`
-                                <li class="mt5 " style="display:flex; align-items: flex-start; gap: 5px"> 
-                                    <input  __opcion_texto="Otro" id="" type="" name="" class="" title="" value="" >
-                                    <label class=" quest quest-opcion" for=""></label> 
-                                    <input type="text"  __opcion_otro class="bg-white  form-control quest-input-line quest-texto hide" placeholder="Especifique ..."  style="width:50%; display:inline-block"  >
+                                <li class="mt5 flex justify-around align-start flex-wrap" __opcion > 
+                                    <div class="flex align-start grow-1 wp100" >
+                                      <input  __opcion_texto="Otro" id="" type="" name="" class="" title="" value="" >
+                                      <label class=" quest quest-opcion ml5" for=""></label>
+                                    </div>
+                                    <div class="flex align-start grow-1 " style="gap: 5px; flex-basis:50%">
+                                      <input type="text"  __opcion_otro class="bg-white  form-control quest-input-line quest-texto hide" placeholder="Especifique ..."  style="width:80%; display:inline-block"  >
+                                    </div>
                                 </li>`,
   
           /* Opcion  "Ninguno"*/
@@ -112,11 +128,11 @@ export class Form101Component implements OnInit {
                                 </li>`,
   
           ayuda: /*html*/`  
-                <span __ayuda class="pull-right">
+                <span __ayuda class="">
                     <span __ayuda_btn class=" text-center bg-primary br12 p5 ph8 ml10 fs11" title="más información..." style="cursor:pointer; position:relative">
                         <i class="fa fa-question "></i>
                     </span>
-                    <div __ayuda_texto class="hide fs12 text-white" style="top: 22px; left:0px;position: absolute;background: #000000aa;padding: 15px;border-radius: 12px;min-width: 250px;  z-index: 13;"></div>
+                    <div __ayuda_texto class="hide fs12 text-white" style="top: 22px; right:0px;position: absolute;background: #000000aa;padding: 15px;border-radius: 12px;min-width: 200px;  z-index: 13;"></div>
                     <div class="cuadro_fondo hide " style="position:fixed; top:0; left:0; width:100vw; height:100vh; background-color: #33333311; z-index:11">
                     </div>
                 </span>`
@@ -199,11 +215,21 @@ export class Form101Component implements OnInit {
                   let opcion = $(form.elemhtml.opcion_seleccion_rend);
                   /* se coloca en cada checkitem el id para enlazarcon label y el name con id de elemento para agrupar */
                   let numeroOpcion = k + 1; 
-                  $(opcion).find('input').attr('__id_opcion', op.id).attr('__opcion_numero', numeroOpcion).attr('__opcion_texto', op.opcion_texto).attr('id', op.id).attr('name', objElem.id).attr('type', typeinput);
+                  $(opcion).find('input').attr('__id_opcion', op.id).attr('__opcion_numero', numeroOpcion).attr('__opcion_texto', op.opcion_texto).attr('id', op.id).attr('name', objElem.id).attr('type', typeinput).attr('__goto', cnfOpcion.goto ? cnfOpcion.goto : '');;
                   $(opcion).find('label').attr('for', op.id).text(`${k + 1}. ${op.opcion_texto}`);
 
-                  /* la config de la opcion ayuda y goto*/
-                  $(opcion).find('input').attr('__goto', cnfOpcion.goto ? cnfOpcion.goto : '');
+                  /* si  tiene DIMENSIONES */
+                  if (cnfElem.nombre_dimension && cnfElem.nombre_dimension.length > 0 && cnfElem.tipo_dimension && cnfElem.tipo_dimension.length > 0){
+                    let dimensionHtml = /*html*/`
+                        <div class="grow-1"  __dimension style="display:none">
+                          <span>${cnfElem.nombre_dimension}</span>
+                          <input type="${cnfElem.tipo_dimension}" __opcion_nombre_dimension="${cnfElem.nombre_dimension}" style="width: 80px; padding: 2px 5px; border: 0px; border-bottom: 1px grey solid">
+                        </div>
+                    `
+                    $(opcion).append(dimensionHtml);
+                  }
+
+                  /* La config opcion para la ayuda */
                   if (cnfOpcion.ayuda && cnfOpcion.ayuda.length > 0) {
                     $(opcion).append(form.elemhtml.ayuda);
                     $(opcion).find('[__ayuda_texto]').html(cnfOpcion.ayuda.replace(/\n/g, '<br>'));
@@ -222,12 +248,23 @@ export class Form101Component implements OnInit {
                   $(bloque_otro).find('input[__opcion_texto=Otro]').attr('__goto', cnfElem.opcion_otro_goto).attr('id', id_rand).attr('name', objElem.id).attr('type', typeinputOtro);
                   $(bloque_otro).find('label').attr('for', id_rand).html(`${numeroCorrelativoOtro}. Otro:`);
 
+                  /* Si tiene DIMENSIONES OTRO*/
+                  if (cnfElem.nombre_dimension && cnfElem.nombre_dimension.length > 0 && cnfElem.tipo_dimension && cnfElem.tipo_dimension.length > 0){
+                    let dimensionHtml = /*html*/`
+                        <div class="grow-1" __dimension style="display:none">
+                          <span>${cnfElem.nombre_dimension}</span>
+                          <input type="${cnfElem.tipo_dimension}" __opcion_nombre_dimension="${cnfElem.nombre_dimension}" style="width: 80px; padding: 2px 5px; border: 0px; border-bottom: 1px grey solid">
+                        </div>
+                    `
+                    $(bloque_otro).append(dimensionHtml);
+                  }
+
                   $(elemento).find('.__opciones_respuesta').append(bloque_otro);
                 }
 
                 /* Opcion NINGUNO*/
                 if (cnfElem.opcion_ninguno) {
-                  let typeinputNinguno = 'checkbox'; // Siempre debe ser checkbox para habilitar o deshabilitar a todos los demas
+                  let typeinputNinguno = 'checkbox'; // Siempre debe ser checkbox para habilitar o deshabilitar a los demas options
                   let bloque_ninguno = $(form.elemhtml.opcion_ninguno_rend);
 
                   let numeroCorrelativoNinguno = $(elemento).find('.__opciones_respuesta li').length + 1;
@@ -268,27 +305,42 @@ export class Form101Component implements OnInit {
         },
         getData() {
           let timeFin = new Date();
-          // let datosCabeceraObj = xyzFuns.getData__fields('__rg_field');
           let contest = {            
             tiempo_seg: 0, 
             respuestas: []
           };
 
           // $.extend(contest, datosCabeceraObj);
-          console.log('contest',contest);
           _.forEach($(".__elemento[__tipo='pregunta']"), function (elemento, k) {
 
             let tipoRespuesta = $(elemento).find('[__tipo_respuesta]').first().attr('__tipo_respuesta');
             if (tipoRespuesta == 'single' || tipoRespuesta == 'multiple' || tipoRespuesta == 'mixta') {
               _.forEach($(elemento).find("input:checked"), function (opcionChecked) {
                 let opChecked = $(opcionChecked);
-                let objResp = {
+                let objResp: any = {
                   id_elemento: $(elemento).attr('__id_elemento'),
-                  id_opcion: opChecked.attr('__id_opcion') || null,
+                  // id_opcion: opChecked.attr('__id_opcion') || null,
                   respuesta_opcion: opChecked.attr('__opcion_texto'),
                   respuesta: (opChecked.attr('__opcion_texto') == "Otro") ?
                     opChecked.closest('li').find('[__opcion_otro]').first().val() : opChecked.attr('__opcion_texto'),
+                  
+                  }
+                  
+                /* obtener las dimensiones (una sola por le momento) */  
+                let dimensiones = opChecked.closest('[__opcion]').find('[__dimension]');
+                if ($(dimensiones).length > 0) {
+                  let arrayDimensiones = [];
+                  _.forEach($(dimensiones).find('input[__opcion_nombre_dimension]'), (dimension, k) => {
+                    let dim = { key: $(dimension).attr('__opcion_nombre_dimension'), value: $(dimension).val() };
+                    arrayDimensiones.push(dim);
+                    /* temporales solo sirven para una dimension, el que vale seria el arrayDimensiones*/
+                    objResp.nombre_dimension = dim.key;
+                    objResp.valor_dimension = dim.value;
+                  })
+                  objResp.dimensiones = JSON.stringify(arrayDimensiones);
                 }
+
+
                 contest.respuestas.push(objResp);
               })
             }
@@ -397,49 +449,6 @@ export class Form101Component implements OnInit {
           $("[__info_general=mineral]").html(`${(ctxG.nimSel.mineral) ? ctxG.nimSel.mineral : ''}`);
 
         },
-        /** Mjuestra ventana emergente para confirmar el evio del form */
-        confirmar(){
-          let noCumplenValidacion = funs.noCumplenValidacion(ctxG.content, '.__elemento[required]', 'error-validacion');
-          if(noCumplenValidacion.length > 0)
-            return;
-
-          let op:any = { 
-            background_color:'#00000060', 
-            class_icon: '',
-            class_texto: '',
-            texto: /*html*/`
-            <div class="panel mn"   style="">
-              <div class="panel-heading h-50 bg-marron--20 bg-system_ bg-success--40_ bg-666_ text-fff _darker">
-                <h5><i class="fa fa-send mr10"></i>Confirmar envío</h5>           
-                <span class="glyphicons glyphicons-remove_2 p3 close fs15" style="position: absolute; top: 5px; right: 10px; color: inherit; text-shadow: none; opacity: 0.8"></span>     
-              </div>
-              <div class="panel-body">
-                <div class="p20 fs14 bg-light text-center_ text-primary--60" style="text-align:justify; border-bottom: 1px solid #afafaf;" >
-                  <p>El presente Formulario 101, tiene el carácter de declaración jurada y es de uso obligatorio para los operadores mineros, personas naturales y jurídicas que realicen el transporte y comercialización de minerales metálicos y no metálicos.</b></p>
-                  <p><b>A partir de su emisión tiene 3 días para su utilización, caso contrario el mismo quedará sin efecto.</b></p>
-                </div>
-                <h4 class="text-center text-theme1--20 fw600">Desea enviar la información ? </h4>
-                <div class="flex justify-evenly p10">
-                  <button __accion_form="close" class="btn bg-eee ph20 br6 br-a br-dark">Cerrar</button>
-                  <button __accion_form="save" class="btn btn-primary ph20 br6 br-a br-dark">Confirmar</button>
-                </div>
-              </div>
-            </div>`
-          }
-          let alert = /*html*/`
-                <div __alert style="display:none; z-index: 99000"> 
-                  <div class="flex justify-center align-center wp100 " style="height: 100vh; z-index: 99000; position: fixed; top: 0px; left: 0vw; 
-                  background-color: ${op.background_color} ">
-                    <div class="flex justify-center align-center br3"style="  width: calc(300px + 25vw); max-width: 90%; 
-                      background-color: #f4f4f8; box-shadow: 0px 0px 8px 0px #0000004a; position: relative; top: -50px">                        
-                          ${op.texto}
-                    </div>
-                  </div>
-                </div> `;
-          $(ctxG.content).append(alert);
-          $("[__alert]").show(300);
-
-        },
         /** Guarda el Form */
         save() {
           let noCumplenValidacion = funs.noCumplenValidacion(ctxG.content, '.__elemento[required]', 'error-validacion');
@@ -460,7 +469,7 @@ export class Form101Component implements OnInit {
             }
 
             funs.spinner(false);
-            funs.stateView('guardado'); 
+            funs.stateView('guardado', res.data.uid); 
           }).fail(function (r) {
             funs.mostrarError("Hubo un error inesperado.");
             funs.spinner(false);
@@ -468,9 +477,11 @@ export class Form101Component implements OnInit {
         },
         /* Verifica requeridos */
         noCumplenValidacion: (container, selectorFieds, classError) => {
-          //TODO  qutar
-          return [];
-          //TODO end
+
+          // //TODO  quitar - solo es para pruebas para hacer pasar sin validar
+          // return [];
+          // //TODO end
+
           let noCumplen = [];
           $(`${container} ${ selectorFieds }`).find("[__tipo_respuesta]").removeClass(classError);
 
@@ -498,8 +509,50 @@ export class Form101Component implements OnInit {
           })
           return  noCumplen;
         },
+        /** Mjuestra ventana emergente para confirmar el evio del form */
+        confirmar() {
+          let noCumplenValidacion = funs.noCumplenValidacion(ctxG.content, '.__elemento[required]', 'error-validacion');
+          if (noCumplenValidacion.length > 0)
+            return;
+
+          let op: any = {
+            background_color: '#00000060',
+            class_icon: '',
+            class_texto: '',
+            texto: /*html*/`
+                <div class="panel mn"   style="">
+                  <div class="panel-heading h-50 bg-marron--20 bg-system_ bg-success--40_ bg-666_ text-fff _darker">
+                    <h5><i class="fa fa-send mr10"></i>Confirmar envío</h5>           
+                    <span class="glyphicons glyphicons-remove_2 p3 close fs15" style="position: absolute; top: 5px; right: 10px; color: inherit; text-shadow: none; opacity: 0.8"></span>     
+                  </div>
+                  <div class="panel-body">
+                    <div class="p20 fs14 bg-light text-center_ text-primary--60" style="text-align:justify; border-bottom: 1px solid #afafaf;" >
+                      <p>El presente Formulario 101, tiene el carácter de declaración jurada y es de uso obligatorio para los operadores mineros, personas naturales y jurídicas que realicen el transporte y comercialización de minerales metálicos y no metálicos.</b></p>
+                      <p><b>A partir de su emisión tiene 3 días para su utilización, caso contrario el mismo quedará sin efecto.</b></p>
+                    </div>
+                    <h4 class="text-center text-theme1--20 fw600">Desea continuar? </h4>
+                    <div class="flex justify-evenly p10">
+                      <button __accion_form="close" class="btn bg-eee ph20 br6 br-a br-dark fs14"> Cerrar</button>
+                      <button __accion_form="save" class="btn btn-primary ph20 br6 br-a br-dark fs14"><i class="glyphicons glyphicons-ok"></i> Confirmar</button>
+                    </div>
+                  </div>
+                </div>`
+          }
+          let alert = /*html*/`
+                    <div __alert style="display:none; z-index: 99000"> 
+                      <div class="flex justify-center align-center wp100 " style="height: 100vh; z-index: 99000; position: fixed; top: 0px; left: 0vw; 
+                      background-color: ${op.background_color} ">
+                        <div class="flex justify-center align-center br3"style="  width: calc(300px + 25vw); max-width: 90%; 
+                          background-color: #f4f4f8; box-shadow: 0px 0px 8px 0px #0000004a; position: relative; top: -50px">                        
+                              ${op.texto}
+                        </div>
+                      </div>
+                    </div> `;
+          $(ctxG.content).append(alert);
+          $("[__alert]").show(300);
+        },
         /* Configura los elementos de la vista segun el contexto,solo en caso de error se requiere msg */
-        stateView: (stateview, msg = '') => {
+        stateView: (stateview, text = '') => {
           if(stateview == 'inicial'){
             // $("[__frm_content]").hide();
             $("[__frm_datos_general]").hide();
@@ -519,51 +572,24 @@ export class Form101Component implements OnInit {
             $("[__frm_enviar]").hide();
 
             let alert = /*html*/`
-                      <h2 class="text-center">Se ha enviado exitosamente el formulario.</h2>
-                      <h2>Muchas gracias.</h2>
+                      <h2 class="text-center">Se ha emitido la declaración del formulario.</h2>
                       <div class="flex justify-center p20" >
                         <div id="codigo_qr" __codigo_qr class="p5 bg-white" style="border: 5px solid #333333"></div>
                         <div class="flex flex-y justify-between">
-                          <i __accion_form="share" class="glyphicon glyphicon-share-alt fa-2x p5 text-dark cursor"></i>
-                          <i __accion_form="download" class="glyphicons glyphicons-download_alt fa-2x p5 text-dark cursor"></i>
+                          <span __accion_form="share" class="fa fa-share-square-o fa-2x p5 text-dark cursor"></span>
+                          <i __accion_form="downloadQR" class="glyphicons glyphicons-download_alt fa-2x p5 text-dark cursor"></i>
                         </div>
                       </div>
-                      <div><button __accion_form="home" class="btn btn-lg btn-info br6 wp66" >Volver a Inicio</button></div>
+                      <div class="flex justify-evenly">
+                        <button __accion_form="home" class="btn btn-lg btn-info br6 wp30 " >Volver a Inicio</button>
+                        <button __accion_form="ver_form" __uid=${text} class="btn btn-lg btn-success br6 wp30" >Ver Formulario</button>
+                      </div>
                   `;
             xyzFuns.alertMsg("[__frms]", alert, ' alert-success br-a br-success pastel   fs15 p20 br12 mt50', 'fa fa-check-circle fa-3x', '', false);
-            
-            funs.mostrarQR('62.171.160.162');            
+            let urlForm = component.sform.getUrlPublicForm(text)
+            component.sform.generarQR("#codigo_qr", urlForm);           
           }
 
-          // if (stateview == 'error_critico') {
-          //   $("[__frm_content]").show();
-          //   $("[__frm_datos_general]").hide();
-          //   $("[__frm_formulario]").hide();
-          //   $("[__frm_enviar]").hide();
-
-          //   let alert = /*html*/`
-          //             <div class="text-center">${msg}</div>
-          //             <div>
-          //               <button __btn_home class="btn btn-lg btn-info br-a br-dark mt20 br6 wp66">Volver a Inicio</button>
-          //             </div>
-          //         `;
-          //   xyzFuns.alertMsg("[__error]", alert, ' alert-danger br-a br-danger pastel   fs15 p20 br12 mt50', 'fa fa-exclamation-circle fa-2x', '', false);
-
-          // }
-        },
-        /* Genera QR a artir de un texto o url */
-        mostrarQR: (text) => {
-          let containerQR = $("#codigo_qr")[0];
-          // let containerQR = $("[__codigo_qr]");
-          let qrcode = new QRCode(containerQR, {
-            // text: "https://escueladigital.ga/curzar",
-            width: 128,
-            height: 128,
-            colorDark : "#333333",
-            colorLight : "#ffffff",
-            correctLevel : QRCode.CorrectLevel.H
-          });
-          qrcode.makeCode(text);
         },
 
         /* Descargar la imagen del QR*/
@@ -585,7 +611,7 @@ export class Form101Component implements OnInit {
         mostrarOcultarAyuda: (accion, ayuda) => {
           if (accion == 'mostrar') {
             if ($(ayuda).find('[__ayuda_texto]').hasClass('hide')) {
-              /* Se ocultan todos*/
+              /* Se ocultan all helps */
               $("[__ayuda_texto]").addClass('hide');
               $(".cuadro_fondo").addClass('hide');
               /* Solo muestra la ayuda y fondo del elemento*/
@@ -644,17 +670,21 @@ export class Form101Component implements OnInit {
           /* Al hacer click los botones de acciones_form ENVIAR GUARDAR CERRAR etc*/
           .on('click', "[__accion_form]", function (e) {
             let accion = $(e.currentTarget).attr("__accion_form");
-            if(accion == 'home')            
-              component.volverInicio()
-
-            if(accion == 'send')
+            if(accion == 'send'){
               funs.confirmar();
-
+            }
+            if (accion == 'home') {
+              component.router.navigate(['listaforms'])
+            }
             if(accion == 'save'){
               funs.save();
               $(e.currentTarget).closest("[__alert]").remove();
             }
-            if(accion == 'download'){
+            if (accion == 'ver_form') {
+              let uid = $(e.currentTarget).attr("__uid");
+              component.router.navigate(['listaforms/' + uid]);
+            }
+            if(accion == 'downloadQR'){
               funs.downloadQR();
             }
             if(accion == 'close'){
@@ -671,6 +701,9 @@ export class Form101Component implements OnInit {
               else
                 $(op).closest('li').find('[__opcion_otro]').addClass('hide').val('')
             })
+            
+            /* para mostrar u ocultar las DImensiones */
+            $(e.currentTarget).closest('[__opcion]').find('[__dimension]').toggle().find('input').val('');
           })
 
           /* Para controlar la opcion NINGUNO ,  */

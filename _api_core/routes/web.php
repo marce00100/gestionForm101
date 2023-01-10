@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Formularios\GestorFormulariosController as Gestor;
 use App\Http\Controllers\Formularios\FormularioController as Form;
 use App\Http\Controllers\GestionUsuarios\UsuariosController as Usuarios;
+use App\Http\Controllers\GestionContenidos\ContenidosController as Contenidos;
 use App\Http\Controllers\Config\ConfigController as Config;
 
 /*
@@ -69,7 +70,7 @@ Route::group(['prefix' => 'api', 'middleware' => ['cors']], function () {
 	/** Lista deformularios llenos */
 	Route::post('forms-llenos-user',          [Form::class, 'formsLlenosUser'])->middleware(['authorize:1|3']);
 	/** Form lleno con sus  respuestas  */
-	Route::get('formenviado-reps',       [Form::class, 'formLlenoRespuestas'])->middleware([]);
+	Route::get('formenviado-resp',       [Form::class, 'formLlenoRespuestas'])->middleware([]);
 
 
 	/** -- USUARIOS */
@@ -82,6 +83,16 @@ Route::group(['prefix' => 'api', 'middleware' => ['cors']], function () {
 	Route::post('operador-minero',  [Usuarios::class, 'getUser'])->middleware(['authorize:1']);
 	/** Guardar usuario y dependencias */
 	Route::post('save-user',        [Usuarios::class, 'saveUser'])->middleware(['authorize:1']);
+
+
+	/** -- CONTENIDOS */
+
+	/** lista de usuario */
+	Route::post('get-contents',      [Contenidos::class, 'getContents'])->middleware(['authorize:1']);
+	/** Obtiene un usuario con todas sus dependencias (tambien si es operador) */
+	Route::post('get-content',         [Contenidos::class, 'getContent'])->middleware(['authorize:1']);
+	/** Guardar usuario y dependencias */
+	Route::post('save-content',        [Contenidos::class, 'saveContent'])->middleware(['authorize:1']);
 
 
 	// Route::post('cambiar-password', [UsuariosController::class, 'cambioPassword']); //  ->middleware(['auth']);
