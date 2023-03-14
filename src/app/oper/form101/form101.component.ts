@@ -53,10 +53,10 @@ export class Form101Component implements OnInit {
         elemhtml : {
           /* Elementos */
           pregunta_rend: /*html*/`
-                            <div __card class="__elemento row mnw150 grow-1 " __tipo="pregunta" __id_elemento="" __pregunta_numero __titulo_principal_seccion>                          
+                            <div __card class="__elemento row_ mnw100 grow-1 " __tipo="pregunta" __id_elemento="" __pregunta_numero __titulo_principal_seccion>                          
                                 <div class="__elem_texto quest quest-pregunta  "  ></div>
                                 <div class="__elem_descripcion quest quest-descripcion "  ></div>
-                                <div class="__elem_respuesta pl5 col-md-12"  __tipo_respuesta="" __dependencia>
+                                <div class="__elem_respuesta pl5 col-md-12_"  __tipo_respuesta="" __dependencia>
                                 </div>  
                             </div>`,
           titulo_rend: /*html*/`  
@@ -79,7 +79,7 @@ export class Form101Component implements OnInit {
                                 </div>`,
           respuesta_numero_rend: /*html*/` 
                                 <div class="mt5 mb15">
-                                        <input type="number" class="bg-white  form-control quest-input-line quest-texto __number" placeholder="" style="width:150px" autocomplete="no-autocompletar-" >
+                                        <input type="number" class="bg-white  form-control quest-input-line quest-texto __number" placeholder="" style="/*width:150px*/" autocomplete="no-autocompletar-" >
                                 </div>`,
           respuesta_fecha_rend: /*html*/` 
                                 <div class="mt5 mb15">
@@ -93,6 +93,11 @@ export class Form101Component implements OnInit {
           respuesta_select_numbers_rend: /*html*/` 
                                 <div class="mt5 mb15">
                                         <select class="form-control w100 ph15 __select_numbers"></select>
+                                </div>`,
+          
+          respuesta_select_rend: /*html*/` 
+                                <div class="__opciones_respuesta mt5 mb15">
+                                        <select class="form-control  __select"></select>
                                 </div>`,
 
   
@@ -215,7 +220,7 @@ export class Form101Component implements OnInit {
                   let opcion = $(form.elemhtml.opcion_seleccion_rend);
                   /* se coloca en cada checkitem el id para enlazarcon label y el name con id de elemento para agrupar */
                   let numeroOpcion = k + 1; 
-                  $(opcion).find('input').attr('__id_opcion', op.id).attr('__opcion_numero', numeroOpcion).attr('__opcion_texto', op.opcion_texto).attr('id', op.id).attr('name', objElem.id).attr('type', typeinput).attr('__goto', cnfOpcion.goto ? cnfOpcion.goto : '');;
+                  $(opcion).find('input').attr('__id_opcion', op.id).attr('__opcion_numero', numeroOpcion).attr('__opcion_texto', op.opcion_texto).attr('id', op.id).attr('name', objElem.id).attr('type', typeinput).attr('__goto', cnfOpcion.goto ? cnfOpcion.goto : '');
                   $(opcion).find('label').attr('for', op.id).text(`${k + 1}. ${op.opcion_texto}`);
 
                   /* si  tiene DIMENSIONES */
@@ -274,6 +279,24 @@ export class Form101Component implements OnInit {
 
                   $(elemento).find('.__opciones_respuesta').append(bloque_ninguno);
                 }
+              }
+              if (cnfElem.tipo_respuesta == 'select') {
+                $(elemento).find('.__elem_respuesta').append(form.elemhtml.respuesta_select_rend);
+                // $(elemento).find(".__opciones_respuesta").append(form.elemhtml.respuesta_select_rend);
+                // console.log(objElem.opciones);
+                let opts = xyzFuns.generaOpciones(objElem.opciones, 'opcion_texto', 'opcion_texto');   
+
+                /* Opcion OTRO*/
+                if (cnfElem.opcion_otro) {
+                  opts += /*html*/`<option value="Otro">Otro..</option>`;
+                  let inputOtro = /*html*/`
+                        <div class="flex align-start grow-1 " style="gap: 5px; flex-basis:50%">
+                          <input type="text"  __opcion_otro class="bg-white  form-control quest-input-line quest-texto hide" placeholder="Especifique ..."  style="width:80%; display:inline-block"  >
+                        </div>`;
+                  $(elemento).find(".__opciones_respuesta").append(inputOtro);
+                }
+                $(elemento).find('.__select').html(opts);
+
               }
               if (cnfElem.tipo_respuesta == 'open_sm')
                 $(elemento).find('.__elem_respuesta').append(form.elemhtml.respuesta_corta_rend);
@@ -371,6 +394,17 @@ export class Form101Component implements OnInit {
                   id_elemento: $(elemento).attr('__id_elemento'),
                   respuesta: num,
                   respuesta_opcion: num,
+                }
+                contest.respuestas.push(objResp);
+              }
+            }
+            if (tipoRespuesta == 'select') {
+              let respSelect = $(elemento).find(".__select");
+              if(respSelect.val() && respSelect.val().trim().length > 0  ){
+                let objResp = {
+                  id_elemento: $(elemento).attr('__id_elemento'),
+                  respuesta: respSelect.val(),
+                  respuesta_opcion: respSelect.val(),
                 }
                 contest.respuestas.push(objResp);
               }

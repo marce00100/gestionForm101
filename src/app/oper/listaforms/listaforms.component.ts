@@ -137,7 +137,8 @@ export class ListaformsComponent implements OnInit {
               {
                 title: 'Mineral', data: 'id',
                 render: function (data, type, row, meta) {
-                  return "";
+                  let minerales = row.respuestas.mineral[0].respuesta
+                  return minerales;
                 }
               },
               { title: 'Estado', data: 'estado_form_lleno' },

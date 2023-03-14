@@ -18,7 +18,7 @@ class UsuariosController extends MasterController {
 	 */
 	public function getUsuarios(Request $req) {
 		$usuariosList = collect(\DB::select("SELECT u.id as id_usuario, u.username, u.email, u.nombres, u.apellidos, u.carnet, u.nit, u.razon_social
-                                    , u.estado_usuario, u.fecha_registro
+                                    , u.estado_usuario, u.fecha_registro, u.numero_celular, u.nit
                                     , u.id_rol, r.rol 
                                     FROM users u 
                                     LEFT JOIN roles r ON u.id_rol = r.id ORDER BY u.fecha_registro desc "));
@@ -107,7 +107,7 @@ class UsuariosController extends MasterController {
 		}
 
 		$user = collect(\DB::select("SELECT u.id as id_usuario, u.username, u.email, u.nombres, u.apellidos, u.carnet, u.nit, u.razon_social
-                                , u.estado_usuario, u.fecha_registro
+                                , u.estado_usuario, u.fecha_registro, u.numero_celular
                                 , u.id_rol, r.rol 
                                 FROM users u 
                                 LEFT JOIN roles r ON u.id_rol = r.id
@@ -147,6 +147,112 @@ class UsuariosController extends MasterController {
 			'msg' => 'Se realizo el cambio de password.'
 		]);
 	}
+
+
+
+
+
+
+
+
+	/** POST Envia mesajes SMS a traves una conexion con celular por la misma red.
+	 * TODO paramtrizar
+	 */
+	public function sms(Request $req) {
+		$mensaje = $req->mensaje;
+		$celular = $req->numero_celular;
+
+		// return response()->json([
+		// 	'data' => $celular,
+		// 	'msg' => $mensaje
+		// ]);
+
+		//open connection
+		$ch = curl_init();
+
+		curl_setopt($ch, CURLOPT_URL, "http://192.168.1.247:8081/sendSMS");
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+			array(
+				'phone'  => $celular,
+				'message' => $mensaje
+			)
+		));
+
+		//So that curl_exec returns the contents of the cURL; rather than echoing it
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+		//execute post
+		$jsonResponse = curl_exec($ch);
+		echo $jsonResponse;
+
+		return response()->json([
+			'msg' => $jsonResponse,
+		]);
+
+
+
+
+		// $url = "https://wsconsultarui.segip.gob.bo/ServicioExternoInstitucion.svc";
+
+		// $curl = curl_init($url);
+		// curl_setopt($curl, CURLOPT_URL, $url);
+		// curl_setopt($curl, CURLOPT_POST, true);
+		// curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+
+		// $headers = array(
+		// "Content-Type: text/xml",
+		// "SOAPAction: http://tempuri.org/IServicioExternoInstitucion/ConsultaDatoPersonaContrastacion",
+		// );
+		// curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+
+		// $data = <<<DATA
+		// <Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/">
+		//                             <Body>
+		//                                 <ConsultaDatoPersonaContrastacion xmlns="http://tempuri.org/">
+		//                                     <pCodigoInstitucion>252</pCodigoInstitucion>
+		//                                     <pUsuario>javier.fernandez</pUsuario>
+		//                                     <pContrasenia>Fernandez2022</pContrasenia>
+		//                                     <pClaveAccesoUsuarioFinal>J310514796656</pClaveAccesoUsuarioFinal>
+		//                                     <pListaCampo>{
+		//                                     "NumeroDocumento":"{$cedula_identidad}",
+		//                                     "FechaNacimiento":"{$fecha_nacimiento}",
+		//                                     "Complemento":"{$complemento}",
+		//                                     }</pListaCampo>
+		//                                     <pTipoPersona>1</pTipoPersona>
+		//                                 </ConsultaDatoPersonaContrastacion>
+		//                             </Body>
+		//                         </Envelope>
+		// DATA;
+
+		// curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+
+		// //for debug only!
+		// curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+		// curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+
+		// $resp = curl_exec($curl);
+		// curl_close($curl);
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	// public function prueba() {

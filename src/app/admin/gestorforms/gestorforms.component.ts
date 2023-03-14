@@ -94,7 +94,8 @@ export class GestorFormsComponent implements OnInit {
                 <select __select_tipo_pregunta class=" form-control" style="height: 24px; padding: 0 15px;  width: auto;">
                   <option value="single"        >Selección simple</option>
                   <option value="multiple"      >Selección multiple</option>
-                  <option value="mixta"         >Selección mixta</option>
+                  <option value="select"        >Selección</option>
+                  <!--<option value="mixta"         >Selección mixta</option>-->
                   <option value="open_sm"       >Respuesta corta</option>
                   <option value="open_lg"       >Respuesta larga</option>
                   <option value="number"        >Número</option>
@@ -128,6 +129,10 @@ export class GestorFormsComponent implements OnInit {
             </div>`,
     
         pregunta_seleccion: /*html*/`	
+            <div  class="__respuesta_select w150 mt10 br-a br-greyerh-30 pv5 ph10" placeholder="Seleccionar opción" style="display:none"><span class="text-dark"> opciones </span>
+            <i class="fa fa-angle-down pull-right"></i>
+              
+            </div>
             <ul class="__opciones_respuesta quest_option_single mv10 pl15" style="list-style: none;"></ul>
             <a  href="javascript:void(0)" class="__agregar_opcion_seleccion ml15"><i class="fa fa-plus-circle fa-lg"></i> Agregar opción</a>
             <span class="ml30">
@@ -207,6 +212,104 @@ export class GestorFormsComponent implements OnInit {
       }
     
       let ctxMain = {
+        adicionarElemento: (elem) => {
+          let contenidoElementos = $("[__contenido_elementos]");
+          if(elem == 'pregunta'){
+            let newElem = $(elemshtml.pregunta);
+            /*le agrega la respuesta de seleccion*/
+            newElem.find('.__elem_respuesta').first().append(elemshtml.pregunta_seleccion);
+            /*le agrega por defecto la respuesta de seleccion simple*/
+            newElem.find('.__opciones_respuesta').first().append(elemshtml.opcion_seleccion);
+            contenidoElementos.append(newElem);
+          }
+          if(elem == 'titulo'){
+            contenidoElementos.append(elemshtml.titulo);
+          }
+          if(elem == 'texto'){
+            contenidoElementos.append(elemshtml.texto);
+          }
+          if(elem == 'separador'){
+            $(contenidoElementos).append(elemshtml.separador);
+          }
+    
+          let height = $(contenidoElementos)[0].scrollHeight;
+          $(contenidoElementos).animate({ scrollTop: height }, 3000);
+          let elementoAdd = $(contenidoElementos).find('.__elemento').last();
+          elementoAdd.trigger('click');
+          elementoAdd.find('textarea').first().focus();
+    
+        },
+        ejecutaAccionElemento: (accion, elemento) => {
+          if(accion == 'quitar'){
+            $(elemento).remove();
+          }
+          if(accion == 'subir'){
+            $(elemento).insertBefore(elemento.prev())
+          }
+          if(accion == 'bajar'){
+            $(elemento).insertAfter(elemento.next())
+          }
+        },
+    
+        seleccionaTipoRespuesta: (tipo, elemento) => {
+          let elem_respuesta = $(elemento).find('.__elem_respuesta');
+    
+          /* si ya es de opciones y se cambia a tipo opciones css  , y no se hace nada*/
+          if (elem_respuesta.find('.__opciones_respuesta').length > 0 && (tipo == 'single' || tipo == 'multiple' || tipo == 'mixta' )) {
+            elem_respuesta.find('.__opciones_respuesta').removeClass('quest_option_single quest_option_multiple quest_option_mixta').addClass('quest_option_' + tipo);
+            elem_respuesta.find('.__respuesta_select').hide();
+            return;
+          }
+          /* si ya es de opciones y se cambia a select  ,solo se muestra el select y no se hace nada */
+          if (elem_respuesta.find('.__opciones_respuesta').length > 0 && (tipo == 'select')) {
+            elem_respuesta.find('.__opciones_respuesta').removeClass('quest_option_single quest_option_multiple quest_option_mixta').addClass('quest_option_single');
+            elem_respuesta.find('.__respuesta_select').show();
+            return;
+          }
+          if (tipo == 'select') {
+            elem_respuesta.html(elemshtml.pregunta_seleccion);
+            elem_respuesta.find('.__opciones_respuesta').removeClass('quest_option_single quest_option_multiple quest_option_mixta').addClass('quest_option_single');
+            elem_respuesta.find('.__respuesta_select').show();
+          }
+          if (tipo == 'single') {
+            elem_respuesta.html(elemshtml.pregunta_seleccion);
+            elem_respuesta.find('.__opciones_respuesta').removeClass('quest_option_single quest_option_multiple quest_option_mixta').addClass('quest_option_single');
+            elem_respuesta.find('.__respuesta_select').hide();
+          }
+          if (tipo == 'multiple') {
+            elem_respuesta.html(elemshtml.pregunta_seleccion);
+            elem_respuesta.find('.__opciones_respuesta').removeClass('quest_option_single quest_option_multiple quest_option_mixta').addClass('quest_option_multiple');
+            elem_respuesta.find('.__respuesta_select').hide();
+          }
+          if (tipo == 'mixta') {
+            elem_respuesta.html(elemshtml.pregunta_seleccion);
+            elem_respuesta.find('.__opciones_respuesta').removeClass('quest_option_single quest_option_multiple quest_option_mixta').addClass('quest_option_mixta');
+            elem_respuesta.find('.__respuesta_select').hide();
+          }
+          if (tipo == 'open_sm') {
+            elem_respuesta.html(elemshtml.pregunta_corta)
+          }
+          if (tipo == 'open_lg') {
+            elem_respuesta.html(elemshtml.pregunta_larga)
+          }
+          if (tipo == 'select_numbers') {
+            elem_respuesta.html(elemshtml.select_numbers)
+          }
+          if (tipo == 'number') {
+            elem_respuesta.html(elemshtml.pregunta_numero)
+          }
+          if (tipo == 'date') {
+            elem_respuesta.html(elemshtml.pregunta_fecha)
+          }
+        },
+
+        agregaOpcion: (elemento) => {
+          let opcionesRespuesta = $(elemento).find('.__opciones_respuesta');
+          opcionesRespuesta.append(elemshtml.opcion_seleccion);
+          funs.enumeraOpciones(elemento);
+          opcionesRespuesta.find('.__opcion_seleccion').last().focus();
+        },
+        /** obtiene data */
         getData: function () {
           let formulario = {
             id_formulario: $("[__rg_field=id_formulario]").val(),
@@ -235,7 +338,7 @@ export class GestorFormsComponent implements OnInit {
               objConfig.ancho = parseInt($(elemento).find('[__config=elemento] [__config_btn=ancho]').first().val().trim());
               objConfig.ancho = (objConfig.ancho == isNaN || objConfig.ancho < 0 || objConfig.ancho > 100) ? 100 : objConfig.ancho;   
   
-              if (_.includes(['single', 'multiple', 'mixta'], objConfig.tipo_respuesta)) {
+              if (_.includes(['single', 'multiple', 'mixta', 'select'], objConfig.tipo_respuesta)) {
   
                 objConfig.opcion_otro = $(elemento).find('[__opcion_otro]').first().is(':checked');
                 objConfig.opcion_otro_ayuda = $(elemento).find('[__config=opcion_otro] [__config_input=ayuda]').val();
@@ -294,12 +397,12 @@ export class GestorFormsComponent implements OnInit {
           /* NUEVO : verifica si no existe el obj es para nuevo cuestionario*/
           if (!objForm) {
             // $(`${ctxMain.idmodal} textarea, ${ctxMain.idmodal} input`).val('');
-            // funs.adicionarElemento("titulo");
+            // ctxMain.adicionarElemento("titulo");
           }
           /* EDITAR */
           else {  
             objForm.elementos.forEach(function (objElem) {
-              funs.adicionarElemento(objElem.tipo);
+              ctxMain.adicionarElemento(objElem.tipo);
   
               let elemento = $("[__contenido_elementos] .__elemento").last();
               $(elemento).attr('__id', objElem.id);
@@ -320,7 +423,7 @@ export class GestorFormsComponent implements OnInit {
                 funs.pintaBloqueConfig($(elemento).find('[__config=elemento]'));
   
   
-                if (_.includes(['single', 'multiple', 'mixta'], cnfElem.tipo_respuesta)) {
+                if (_.includes(['single', 'multiple', 'mixta', 'select'], cnfElem.tipo_respuesta)) {
                   $(elemento).find('.__opciones_respuesta').html(''); // limpia el espacio de opciones, por la opcion por defecto que deja el select trigger
   
   
@@ -331,8 +434,7 @@ export class GestorFormsComponent implements OnInit {
                     opcionSeleccion.attr('__id', objOpcion.id);
                     opcionSeleccion.find('.__opcion_texto').first().val(objOpcion.opcion_texto);
                     opcionSeleccion.find('.__opcion_numero').first().html(parseInt(k + 1) + '. ');
-  
-  
+    
                     let cnfOpcion = JSON.parse(objOpcion.config) || {};
   
                     opcionSeleccion.find('[__config=opcion] [__config_input=ayuda]').val(cnfOpcion.ayuda ? cnfOpcion.ayuda : '');
@@ -418,87 +520,7 @@ export class GestorFormsComponent implements OnInit {
           $("[__tipo=pregunta] textarea").trigger('keydown ');
         },
   
-        adicionarElemento: (elem) => {
-          let contenidoElementos = $("[__contenido_elementos]");
-          if(elem == 'pregunta'){
-            let newElem = $(elemshtml.pregunta);
-            /*le agrega la respuesta de seleccion*/
-            newElem.find('.__elem_respuesta').first().append(elemshtml.pregunta_seleccion);
-            /*le agrega por defecto la respuesta de seleccion simple*/
-            newElem.find('.__opciones_respuesta').first().append(elemshtml.opcion_seleccion);
-            contenidoElementos.append(newElem);
-          }
-          if(elem == 'titulo'){
-            contenidoElementos.append(elemshtml.titulo);
-          }
-          if(elem == 'texto'){
-            contenidoElementos.append(elemshtml.texto);
-          }
-          if(elem == 'separador'){
-            $(contenidoElementos).append(elemshtml.separador);
-          }
-    
-          let height = $(contenidoElementos)[0].scrollHeight;
-          $(contenidoElementos).animate({ scrollTop: height }, 3000);
-          let elementoAdd = $(contenidoElementos).find('.__elemento').last();
-          elementoAdd.trigger('click');
-          elementoAdd.find('textarea').first().focus();
-    
-        },
-        ejecutaAccionElemento: (accion, elemento) => {
-          if(accion == 'quitar'){
-            $(elemento).remove();
-          }
-          if(accion == 'subir'){
-            $(elemento).insertBefore(elemento.prev())
-          }
-          if(accion == 'bajar'){
-            $(elemento).insertAfter(elemento.next())
-          }
-        },
-    
-        seleccionaTipoRespuesta: (tipo, elemento) => {
-          let elem_respuesta = $(elemento).find('.__elem_respuesta');
-    
-          /* si ya es de opciones y se cambia a tipo opciones  , no se hace nada*/
-          if (elem_respuesta.find('.__opciones_respuesta').length > 0 && (tipo == 'single' || tipo == 'multiple' || tipo == 'mixta')) {
-            elem_respuesta.find('.__opciones_respuesta').removeClass('quest_option_single quest_option_multiple quest_option_mixta').addClass('quest_option_' + tipo);
-            return;
-          }
-          if (tipo == 'single') {
-            elem_respuesta.html(elemshtml.pregunta_seleccion);
-            elem_respuesta.find('.__opciones_respuesta').removeClass('quest_option_single quest_option_multiple quest_option_mixta').addClass('quest_option_single');
-          }
-          if (tipo == 'multiple') {
-            elem_respuesta.html(elemshtml.pregunta_seleccion);
-            elem_respuesta.find('.__opciones_respuesta').removeClass('quest_option_single quest_option_multiple quest_option_mixta').addClass('quest_option_multiple');
-          }
-          if (tipo == 'mixta') {
-            elem_respuesta.html(elemshtml.pregunta_seleccion);
-            elem_respuesta.find('.__opciones_respuesta').removeClass('quest_option_single quest_option_multiple quest_option_mixta').addClass('quest_option_mixta');
-          }
-          if (tipo == 'open_sm') {
-            elem_respuesta.html(elemshtml.pregunta_corta)
-          }
-          if (tipo == 'open_lg') {
-            elem_respuesta.html(elemshtml.pregunta_larga)
-          }
-          if (tipo == 'select_numbers') {
-            elem_respuesta.html(elemshtml.select_numbers)
-          }
-          if (tipo == 'number') {
-            elem_respuesta.html(elemshtml.pregunta_numero)
-          }
-          if (tipo == 'date') {
-            elem_respuesta.html(elemshtml.pregunta_fecha)
-          }
-        },
-        agregaOpcion: (elemento) => {
-          let opcionesRespuesta = $(elemento).find('.__opciones_respuesta');
-          opcionesRespuesta.append(elemshtml.opcion_seleccion);
-          funs.enumeraOpciones(elemento);
-          opcionesRespuesta.find('.__opcion_seleccion').last().focus();
-        },
+        
         /* Acciones de eliminar arriba abajo de las opciones*/
         ejecutaAccionOpcion: (accion, opcionBloque) => {
           let elemento = $(opcionBloque.closest('.__elemento'));
@@ -585,7 +607,7 @@ export class GestorFormsComponent implements OnInit {
         /* Click en agregar elemento */
         .on('click', "[__agregar_elem]", function(e){
           let elem = $(e.currentTarget).attr('__agregar_elem');
-          funs.adicionarElemento(elem);
+          ctxMain.adicionarElemento(elem);
         })
     
         /* Acciones mouse over y seleccion de algun elemento*/
@@ -607,17 +629,17 @@ export class GestorFormsComponent implements OnInit {
     
         /*  click en Acciones del elemento */
         .on('click', '.__acciones_elemento span', function(){
-          funs.ejecutaAccionElemento( $(this).attr('accion'), $(this).closest('.__elemento') );
+          ctxMain.ejecutaAccionElemento( $(this).attr('accion'), $(this).closest('.__elemento') );
         })
     
         /* Seleccionar el tipo de respuesta */
         .on('change', '[__select_tipo_pregunta]', function(){
-          funs.seleccionaTipoRespuesta( $(this).val(), $(this).closest('.__elemento'))
+          ctxMain.seleccionaTipoRespuesta( $(this).val(), $(this).closest('.__elemento'))
         })
     
         /* CLick en Agregar opcion*/
         .on('click', '.__agregar_opcion_seleccion', function () {
-          funs.agregaOpcion($(this).closest('.__elemento'))
+          ctxMain.agregaOpcion($(this).closest('.__elemento'))
         })
     
         /* Mouse enter de las opciones  y sus acciones*/

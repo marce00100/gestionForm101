@@ -25,6 +25,52 @@
 </style>
 <ion-app>
   <ion-content> 
+    <div id="login_content" class="bg-content _bg-theme1-10 flex align-center" style="position:relative; height: 100%;">
+      <div class="flex justify-center wp100" style="">
+        <div class="panel mn w400 br6 text-333" style="font-family: Arial, Helvetica, sans-serif; box-shadow: 2px 2px 8px -1px #00000099;;">
+          <div class="panel-heading bg-white" style="border-radius: 6px 6px 40px 40px; min-height: 160px; background-color: #28bec6!important; position: relative;">
+
+            <div class="text-white" style="font-size: 2.5em;
+            top: 88px;
+            left: 26px;
+            position: absolute;">Ingreso:</div>
+
+          </div>
+          <div class="panel-body" style="border-radius: 0 0 6px 6px;">
+            <h3 class="text-theme1--20 fw400 mb20 mt5">Autenticación de usuario</h3>
+            <div class="" >
+              <div __error_msg clasS="mb20 fs15 text-danger--20" style="display: none"></div>
+              <div>
+                <label class="form-label mb10 ml20 {{error_email ? 'text-danger fw600' : ''}}" for="email">Usuario</label>
+                <input type="text" class="form-control" __lg=email name="username" [(ngModel)]="username" (keydown.enter)="login()" required  style=" border: 3px solid darkorange; border-radius: 18px;">
+              </div>
+              <div class="mt20">
+                <label class="form-label mb10 ml20 {{error_password ? 'text-danger fw600' : ''}}"  for="password" required>Contraseña</label>
+                <input class="form-control" type="password" __lg=password name="password" [(ngModel)]="password" (keydown.enter)="login()" required  style=" border: 3px solid darkorange; border-radius: 18px;">
+              </div>
+            </div>
+            <div class="flex_ mt30">
+              <button type="submit" class="btn bg-theme1--10 btn-lg fs15 wp100 br15 pull-right fs16"  (click)="login()" style="    border-radius: 20px;
+              width: 50% !important; ">Ingresar</button>
+            </div>
+            <div __output class="w60% "></div>
+          </div>
+          <div clasS="panel-footer">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <img src="./assets/img/logo_tr_direccon_gestion_minera_md.png" class="mh5 text-center" style="width: 70px; filter: grayscale(1); " alt="">
+              <img src="./assets/img/gadch_tr_vertical_fontdark_md.png" class="mh5 pull-left" style="width: 200px; filter: grayscale(1);" alt="">
+              <img src="./assets/img/logo_laboratorio.png" class="mh5 pull-right" style="width: 80px;filter: grayscale(1);" alt="">
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    </div>
+      
+  </ion-content>
+</ion-app>
+<!-- <ion-app>
+  <ion-content> 
     <div id="login_content" class="bg-content _bg-theme1-10" style="position:relative; height: 100%;">
       <div class="flex justify-center wp100" style="position:absolute; top: 15vw">
         <div class="panel mn w450 br6 text-333" style="font-family: Arial, Helvetica, sans-serif; box-shadow: 2px 2px 8px -1px #00000099;;">
@@ -61,4 +107,4 @@
     </div>
       
   </ion-content>
-</ion-app>
+</ion-app> -->

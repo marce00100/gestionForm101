@@ -1,0 +1,61 @@
+<style>
+	.popup-basic {
+		position: relative;
+		background: #FFF;
+		width: auto;
+		max-width: 900px;
+		margin: 40px auto;
+	}
+
+	.tabla-head thead>th {
+		background-color: rgb(147, 72, 72);
+	}
+</style>
+<ion-app>
+  <ion-content>
+    <div id="content" class="bg-content">
+      <div class="pv20 ph5">
+				<div class=" bg-white col-sm-10 col-sm-offset-1 col-lg-8 col-lg-offset-2 col-xs-12" style="    box-shadow: 1px 2px 9px 1px;">
+					<div class="p20 pb10">
+						<h3 class="fw600 text-theme1--30 ">Sección de Noticias</h3>
+					</div>
+          <div __contents_list>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- -----------------------------------------          Modal  --------------------------------------------------- -->
+			<div id="modal" class="white-popup-block popup-basic mfp-with-anim mfp-hide">
+				<div class="panel">
+					<!-- panel heading -->
+					<div class="bg-marron--20 text-333 flex align-center  ">
+						<i class="fa fa-paperclip fa-lg ml10"></i>
+						<h2 class="panel-title ml10" __titulo><span>__</span></h2>
+					</div>
+					<!-- end .panel-heading section -->
+					<!-- panel body -->
+					<div class="panel-body of-a">
+						<div class="row">
+							<div class=" ph10 ">
+								<!-- datos de usuario -->
+								<div __content_data></div>
+								<hr>
+              </div>
+						</div>
+					</div>
+					<!-- panelfooter -->
+					<div class="panel-footer flex flex-wrap justify-evenly">
+						<div __error class="wp100"></div>
+						<!-- CON ICONOS -->
+						<button __cerrar class="btn bg-primary lighter br-a br-dark-light br6 btn-md w150 fs14">Cerrar</button>
+					</div>
+				</div>
+				<!-- end: .panel -->
+			</div>
+
+
+    </div>
+  </ion-content>
+</ion-app>

@@ -131,19 +131,51 @@ class FormularioController extends MasterController {
 														WHERE fl.id_municipio = r.id AND fl.id_formulario = f.id 
 														{$query} 
 														ORDER BY fl.id DESC"));
-		
-		foreach ($formsLlenos as $k => $formlleno) {
-			$respuestas = collect(\DB::select("SELECT e.id as id_elemento, e.texto, e.tipo, e.alias, e.orden, 
-																	fr.id_form_lleno, fr.respuesta, fr.respuesta_opcion
-																	FROM elementos e  
-																	LEFT JOIN forms_llenos_respuestas fr on e.id = fr.id_elemento AND fr.id_form_lleno =  {$formlleno->id} 
-																	WHERE e.id_formulario = {$formlleno->id_formulario} 
-																	ORDER BY e.orden"))->groupBy('alias')->toArray();
-																	
-			foreach ( $respuestas as $alias => $respta) {
 
-			}
-		}
+		$formsLlenos->map(function ($formLleno, $k) {
+			// $formLleno = (object)$formlleno;
+			$formLleno->respuestas = collect(\DB::select("SELECT e.id as id_elemento, e.texto, e.tipo, e.alias, e.orden, 
+																			string_agg(fr.respuesta, ', ') as respuesta, 
+																			string_agg(concat(fr.respuesta, ' ', fr.nombre_dimension, ' ', fr.valor_dimension), ', ') as respuesta_dimension ,
+																			count(e.id) as cantidad,
+																			string_agg(concat(fr.valor_dimension), ', ') as valores_dimension 
+																			-- fr.respuesta, fr.respuesta_opcion, 
+																			-- fr.dimensiones, fr.nombre_dimension, fr.valor_dimension
+																			FROM elementos e  
+																			LEFT JOIN forms_llenos_respuestas fr on e.id = fr.id_elemento AND fr.id_form_lleno =  {$formLleno->id} 
+																			WHERE e.id_formulario = {$formLleno->id_formulario} 
+																			GROUP BY e.id, e.texto, e.tipo,  e.alias, e.orden
+																			ORDER BY e.orden"))->groupBy('alias');
+
+			// $formLleno->respuestas = collect(\DB::select("SELECT e.id as id_elemento, e.texto, e.tipo, e.alias, e.orden, 
+			// 																fr.id_form_lleno, fr.respuesta, fr.respuesta_opcion, 
+			// 																fr.dimensiones, fr.nombre_dimension, fr.valor_dimension
+			// 																FROM elementos e  
+			// 																LEFT JOIN forms_llenos_respuestas fr on e.id = fr.id_elemento AND fr.id_form_lleno =  {$formLleno->id} 
+			// 																WHERE e.id_formulario = {$formLleno->id_formulario} 
+			// 																ORDER BY e.orden"))->groupBy('alias');
+			
+			// return response()->json([
+			// 	'data' => $respuestas->mineral,
+			// ]);
+			// $formLleno->minerales = $respuestas->mineral->reduce(function ($carry, $item) {
+			// 															return $carry . $item->respuesta . ', ';
+			// 														});
+
+			return $formLleno;											
+		});
+		
+		// foreach ($formsLlenos as $k => $formlleno) {
+		// 	$respuestas = collect(\DB::select("SELECT e.id as id_elemento, e.texto, e.tipo, e.alias, e.orden, 
+		// 															fr.id_form_lleno, fr.respuesta, fr.respuesta_opcion
+		// 															FROM elementos e  
+		// 															LEFT JOIN forms_llenos_respuestas fr on e.id = fr.id_elemento AND fr.id_form_lleno =  {$formlleno->id} 
+		// 															WHERE e.id_formulario = {$formlleno->id_formulario} 
+		// 															ORDER BY e.orden"))->groupBy('alias');//->toArray();
+			
+
+
+		// }
 		
 		return $formsLlenos;
 	}
@@ -177,12 +209,17 @@ class FormularioController extends MasterController {
 									
 		/* se agegan las respuestas al formulario lleno , se ordenan por los elementos para conseguir todas las preguntas y titulos etc, y se completan con LEFT JOIN con las respustas (aunque esten vacias se tendra el formulario completo con sus respuestas ) */
 		$respuestas = collect(\DB::select("SELECT e.id as id_elemento, e.texto, e.descripcion, e.tipo, e.orden, e.config, 
-																	fr.id as id_form_lleno_respuesta, fr.id_form_lleno, fr.respuesta, fr.respuesta_opcion, fr.dimensiones, fr.nombre_dimension, fr.valor_dimension 
+																	string_agg(fr.respuesta, ', ') as respuesta, 
+																	string_agg(concat(fr.respuesta, ' ', fr.nombre_dimension, ' ', fr.valor_dimension), ', ') as respuesta_dimension ,
+																	count(e.id) as cantidad,
+																	string_agg(concat(fr.valor_dimension), ', ') as valores_dimension 
+																	--fr.id as id_form_lleno_respuesta, fr.id_form_lleno, fr.respuesta, fr.respuesta_opcion, fr.dimensiones, fr.nombre_dimension, fr.valor_dimension 
 																	FROM elementos e  
 																	LEFT JOIN forms_llenos_respuestas fr on e.id = fr.id_elemento AND fr.id_form_lleno =  {$formLleno->id} 
 																	WHERE e.id_formulario = {$formLleno->id_formulario} 
+																	GROUP BY e.id, e.texto, e.tipo,  e.alias, e.orden
 																	ORDER BY e.orden"	))
-															->groupBy('orden')->toArray();	
+															->groupBy('orden');	
 
 		$formLleno->respuestas = $respuestas;
 		return response()->json([

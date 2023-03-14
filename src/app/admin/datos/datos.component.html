@@ -1,0 +1,138 @@
+<style>
+  .popup-basic {
+    position: relative;
+    background: #FFF;
+    width: auto;
+    max-width: 900px;
+    margin: 40px auto;
+  }
+</style>
+<ion-app>
+  <ion-content>
+
+    <div id="datos_contenedor" class="bg-content">
+      <!--  ===========================================    begin: .tray-center    =============================================================== -->
+      <div class="pv20 ph5">
+				<div class=" bg-white  col-sm-12 col-md-10 col-md-offset-1" style="    box-shadow: 1px 2px 9px 1px;">
+					<div class="p20 pb10">
+						<h3 class="fw600 text-theme1--30 ">Seguimiento Estadístico</h3>
+					</div>
+          <div class="panel panel-visible ph10 text-dark">
+            <div class="titulo-modulo p20 pb30">
+                <!-- <a href="" class=" p5 br6 fs12 ph10 ml5 btn-info dark btn pull-right">Análisis de Datos</a> -->
+              <hr class="m5">
+            </div>
+
+            <div  class="pw100 text-righ flex-y flex align-end" >
+              <span __configuracion_alias class="cursor br-a p3 br6"><i clasS="fa-solid fa-gears"></i> 
+                Configuración de las variables y tabla estadística
+              </span>
+              <div __configuracion_alias_cuadro class="bg-dark darker p10 br8" style="width: 50%; display: none;">
+                <div>Es necesario configurar las variables, y ponerle un alias o código mas corto a cada
+                  pregunta. Realizar este proceso si no se ha realizado antes. En caso de dudas mejor no realizar esta configuración.
+                </div>
+                <button __accion_datos="codificar_alias_pregunta" class="btn btn-sm mt5 bg-danger-40 br6 br-a center-block ">Colocar
+                  Alias a las preguntas</button>
+              </div>
+            </div>
+
+            <div class="br8 mv10  bg-light dark "
+              style=" border: 1px solid lightgray; width: 90%;  margin: 10px auto;">
+              <div class="fs12" style="display:grid; grid-template-columns: 1fr 1fr 1fr ; gap: 10px; 
+                        justify-items: end; width: 90%; margin: 20px auto; ">
+
+                <div class="bg-ddd p10 br8 text-center" style="grid-column: 1 / span 4;     justify-self: center;">
+                  <button __accion_datos="sincronizar_tabla" class="btn btn-sm mt5 bg-marron br-a br-dark br6 ">Actualizar
+                    tabla de consolidados</button>
+                  <div><em>Actualizar con la información de formularios llenados mas recientes. Este proceso se lo debe realizar cada que necesite información actualizada.</em></div>
+                </div>
+                <h2 style=" margin: 0;   grid-column: 1 / span 4; justify-self: start;">Filtrar
+                </h2>
+                <div class="pw100">
+                  <span>Municipio</span>
+                  <select __filtro=municipio class="w200 form-control"
+                    name="" id="" placeholder="Departamento"></select>
+                </div>
+                <div class="pw100" style=" grid-column: 2 / span 3; justify-self: start;">
+                  <span>Operadores Mineros</span>
+                  <select __filtro=id_usuario class="pw80 form-control" name="" id="" placeholder=""></select>
+                </div>
+                <div class="pw100"><span>Tipo Formulario</span>
+                  <select __filtro=tipo_formulario class="w200 form-control"
+                    name="" id="" placeholder="tipo formulario">
+                  </select>
+                </div>
+                <div class="pw100"><span>Fecha Desde (incluye)</span> 
+                  <input __filtro=fecha_desde class="w200 form-control" type="date" placeholder="desde">
+                </div>
+                <div class="pw100"><span>Fecha Hasta (incluye)</span> 
+                  <input __filtro=fecha_hasta class="w200 form-control" type="date" placeholder="hasta">
+                </div>
+              </div>
+            </div>
+            <div clasS="text-center">
+              <button __accion_datos="visualizar_datos" class="btn btn-info dark br8"><i
+                  class="fa-solid fa-glasses fa-lg"></i> Visualizar</button>
+              <button __accion_datos="exportar" target="_blank" class="btn  btn-success darker pull-right br8"><i
+                  class="fa-solid fa-file-export fa-lg "></i> Exportar</button>
+            </div>
+            <div class="panel-heading  bg-dark ">
+              <div class="panel-title ">
+                <i class="fa-solid fa-users fa-lg mr5"></i> <span>Formularios Consolidados</span> <span
+                  __conteo_filtro class="ml5 text-white"></span>
+              </div>
+            </div>
+            <div class="panel-body pn">
+              <div class="row">
+                <div class="col-md-12">
+
+                </div>
+              </div>
+              <div>
+                <table __datos_respuestas id="dataT" class=" hover row-border tabla-head bg-table" style="margin: 0 0 40px 0">
+								</table>
+                <!-- <div __datos_respuestas id="dataT" style="margin: 0 0 40px 0"></div> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- end: .tray-center -->
+
+
+
+
+      <!-- -----------------------------------------          Modal  --------------------------------------------------- -->
+      <div id="modal" class="white-popup-block popup-basic admin-form mfp-with-anim mfp-hide">
+        <div class="panel">
+          <div class="panel-heading bg-system darker p10">
+            <span class="panel-title text-white" id="tituloModal"><i class="fa-solid fa-gears"></i> <span
+                __titulo_modal>__</span></span>
+            <button title="Close (Esc)" type="button" class="mfp-close" style="color:white">×</button>
+          </div>
+
+          <div method="post" action="/" id="form_cont" name="form_cont">
+            <div class="panel-body mnw700 of-a">
+              <div class="row">
+                <div class="row">
+                  <div class=" pl5 br-r mvn15">
+                    <h5 class="ml5 mt20 ph10 pb5 br-b fw700"><small class="pull-right fw600"> <span
+                          class="text-primary">-</span> </small> </h5>
+                    <div __contenido_modal></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="panel-footer" style="display: flex; justify-content: space-evenly;">
+              <button __cerrar class="btn btn-danger br6 btn-sm w150 ">Cerrar</button>
+              <button __save_alias type="submit" class="btn btn-primary btn-sm br6 w150 ">Guardar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+  </ion-content>
+</ion-app>

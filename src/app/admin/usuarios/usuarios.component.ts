@@ -34,6 +34,7 @@ export class UsersComponent implements OnInit {
         usersList: [],
         municipios: [],
         id_rol_operador: 3, /*El id_rol del rol operador */
+        smsList: [],
       }
 
       let regmodel = {
@@ -281,18 +282,26 @@ export class UsersComponent implements OnInit {
             destroy: true,
             data: ctxG.usersList,
             autoWidth: true,
+            order: [4, 'asc'],
             // info:true,
             scrollX: true,
             className: 'fs-10',
             columns: [
               // {title: 'Ejemplo', data: 'ejemplo', width: '50% | 600', className: 'dt-right dt-head-center dt-body-left', type:'num',},
               {
-                title: '_', 
+                title: '_',
                 render: function (data, type, row, meta) {
-                  return /*html*/`<span __accion="editar"  __id_usuario=${row.id_usuario} 
-                                style="display:block; "class="p5 text-dark cursor " title="Editar">
-                                <i class="fa-solid fa-user-pen fa-lg 
-                                ${row.estado_usuario == 'ACTIVO' ? 'text-success-20' : 'text-danger-20'}  "></i></span>`
+                  return /*html*/`
+                        <span  class="cursor p3" title="Editar" __accion="editar"  __id_usuario=${row.id_usuario} >
+                            <i class="fa-solid fa-user-pen fa-lg ${row.estado_usuario == 'ACTIVO' ? 'text-success-20' : 'text-danger-20'}  "></i> <span class="hide">${row.estado_usuario}</span>
+                        </span>`
+                }
+              },
+              {
+                title: 'SMS', "orderable": "false", visible: false,
+                render: function (data, type, row, meta) {
+                  return /*html*/`
+                            <input type="checkbox" __sms __id_usuario=${row.id_usuario} __numero_celular=${row.numero_celular} __concat="${row.username}  (${row.numero_celular})" >`
                 }
               },
               {
@@ -303,18 +312,18 @@ export class UsersComponent implements OnInit {
                                   </span>`
                 }
               },
-              { title: 'Nombres ', data: 'nombres', },
-              { title: 'Apellidos', data: 'apellidos', },
-              { title: 'Razon Social', data: 'razon_social', },
-              { title: 'Email', data: 'email', },
+              { title: 'Rol',  data: 'rol' },
+              { title: 'Apellidos', data: 'apellidos', width: '120', },
+              { title: 'Nombres ', data: 'nombres', width: '120' },
+              { title: 'Razon Social', data: 'razon_social', width: '200' },
               {
                 title: 'Fecha Registro', data: 'fecha_registro', 
                 render: function (data, type, row, meta) {
                   return (row.fecha_registro != null && row.fecha_registro != "") ? moment(row.fecha_registro).format('DD/MM/YYYY') : "";
                 }
               },
-              { title: 'Rol',  data: 'rol' },
-              { title: 'Estado',  data: 'estado_usuario' },
+              { title: 'Email', data: 'email', },
+              { title: 'Celular', data: 'numero_celular', },
             ],
             language: xyzFuns.dataTablesEspanol(),
           });
@@ -473,7 +482,8 @@ export class UsersComponent implements OnInit {
             if(resp.status=='error'){
               xyzFuns.alertMsg("[__error]", `Error: ${resp.msg}`, ' alert-danger br-a br-danger pastel   fs14 p5  mv10', '', '', true);
             }
-            obj.id_usuario ? conT.refreshRow(resp.data) : conT.refreshDataT();
+            // obj.id_usuario ? conT.refreshRow(resp.data) : conT.refreshDataT();
+            conT.refreshDataT();
             xyzFuns.spinner(false);
             new PNotify({
               title: resp.status== 'ok' ? 'Guardado' : 'Error',
@@ -498,6 +508,73 @@ export class UsersComponent implements OnInit {
           $("[required]").removeClass(regmodel.model.classError);
           xyzFuns.alertMsgClose('[__error]');
 
+        },
+        panelSMS() {
+          ctxG.smsList = [];
+          let checkeds = $(`${ctxG.dataTableTarget}`).find("[__sms]:checked");
+          let destinatarios = "";
+          _.forEach(checkeds, function(user){
+            destinatarios += $(user).attr('__concat') + ', ' ;
+            let cel = $(user).attr('__numero_celular');
+            if (cel && (cel.length == 8 || cel.length == 11))
+              ctxG.smsList.push(cel);
+          })
+          let op: any = {
+            background_color: '#00000060',
+            class_icon: '',
+            class_texto: '',
+            texto: /*html*/`
+                <div class="panel mn"   style="">
+                  <div class="panel-heading h-50 bg-marron--20 bg-system_ bg-success--40_ bg-666_ text-fff _darker">
+                    <h5><i class="fa fa-send mr10"></i>Enviar Notificaciónes SMS</h5>           
+                    <span class="glyphicons glyphicons-remove_2 p3 close fs15" style="position: absolute; top: 5px; right: 10px; color: inherit; text-shadow: none; opacity: 0.8"></span>     
+                  </div>
+                  <div class="panel-body">
+                    <div>Destinatarios</div>
+                    <div __sms_destinatarios class="p20 fs14 bg-light text-center_ text-primary--60" style="text-align:justify; border-bottom: 1px solid #afafaf;" >
+                        ${destinatarios}
+                    </div>
+                    <div>Mensaje <span __sms_contador></span></div>
+                    <div>
+                      <textarea __sms_mensaje class="wp100 "></textarea>
+                    </div>
+                    <div class="flex justify-evenly p10">
+                      <button __accion="close_panel_sms" class="btn bg-eee ph20 br6 br-a br-dark fs14"> Cerrar</button>
+                      <button __accion="send_sms" class="btn btn-primary ph20 br6 br-a br-dark fs14"><i class="glyphicons glyphicons-ok"></i> Enviar SMS</button>
+                    </div>
+                  </div>
+                </div>`
+          }
+          let alert = /*html*/`
+                    <div __alert style="display:none; z-index: 99000"> 
+                      <div class="flex justify-center align-center wp100 " style="height: 100vh; z-index: 99000; position: fixed; top: 0px; left: 0vw; 
+                      background-color: ${op.background_color} ">
+                        <div class="flex justify-center align-center br3"style="  width: calc(300px + 25vw); max-width: 90%; 
+                          background-color: #f4f4f8; box-shadow: 0px 0px 8px 0px #0000004a; position: relative; top: -50px">                        
+                              ${op.texto}
+                        </div>
+                      </div>
+                    </div> `;
+          $(ctxG.contenedor).append(alert);
+          $("[__alert]").show(300);
+        },
+        sendSMS(){
+          let mensaje = $("[__sms_mensaje]").val().substring(0, 48);
+
+          _.forEach(ctxG.smsList, function(cel){
+            $.post(`${ctxG.rutabase}/sms`, cmp.uAuth.addToken({ mensaje: mensaje, numero_celular: cel }), (res) => {
+              console.log('respuesta_server', res);
+            });
+          })
+          new PNotify({
+            title:'Enviando SMS',
+            text: 'Se estan enviando los mensajes',
+            shadow: true,
+            opacity: 0.9,
+            type: "success",
+            delay: 2500
+          });
+          $("[__accion=close_panel_sms]").trigger('click');
         }
       }
 
@@ -514,15 +591,24 @@ export class UsersComponent implements OnInit {
               funs.nuevo();
             if (accion == 'editar') {
               let id = $(e.currentTarget).attr('__id_usuario');
-
               funs.editar(id)
+            }
+            if (accion == 'habilitar_sms') {
+              $('[__accion=abrir_panel_sms]').toggle(400);
+              let column = $(ctxG.dataTableTarget).DataTable().column(1);
+              column.visible(!column.visible());
+            }
+            if (accion == 'abrir_panel_sms') {
+              funs.panelSMS();
+            }
+            if (accion == 'send_sms') {
+              funs.sendSMS();
+            }
+            if (accion == 'close_panel_sms') {
+              $(e.currentTarget).closest("[__alert]").remove();
             }
           })
 
-          /** Click sobre una FILA DELA TABLA para en caso de edicion solo afectar a la fila seleccionada */
-          .on('click', 'tr', (e) => {
-            conT.selectedRow = e.currentTarget;
-          });
         
         /** DEL MODAL */
         $(ctxG.modal)

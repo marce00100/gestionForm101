@@ -11,7 +11,7 @@ declare var summernote: any;
 @Component({
   selector: 'app-gestion-contenidos',
   templateUrl: './gestion-contenidos.component.html',
-  styleUrls: ['./gestion-contenidos.component.scss'],
+  // styleUrls: ['./gestion-contenidos.component.scss'],
 })
 export class GestionContenidosComponent implements OnInit {
 
@@ -259,7 +259,7 @@ export class GestionContenidosComponent implements OnInit {
             minHeight: 350,
             focus: false, //set focus editable area after Initialize summernote
             toolbar: [
-              ['style', ['bold', 'italic', 'underline', 'clear']],
+              ['style', ['style', 'bold', 'italic', 'underline', 'clear']],
               ['font', ['strikethrough']],
               ['fontsize', ['fontsize']],
               ['color', ['color']],

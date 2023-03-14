@@ -13,7 +13,7 @@ class ContenidosController extends MasterController {
 	public function getContents(Request $req) {
 		$condicion = $req->estado == 'ALL' ?  ' TRUE ' : " estado_contenido = 'ACTIVO' ";
 		$list = collect(\DB::select("SELECT id as id_contenido, titulo,  prioridad, estado_contenido, imagen, 
-																substr(regexp_replace(texto, '<[^>]*>', '', 'g'), 1, 50) as texto_cortado, fecha_registro
+																substr(regexp_replace(texto, '<[^>]*>', '', 'g'), 1, 250) as texto_cortado, fecha_registro
 																	FROM contenidos  WHERE {$condicion} 
 																	ORDER BY prioridad, fecha_registro desc "));
 

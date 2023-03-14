@@ -15,7 +15,7 @@
 	<ion-content>
 		<div id="users_contenedor" class="bg-content">
 			<div class="pv20 ph5">
-				<div class=" bg-white col-sm-10 col-sm-offset-1 col-lg-8 col-lg-offset-2 col-xs-12" style="    box-shadow: 1px 2px 9px 1px;">
+				<div class=" bg-white  col-sm-12 col-md-10 col-md-offset-1" style="    box-shadow: 1px 2px 9px 1px;">
 					<div class="p20 pb10">
 						<h3 class="fw600 text-theme1--30 ">Administrador de Usuarios</h3>
 					</div>
@@ -36,6 +36,13 @@
 								<div class="col-md-12">
 									<button __accion="nuevo" class="btn btn-sm bg-success  m5 br4 ph30 br-a br-dark">
 										<i class="fa fa-plus "></i> Agregar </button>
+
+									<span class="pull-right">
+										<input id="habilitar_sms" type="checkbox" __accion="habilitar_sms">
+										<label  for="habilitar_sms"> SMS</label>
+										<button __accion="abrir_panel_sms" class="btn btn-sm bg-warning ph20 ml5 br4 br-a br-dark" style="display:none">
+											<i class="glyphicons glyphicons-message_new mr5"></i> Enviar SMS</button>
+									</span>
 								</div>
 							</div>
 							<div class="">

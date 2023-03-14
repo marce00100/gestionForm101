@@ -137,17 +137,20 @@ export class SFormService {
       }
       if(elemObj.tipo == 'pregunta'){
         let cnfElem = JSON.parse(elemObj.config) || {};
-        /* si es arraydeuno*/
-        let respuesta = resps.length == 1 ? resps[0].respuesta ?? '' 
-          : _.chain(resps)
-          .sortBy('id_form_lleno_respuesta')
-          .reduce( 
-            function (result, resp) { 
-              let item = resp.respuesta;
-              if(resp.nombre_dimension && resp.nombre_dimension.length>0 )
-                item += ` ${resp.valor_dimension}(${resp.nombre_dimension})`;
+        /* Si tiene dimensiones muestra la respuesta con dimensiones */
+        let respuesta = elemObj.valores_dimension.length > 0 ? elemObj.respuesta_dimension : elemObj.respuesta || '';
+
+        // /* si es arraydeuno*/
+        // let respuesta = resps.length == 1 ? resps[0].respuesta ?? '' 
+        //   : _.chain(resps)
+        //   .sortBy('id_form_lleno_respuesta')
+        //   .reduce( 
+        //     function (result, resp) { 
+        //       let item = resp.respuesta;
+        //       if(resp.nombre_dimension && resp.nombre_dimension.length>0 )
+        //         item += ` ${resp.valor_dimension}(${resp.nombre_dimension})`;
               
-            return result + `${item}, `}, '');
+        //     return result + `${item}, `}, '');
         
         htmlResp += /* html*/`
                         <div class="flex justify-start align-start" style="width: ${cnfElem.ancho}%; border-bottom: 1px solid #ccc">
@@ -198,8 +201,9 @@ export class SFormService {
    */
   public exportFormPDF() {
     let fileName = `form101_${this.objFrmLleno.numero_formulario}`;
-    let doc = new jspdf.jsPDF('p', 'pt', 'letter');
-    let marginX = 60;
+    let doc = new jspdf.jsPDF('l', 'pt', 'letter'); // landscape
+    // let doc = new jspdf.jsPDF('p', 'pt', 'letter'); // portrait
+    let marginX = 45;
     let marginY = 45;
     html2canvas($('[__frm]')[0], {
       background: 'white',
@@ -208,12 +212,18 @@ export class SFormService {
       let img = canvas.toDataURL('image/PNG');
       // Add image Canvas to PDF
       let imgProps = (doc as any).getImageProperties(img);
-      let pdfWidth = doc.internal.pageSize.getWidth() - 3 * marginX;
+      let pdfWidth = doc.internal.pageSize.getWidth() - 3 * marginX - 0.45 * doc.internal.pageSize.getWidth();
       let pdfHeight = (imgProps.height * pdfWidth) / (1.1 * imgProps.width);
       // let pdfWidth = doc.internal.pageSize.getWidth() - 4 * marginX;
       // let pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
       doc.addImage(img, 'PNG', marginX, marginY, pdfWidth, pdfHeight, undefined, 'FAST');
+
+      doc.setLineDash([3, 2], 0); /* Linea punteada*/
+      let lineX = doc.internal.pageSize.getWidth() / 2;
+      doc.line(lineX, 0, lineX, imgProps.height - 2 * marginY); /* Linea dividiendo los formularios*/
+      
+      doc.addImage(img, 'PNG', lineX + marginX, marginY, pdfWidth, pdfHeight, undefined, 'FAST');
       return doc;
     }).then((docResult) => {    //   
       docResult.save(fileName);

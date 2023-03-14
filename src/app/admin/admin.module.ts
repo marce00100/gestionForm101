@@ -1,14 +1,15 @@
-import { NgModule } from '@angular/core';
+import { NgModule }     from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule }  from '@ionic/angular';
 
 import { AdminRoutingModule } from './admin-routing.module';
-import { RouterModule } from '@angular/router';
-import { AdminComponent } from './admin.component';
+import { RouterModule }       from '@angular/router';
 
-import { UsersComponent } from './usuarios/usuarios.component';
-import { GestorFormsComponent } from './gestorforms/gestorforms.component';
+import { AdminComponent }             from './admin.component';
+import { UsersComponent }             from './usuarios/usuarios.component';
+import { GestorFormsComponent }       from './gestorforms/gestorforms.component';
 import { GestionContenidosComponent } from './gestion-contenidos/gestion-contenidos.component';
+import { DatosComponent }             from './datos/datos.component';
 
 @NgModule({
   declarations: [
@@ -16,6 +17,7 @@ import { GestionContenidosComponent } from './gestion-contenidos/gestion-conteni
     UsersComponent,
     GestorFormsComponent,
     GestionContenidosComponent,
+    DatosComponent
 
   ],
   imports: [
