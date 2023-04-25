@@ -22,9 +22,9 @@ export class ViewformComponent implements OnInit {
   ngOnInit() {
     this.uauth.setEnteringPublicPage(true);
     let uid = this.routeurl.snapshot.paramMap.get('uid');
-    $.get(`${xyzFuns.urlRestApi}/formenviado-resp`, { fluid: uid }, (resp) => {
+    $.get(`${xyzFuns.urlRestApi}/form-lleno-resp`, { fluid: uid }, (resp) => {
       let formlleno = resp.data;
-      this.sform.renderFormLleno("[__frm_content]", formlleno);
+      this.sform.renderFormLlenoCompleto("[__frm_content]", formlleno);
     })
   }
 

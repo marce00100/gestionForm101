@@ -20,7 +20,7 @@ declare var html2canvas: any;
 })
 export class ListaformsComponent implements OnInit {
 
-  private frmLleno: any = {};
+  // private frmLleno: any = {};
 
   constructor(
     private router: Router, 
@@ -33,9 +33,9 @@ export class ListaformsComponent implements OnInit {
     let uid = this.routeurl.snapshot.paramMap.get('uid');
     if (uid && uid.length > 0) {
       xyzFuns.spinner({}, '#listaforms_content')
-      $.get(`${xyzFuns.urlRestApi}/formenviado-resp`, { fluid: uid }, (resp) => {
+      $.get(`${xyzFuns.urlRestApi}/form-lleno-resp`, { fluid: uid }, (resp) => {
         let formlleno = resp.data;
-        this.sform.renderFormLleno("[__frm_content]", formlleno);
+        this.sform.renderFormLlenoCompleto("[__frm_content]", formlleno);
         xyzFuns.showModal("#modal");
         xyzFuns.spinner(false)
       })
@@ -46,20 +46,23 @@ export class ListaformsComponent implements OnInit {
   }
   
   /**
-   * se llama al Service Para cargar el fomulario lleno con sus respuestas 
+   * se llama al Service Para cargar el fomulario lleno con sus respuestas y su qr y firmas
    * @param objFrmLleno Objeto con el Form lleno y respuestas
    * @returns HTML
    */
-  renderformLleno(content, objFrmLleno){
-    this.frmLleno = objFrmLleno;
-    return this.sform.renderFormLleno(content, objFrmLleno)
+  renderformLlenoCompleto(content, objFrmLleno){
+    // this.frmLleno = objFrmLleno;
+    return this.sform.renderFormLlenoCompleto(content, objFrmLleno)
   }
 
   /**
-   * Cuando se presiona en el boton de nuevo form
+   * Cuando se presiona en el boton de nuevo form o editar
    */
-  nuevoFormulario(){
-    this.router.navigate(['form101'])
+  irFormulario101(uid = false) {
+    if (uid === false)
+      this.router.navigate(['form101'])
+    if (uid)
+      this.router.navigate(['form101/' + uid])
   }
 
   /**
@@ -110,23 +113,22 @@ export class ListaformsComponent implements OnInit {
             // info:true,
             scrollX: true,
             className: 'fs-10',
+            "order": [[ 0, "desc" ]],
             columns: [
               // {title: 'Ejemplo', data: 'ejemplo', width: '50% | 600', className: 'dt-right dt-head-center dt-body-left', type:'num',},
-              {
-                title: '_', 
+              
+              { title: 'NUM-FORM', data: 'numero_formulario',
                 render: function (data, type, row, meta) {
-                  return /*html*/`<span __accion_bandeja="mostrar"  __id_form_lleno=${row.id} __uid_form_lleno=${row.uid}
-                                style="cursor:pointer; display:block; "class="p5 text-dark " title="Editar">
-                                <i class="fa fa-tag fa-lg "></i></span>`
+                  return /*html*/`<span class="${row.vigencia == 1 ? 'fw600' : ''}">${row.numero_formulario}</span>
+                  <!-- <em style="display:block" class=" ${row.vigencia == 1 ? 'fw600' : ''}">${row.vigencia == 1 ? 'Vigente' : 'No vig.'}</em>-->`;
                 }
               },
               {
-                title: 'Fecha Registro', data: 'fecha_registro', 
+                title: 'Fecha Registro', data: 'fecha_registro', type: 'date',
                 render: function (data, type, row, meta) {
-                  return (row.fecha_registro != null && row.fecha_registro != "") ? moment(row.fecha_registro).format('DD/MM/YYYY') : "";
+                  return (row.fecha_registro != null && row.fecha_registro != "") ? moment(row.fecha_registro).format('YYYY-MM-DD') : "";
                 }
               },
-              { title: 'NUM-FORM', data: 'numero_formulario', },
               { title: 'NIM', data: 'nim', },
               {
                 title: 'Municipio', data: 'cod - municipio', 
@@ -141,15 +143,31 @@ export class ListaformsComponent implements OnInit {
                   return minerales;
                 }
               },
-              { title: 'Estado', data: 'estado_form_lleno' },
-              // {
-              //   title: 'Usuario', data: 'username', type: 'html',
-              //   render: function (data, type, row, meta) {
-              //     return /*html*/`<span  style="display:block; background-color:${row.estado_usuario == 'ACTIVO' ? '#edf5ff' : '#fff0f0'}" class="ph5 text-dark "><b>${row.username}</b></span>`
-              //   }
-              // },
-              // { title: 'Razon Social', data: 'razon_social', },
-              // { title: 'Rol',  data: 'rol' },
+              // { title: 'Estado', data: 'estado_form_lleno' },
+              {
+                title: 'ACCIONES', sort:false, width:150, className: 'dt-head-center',
+                render: function (data, type, row, meta) {
+                  let buttonVer = /*html*/
+                            `<span __accion_bandeja="mostrar"  __id_form_lleno=${row.id} __uid_form_lleno=${row.uid}
+                              style="cursor:pointer; "class="p5 text-dark ${row.vigencia == 1 ? 'bg-success-40' : 'bg-eee'}  text-fff mr5 mt5 br6 br-a br-greyer " title="Ver">
+                              <i class="fa fa-tag fa-lg "></i> ver </span>`
+
+                  let buttonEditar = row.vigencia == 0 ? '' : 
+                            /*html*/
+                            `<span __accion_bandeja="editar"  __id_form_lleno=${row.id} __uid_form_lleno=${row.uid}
+                            style="cursor:pointer; "class="p5 text-dark bg-warning-40 text-fff mr5 mt5 br6 br-a br-greyer " title="Editar">
+                            <i class="fa fa-pencil fa-lg "></i> editar </span>` 
+
+                  let buttonAnular = row.vigencia == 0 ? '' : 
+                            /*html*/
+                            `<span __accion_bandeja="anular"  __id_form_lleno=${row.id} __uid_form_lleno=${row.uid}
+                            style="cursor:pointer; "class="p5 text-dark bg-danger-40 text-fff mr5 mt5 br6 br-a br-greyer " title="Anular">
+                            <i class="fa fa-remove fa-lg "></i> </span>`
+
+                  return buttonVer + buttonEditar + buttonAnular;
+                }
+              },
+
             ],
             language: xyzFuns.dataTablesEspanol(),
           });
@@ -165,12 +183,15 @@ export class ListaformsComponent implements OnInit {
       }
 
       let funs = {
-        /** Muestra Modalcon el formulario lleno */
+        /**
+         * Muestra Modalcon el formulario lleno
+         * @param uid_form_lleno valor uid del formulario lleno
+         */
         mostrarFormlleno: (uid_form_lleno) => {
           funs.spinner();
-          $.get(`${ctxG.rutabase}/formenviado-resp`, { fluid: uid_form_lleno }, (resp) => {
+          $.get(`${ctxG.rutabase}/form-lleno-resp`, { fluid: uid_form_lleno }, (resp) => {
             ctxG.formllenoSel = resp.data;
-            cmp.renderformLleno("[__frm_content]", ctxG.formllenoSel);
+            cmp.renderformLlenoCompleto("[__frm_content]", ctxG.formllenoSel);
             xyzFuns.showModal(ctxG.modal);
             funs.spinner(false);
           })
@@ -191,7 +212,11 @@ export class ListaformsComponent implements OnInit {
             let accion = $(e.currentTarget).attr('__accion_bandeja');
 
             if (accion == 'nuevo')
-              cmp.nuevoFormulario();
+              cmp.irFormulario101();
+            if (accion == 'editar') {
+              let uid = $(e.currentTarget).attr('__uid_form_lleno');
+              cmp.irFormulario101(uid)
+            }
             if (accion == 'mostrar') {
               let uid = $(e.currentTarget).attr('__uid_form_lleno');
               funs.mostrarFormlleno(uid)

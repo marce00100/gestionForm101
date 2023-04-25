@@ -46,7 +46,7 @@ export class Form101Component implements OnInit {
         timeIni: new Date(), /* Para calcular tiempo*/
         municipios: [],
         datosUserNims: [],
-        objFrmData: {},
+        nimSel: {},
       }
 
       let form = {
@@ -173,7 +173,6 @@ export class Form101Component implements OnInit {
               let numeroPregunta = form.cortarNumero(objElem.texto);
               $(elemento).find('.__elem_texto').html(objElem.texto);
               // $(elemento).find('.__elem_texto').html(numeroPregunta.texto);
-              $(elemento).attr('__pregunta_texto_completo', objElem.texto);
               $(elemento).attr('__pregunta_numero', numeroPregunta.numero);
               /* Coloca la descripcion solo a las preguntas*/
               (objElem.descripcion && objElem.descripcion.length > 0) ? $(elemento).find('.__elem_descripcion').html(objElem.descripcion)
@@ -414,85 +413,31 @@ export class Form101Component implements OnInit {
           });
           return contest;
         },
-        /**
-         * Para colocar los datos en el form para edicion
-         * @param respuestas array de arrays con las respuestas (pueden ser de selccion multipla)
-         */
-        setData: (respuestas) => {
-          _.forEach(respuestas, function (respArray, k){
-            let respFirst = respArray[0];
-            let cnfElem = JSON.parse(respFirst.config) || {};
-            if (cnfElem.tipo_respuesta && cnfElem.tipo_respuesta.length > 0){
-              
-              if (_.includes(['open_sm', 'number', 'date'], cnfElem.tipo_respuesta)) {
-                $(`.__elemento[__tipo='pregunta'][__pregunta_texto_completo='${respFirst.texto}']`).find('input').first().val(respFirst.respuesta);
-              }
-              if (_.includes([ 'select_numbers', 'select'], cnfElem.tipo_respuesta)) {
-                $(`.__elemento[__tipo='pregunta'][__pregunta_texto_completo='${respFirst.texto}']`).find('select').first().val(respFirst.respuesta);
-              }
-              if (cnfElem.tipo_respuesta == 'open_lg' ) {
-                $(`.__elemento[__tipo='pregunta'][__pregunta_texto_completo='${respFirst.texto}']`).find('textarea').first().val(respFirst.respuesta);
-              }
-
-              if (cnfElem.tipo_respuesta == 'single' || cnfElem.tipo_respuesta == 'multiple' || cnfElem.tipo_respuesta == 'mixta') {
-                let elemOpciones = $(`.__elemento[__tipo='pregunta'][__pregunta_texto_completo='${respFirst.texto}']`);
-
-                _.forEach(respArray, (resp, k) => {
-                  let opcionSeleccionada = $(elemOpciones).find(`input[__opcion_texto='${resp.respuesta_opcion}']`);
-                  $(opcionSeleccionada).prop('checked', true).trigger('change');
-
-                  /*si tiene dimension subimos al nivel de Li para buscar el input de dimension de la opcion*/
-                  if(resp.valor_dimension && resp.valor_dimension.length > 0){
-                    opcionSeleccionada.closest('li').find(`input[__opcion_nombre_dimension='${resp.nombre_dimension}']`).val(resp.valor_dimension);
-                  }
-
-                  /* si es opcion otro subimos al nivel de li, para buscarel input opcion_otro */
-                  if(resp.respuesta_opcion == 'Otro'){
-                    opcionSeleccionada.closest('li').find(`input[__opcion_otro]`).val(resp.respuesta);
-                  }
-                })
-              }
-                
-
-
-              //TODO hacer lo mismo para ninguno
-              //TODO verificar con tipos de respuestas 
-
-            }
-
-
-          })
-        }
         
       }
 
       let funs = {
         verificaNuevoOEdicion: () => {
-          let uidFormParaEditar = component.existeParametro();
-          /* si no existe el parametro querystring  uid entonces es un nuevo formulario */
-          if (!uidFormParaEditar) {
-            funs.cargarComboUserNims();
-          }
-          /* si es para editar */
-          else {
-            funs.spinner();
-            $.post(`${ctxG.rutabase}/form-lleno-resp-foredit`, component.uauth.addToken({ fluid: uidFormParaEditar }), (resp) => {
-              if (resp.status == 'error') {
-                funs.stateView('inicial');
-                funs.mostrarError(resp.msg);
+            let uidFormParaEditar = component.existeParametro();
+            /* si no existe el parametro querystring  uid entonces es un nuevo formulario */
+            if(!uidFormParaEditar){
+              funs.cargarComboUserNims();
+            }
+            else{
+              funs.spinner();
+              $.post(`${ctxG.rutabase}/form-lleno-resp-foredit`, component.uauth.addToken({ fluid: uidFormParaEditar }), (resp) => {
+                if(resp.status == 'error'){
+                  funs.stateView('inicial');
+                  funs.mostrarError(resp.msg);
+                  funs.spinner(false);
+                  return;
+                }
+
+                ctxG.formllenoSel = resp.data;
+                // component.renderformLleno("[__frm_content]", ctxG.formllenoSel);
+                xyzFuns.showModal(ctxG.modal);
                 funs.spinner(false);
-                return;
-              }
-
-              let formlleno = resp.data;
-              let nim_concat = `FORM-101 ${formlleno.tipo_formulario_nombre} - NIM: ${formlleno.nim} - Municipio: ${formlleno.municipio}`;
-              $("[__select_nim]").append(/*html*/`<option value=${formlleno.nim}>${nim_concat}</option>`);
-              $("[__select_nim] option")[0].selected = true;
-              $("[__select_nim]").prop('disabled', true);
-
-              funs.renderFormulario(formlleno);
-              funs.spinner(false);
-            })
+              })
           }
             
               
@@ -503,10 +448,10 @@ export class Form101Component implements OnInit {
           funs.spinner();
           $.post(`${ctxG.rutabase}/nimsforms-activos-for-user`, component.uauth.addToken({}), (res) => {
             ctxG.datosUserNims = _.map(res.data, (item) => {
-                    item.nim_concat = `FORM-101 ${item.tipo_formulario_nombre} - NIM: ${item.nim} - Municipio: ${item.municipio}`;
+                    item.concat = `FORM-101 ${item.tipo_formulario_nombre} - NIM: ${item.nim} - Municipio: ${item.municipio}`;
                     return item;
                   });
-            let optsForms = xyzFuns.generaOpciones(res.data, 'nim', 'nim_concat', ' ');
+            let optsForms = xyzFuns.generaOpciones(res.data, 'nim', 'concat', ' ');
             $("[__select_nim]").append(optsForms);  
             /** Si solo es una opcion se bloquea el combo */
             if(res.data.length == 1) {
@@ -525,15 +470,11 @@ export class Form101Component implements OnInit {
           
         },
         /**Carga el formulario con sus elementos */
-        renderFormulario: (objFormData) => {
+        renderFormulario: (nim) => {
+          ctxG.nimSel = _.find(ctxG.datosUserNims, item => item.nim == nim);
           funs.spinner();
-          /**
-           * Se guarda en la variable global,
-           * ya sea que venga desde selectNim que contiene los datos generales ; 
-           * o que venga desde formLLenoEdit que contiene los datos generales mas un atributo con las reespuestas en forma de vector  */
-          ctxG.objFrmData = objFormData         
-          funs.crearDatosGeneral(objFormData);
-          $.post(`${ctxG.rutabase}/get-form-elems`, component.uauth.addToken({ id_formulario: objFormData.id_formulario }), function (res) {
+          funs.crearDatosGeneral(ctxG.nimSel);
+          $.post(`${ctxG.rutabase}/get-form-elems`, component.uauth.addToken({ id_formulario: ctxG.nimSel.id_formulario }), function (res) {
             if(res.status == 'error'){
               funs.mostrarError(res.msg);
               funs.spinner(false);
@@ -542,21 +483,31 @@ export class Form101Component implements OnInit {
 
             $("[__frm_formulario]").html("");
             form.renderizarElementos(res.data, "[__frm_formulario]");
-
-            /* si tiene respuestas es para editar */
-            if(objFormData.respuestas){
-              form.setData(objFormData.respuestas);
-            }
             funs.stateView('mostrar_formulario')
             funs.spinner(false);
           });
         },
         /** Carga Datos del usuario */
-        crearDatosGeneral: (objDatoGeneral) => {
-          /* Se llena la informacion del tipo de formulario de la cabecera*/
-          $("[__tipo_mineral]").html(objDatoGeneral.tipo_formulario_nombre);
-          let htmlDatosGeneral= component.sform.htmlRenderDatosGeneral(objDatoGeneral);
-          $("[__frm_datos_general]").html(htmlDatosGeneral);
+        crearDatosGeneral: (datosCabecera) => {
+          $("[__tipo_mineral]").html(ctxG.nimSel.tipo_formulario_nombre);
+          $("[__info_general=nim]").html(`${(ctxG.nimSel.nim) ? ctxG.nimSel.nim : ''}`);
+          $("[__info_general=nit]").html(`${(ctxG.nimSel.nit) ? ctxG.nimSel.nit : ''}`);
+
+          let fecha_registro = moment(Date.now()).format('DD/MM/YYYY');
+          $("[__info_general=fecha_registro]").html(`${fecha_registro}`);
+
+          let htmlNombres = !_.isEmpty(ctxG.nimSel.nombres) ? /*html*/`<span style="font-weight:400; font-size:0.8em">Nombre: </span> <span>${ctxG.nimSel.nombres} ${ctxG.nimSel.apellidos}</span>` : '';
+          let saltoLinea = !_.isEmpty(htmlNombres) && !_.isEmpty(ctxG.nimSel.razon_social) ? "<br>" : "";
+          htmlNombres += !_.isEmpty(ctxG.nimSel.razon_social) ? /*html*/`${saltoLinea}<span style="font-weight:400; font-size:0.8em">Razón Social: </span> <span>${ctxG.nimSel.razon_social}</span>` : '';
+          
+          $("[__info_general=nombres]").html(htmlNombres);
+
+          let htmlProcedencia = /*html*/`<span>CHUQUISACA</span>`;
+          // let saltoLinea = !_.isEmpty(htmlNombres) && !_.isEmpty(ctxG.nimSel.razon_social) ? "<br>" : "";            
+          htmlProcedencia += (ctxG.nimSel.municipio) ? /*html*/`<br>Municipio: <span>${ctxG.nimSel.municipio} - Cód. Mun.: <span>${ctxG.nimSel.codigo_municipio} </span>` : '';
+          $("[__info_general=procedencia]").html(htmlProcedencia);
+          $("[__info_general=mineral]").html(`${(ctxG.nimSel.mineral) ? ctxG.nimSel.mineral : ''}`);
+
         },
         /** Guarda el Form */
         save() {
@@ -566,8 +517,8 @@ export class Form101Component implements OnInit {
 
           funs.spinner();
           let dataSend: any = form.getData();
-          $.extend(dataSend, ctxG.objFrmData);
-          // dataSend.id_formulario = ctxG.objFrmData.id_formulario;
+          $.extend(dataSend, ctxG.nimSel);
+          dataSend.id_formulario = ctxG.nimSel.id_formulario;
           console.log('Obj enviar save', dataSend);
 
           $.post(`${ctxG.rutabase}/save-respuestas`, component.uauth.addToken(dataSend), (res) => {
@@ -758,9 +709,8 @@ export class Form101Component implements OnInit {
         $(ctxG.content)
           /** Selecciona NIM */
           .on('change', "[__select_nim]", function (e) {
-            let nimSel = $(e.currentTarget).val();  
-            let objNimSel = _.find(ctxG.datosUserNims, item => item.nim == nimSel);           
-            ( nimSel != '') ? funs.renderFormulario(objNimSel) : false;
+            let nimSel = $(e.currentTarget).val(); 
+            ( nimSel != '') ? funs.renderFormulario(nimSel) : false;
           })
           /* Tamaño de los textareas*/
           .on('change drop keydown cut paste', 'textarea', function () {

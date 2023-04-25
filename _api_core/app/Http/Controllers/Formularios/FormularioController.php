@@ -68,7 +68,7 @@ class FormularioController extends MasterController {
 		$form_contestado->nit               = $req->nit;
 		$form_contestado->nim               = $req->nim;
 		$form_contestado->id_municipio      = $req->id_municipio;
-		$form_contestado->periodo						= $this->now();
+		// $form_contestado->fecha_registro						= $this->now();
 		$form_contestado->uid   						= rand(1, 9999) . uniqid();
 
 
@@ -113,28 +113,46 @@ class FormularioController extends MasterController {
 	}
 
 	/**
-	 * Funcion para filtrar formularios llenos con sus respuestas
+	 * POST LISTA DE FORMULARIOS LLENOS del USUARIO   segun parametros
+	 */
+	public function formsLlenosUser(Request $req){
+		$id_usuario = $this->getUserLogged()->id;
+		$list = $this->formsLlenosQuery((object)['id_usuario' => $id_usuario]);
+		return response()->json([
+			'data' => $list,
+			'status' => 'ok'
+		]);
+
+	}
+
+	/**
+	 * DE CLASE Funcion para filtrar formularios llenos con sus respuestas
 	 */
 	private function formsLlenosQuery($obj){
 		$query = '';
 		$query .= isset($obj->id_usuario) ? " AND fl.id_usuario = {$obj->id_usuario} " : "";
 		$query .= isset($obj->uid) ? " AND fl.uid = '{$obj->uid}' " : "";
 		$query .= isset($obj->id_municipio) ? " AND fl.id_municipio = {$obj->id_municipio} " : "";
-		// $query .= $obj->periodo ? " AND fl.id_usuario = {$obj->id_usuario} " : "";
+		// $query .= $obj->fecha_registro ? " AND fl.id_usuario = {$obj->id_usuario} " : "";
 		// $query .= $obj->id_usuario ? " AND fl.id_usuario = {$obj->id_usuario} " : "";
 
+		$dias_vigencia = ConfigController::getValorConfig('dias_vigencia');
 		$formsLlenos  = collect(\DB::select(
 												"SELECT fl.*, 
-														r.nombre as municipio, r.codigo_numerico as codigo_municipio, 
-														f.nombre as tipo_formulario_nombre 
-														FROM forms_llenos fl, regiones r, formularios f
-														WHERE fl.id_municipio = r.id AND fl.id_formulario = f.id 
-														{$query} 
-														ORDER BY fl.id DESC"));
+													/* date_trunc('day', now()) - date_trunc('day', fl.fecha_registro) AS dias_transcurridos,*/
+													CASE WHEN CAST(EXTRACT(day from (date_trunc('day', now()) - date_trunc('day', fl.fecha_registro))) as integer) <= {$dias_vigencia}
+													THEN 1 ELSE 0  END AS vigencia ,
+													r.nombre as municipio, r.codigo_numerico as codigo_municipio, 
+													f.nombre as tipo_formulario_nombre 
+													FROM forms_llenos fl, regiones r, formularios f
+													WHERE fl.id_municipio = r.id AND fl.id_formulario = f.id 
+													{$query} 
+													ORDER BY fl.id DESC"));
 
 		$formsLlenos->map(function ($formLleno, $k) {
-			// $formLleno = (object)$formlleno;
-			$formLleno->respuestas = collect(\DB::select("SELECT e.id as id_elemento, e.texto, e.tipo, e.alias, e.orden, 
+
+			$formLleno->respuestas = collect(\DB::select(
+																	"SELECT e.id as id_elemento, e.texto, e.tipo, e.alias, e.orden, 
 																			string_agg(fr.respuesta, ', ') as respuesta, 
 																			string_agg(concat(fr.respuesta, ' ', fr.nombre_dimension, ' ', fr.valor_dimension), ', ') as respuesta_dimension ,
 																			count(e.id) as cantidad,
@@ -147,105 +165,79 @@ class FormularioController extends MasterController {
 																			GROUP BY e.id, e.texto, e.tipo,  e.alias, e.orden
 																			ORDER BY e.orden"))->groupBy('alias');
 
-			// $formLleno->respuestas = collect(\DB::select("SELECT e.id as id_elemento, e.texto, e.tipo, e.alias, e.orden, 
-			// 																fr.id_form_lleno, fr.respuesta, fr.respuesta_opcion, 
-			// 																fr.dimensiones, fr.nombre_dimension, fr.valor_dimension
-			// 																FROM elementos e  
-			// 																LEFT JOIN forms_llenos_respuestas fr on e.id = fr.id_elemento AND fr.id_form_lleno =  {$formLleno->id} 
-			// 																WHERE e.id_formulario = {$formLleno->id_formulario} 
-			// 																ORDER BY e.orden"))->groupBy('alias');
-			
-			// return response()->json([
-			// 	'data' => $respuestas->mineral,
-			// ]);
-			// $formLleno->minerales = $respuestas->mineral->reduce(function ($carry, $item) {
-			// 															return $carry . $item->respuesta . ', ';
-			// 														});
-
 			return $formLleno;											
 		});
-		
-		// foreach ($formsLlenos as $k => $formlleno) {
-		// 	$respuestas = collect(\DB::select("SELECT e.id as id_elemento, e.texto, e.tipo, e.alias, e.orden, 
-		// 															fr.id_form_lleno, fr.respuesta, fr.respuesta_opcion
-		// 															FROM elementos e  
-		// 															LEFT JOIN forms_llenos_respuestas fr on e.id = fr.id_elemento AND fr.id_form_lleno =  {$formlleno->id} 
-		// 															WHERE e.id_formulario = {$formlleno->id_formulario} 
-		// 															ORDER BY e.orden"))->groupBy('alias');//->toArray();
-			
-
-
-		// }
-		
+	
 		return $formsLlenos;
 	}
 
-
 	/**
-	 * POST LISTA DE FORMULARIOS LLENOS del USUARIO   segun parametros
+	 * DE CLASE
+	 * OBTIENE UN FORMULARIO LLENO CON SUS RESPUESTAS a partir del UID
 	 */
-	public function formsLlenosUser(Request $req){
-
-		$id_usuario = $this->getUserLogged()->id;
-		$list = $this->formsLlenosQuery((object)['id_usuario' => $id_usuario]);
-		return response()->json([
-			'data' => $list,
-			'status' => 'ok'
-		]);
-
-	}
-
-	/**
-	 * GET no necesita TOKEN 
-	 * Obtiene un FORMULARIO CON RESPUESTAS  a partr del UID_form_lleno
-	 */
-	public function formLlenoRespuestas(Request $req){
-		$form_lleno_uid = $req->fluid;
-		$formLleno  = collect(\DB::select("SELECT fl.*, 
-														r.nombre as municipio, r.codigo_numerico as codigo_municipio, f.nombre as tipo_formulario_nombre 
-														FROM forms_llenos fl, regiones r, formularios f
-														WHERE fl.id_municipio = r.id AND fl.id_formulario = f.id 
-														AND fl.uid = '{$form_lleno_uid}' "))->first();
+	private function obtenerFormLlenoRespuestas($obj){
+		$form_lleno_uid = $obj->fluid;
+		$dias_vigencia = ConfigController::getValorConfig('dias_vigencia');
+		$formLleno  = collect(\DB::select(
+											"SELECT fl.*, 
+													/* date_trunc('day', now()) - date_trunc('day', fl.fecha_registro) AS dias_transcurridos,*/
+													CASE WHEN CAST(EXTRACT(day from (date_trunc('day', now()) - date_trunc('day', fl.fecha_registro))) as integer) <= {$dias_vigencia}
+													THEN 1 ELSE 0  END AS vigencia ,
+													r.nombre as municipio, r.codigo_numerico as codigo_municipio, f.nombre as tipo_formulario_nombre 
+													FROM forms_llenos fl, regiones r, formularios f
+													WHERE fl.id_municipio = r.id AND fl.id_formulario = f.id 
+													AND fl.uid = '{$form_lleno_uid}' "))->first();
 									
-		/* se agegan las respuestas al formulario lleno , se ordenan por los elementos para conseguir todas las preguntas y titulos etc, y se completan con LEFT JOIN con las respustas (aunque esten vacias se tendra el formulario completo con sus respuestas ) */
+		/** Se agegan las respuestas al formulario lleno , se ordenan por los elementos para conseguir todas las preguntas y titulos etc, y se completan con LEFT JOIN con las respustas (aunque esten vacias se tendra el formulario completo con sus respuestas ) */
+		/** Si son varias respuestas , se las pone en forma de matriz para que tengan toda la informacion de cada opcion especialmente para la edicion del form */
 		$respuestas = collect(\DB::select("SELECT e.id as id_elemento, e.texto, e.descripcion, e.tipo, e.orden, e.config, 
-																	string_agg(fr.respuesta, ', ') as respuesta, 
-																	string_agg(concat(fr.respuesta, ' ', fr.nombre_dimension, ' ', fr.valor_dimension), ', ') as respuesta_dimension ,
-																	count(e.id) as cantidad,
-																	string_agg(concat(fr.valor_dimension), ', ') as valores_dimension 
-																	--fr.id as id_form_lleno_respuesta, fr.id_form_lleno, fr.respuesta, fr.respuesta_opcion, fr.dimensiones, fr.nombre_dimension, fr.valor_dimension 
+																	-- string_agg(fr.respuesta, ', ') as respuesta, 
+																	-- string_agg(concat(fr.respuesta, ' ', fr.nombre_dimension, ' ', fr.valor_dimension), ', ') as respuesta_dimension ,
+																	-- count(e.id) as cantidad,
+																	-- string_agg(concat(fr.valor_dimension), ', ') as valores_dimension 
+																	fr.id as id_form_lleno_respuesta, fr.id_form_lleno, fr.respuesta, fr.respuesta_opcion, fr.dimensiones, fr.nombre_dimension, fr.valor_dimension 
 																	FROM elementos e  
 																	LEFT JOIN forms_llenos_respuestas fr on e.id = fr.id_elemento AND fr.id_form_lleno =  {$formLleno->id} 
 																	WHERE e.id_formulario = {$formLleno->id_formulario} 
-																	GROUP BY e.id, e.texto, e.tipo,  e.alias, e.orden
+																	-- GROUP BY e.id, e.texto, e.tipo,  e.alias, e.orden
 																	ORDER BY e.orden"	))
 															->groupBy('orden');	
 
 		$formLleno->respuestas = $respuestas;
+		return $formLleno;
+	}
+
+	/**
+	 * GET no necesita TOKEN , se lo usa en la visualizacion 
+	 * Obtiene un FORMULARIO CON RESPUESTAS  a partr del UID_form_lleno
+	 */
+	public function formLlenoRespuestas(Request $req){
+		$formLleno = $this->obtenerFormLlenoRespuestas($req);
 		return response()->json([
 			'data' => $formLleno,
 			'status' => 'ok',
 		]);
-
-
-
 	}
 
 
+	/**
+	 * POST si necesita TOKEN 
+	 * Obtiene un FORMULARIO CON RESPUESTAS  a partr del UID_form_lleno, SE lo usa en la edicion
+	 * ademas verifica si el usuario es el que ha llenado previamente el Form
+	 */
+	public function formLlenoRespuestasToken(Request $req){
+		$id_usuario = $this->getUserLogged()->id;
+		$formLleno = $this->obtenerFormLlenoRespuestas($req);
+		/* Si el usuario no es el que ha llenado el form, entonces no podra abrir para editar*/ 
+		if($id_usuario != $formLleno->id_usuario)
+			return response()->json([
+				'status' => 'error',
+				'msg' => 'El formulario no peretenece al usuario actual.'
+			]);
 
-
-	public function getEncuestaId(Request $req) {
-		$idEncuestado = $req->id_encuestado;
-		$encuestado = collect(\DB::select("SELECT * from encuestados WHERE id = {$idEncuestado}"))->first();
-		$respEncuestado = collect(\DB::select(
-			"SELECT r.respuesta, r.respuesta_opcion, l.id id_elemento, l.texto , l.alias
-                                                    FROM encuestados_respuestas r, elementos l 
-                                                    WHERE r.id_elemento = l.id AND r.id_encuestado = {$encuestado->id}  ORDER BY l.orden "
-		))->groupBy('alias');
-		$encuestado->respuestas_encuesta = $respEncuestado;
 		return response()->json([
-			'data' => $encuestado,
-			'status' => 'ok'
+			'data' => $formLleno,
+			'status' => 'ok',
 		]);
 	}
 

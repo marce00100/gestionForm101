@@ -89,9 +89,7 @@ export class DatosComponent implements OnInit {
           $("[__filtro=tipo_formulario]").html(optsTipoForm);
         },
 
-
-
-        /* Obtiene los filtros para los datos*/
+        /** Obtiene los filtros para los datos*/
         get_filtros: () => {
           return {
             tipo_formulario: $("[__filtro=tipo_formulario]").val(),
@@ -101,27 +99,27 @@ export class DatosComponent implements OnInit {
             id_usuario: $("[__filtro=id_usuario]").val(),
           }
         },
-        /* Visuañliza en DT*/
+
+        /** Visuañliza en DT*/
         visualizar_datos: () => {
-          // xyzFuns.spinner(true);
+          xyzFuns.spinner(true);
           console.log(funs.get_filtros());
           $.post(`${ctxG.rutabase}/getdatos-respuestas`, cmp.uAuth.addToken(funs.get_filtros()), function (resp) {
             if (resp.estado == 'ok') {    
               conT.fillDataT(resp.columnas, resp.data);
               $("[__conteo_filtro]").html(` ${resp.data.length} Registros`);
-
             }
             xyzFuns.spinner(false);
           })
         },
-        /* Exportar a Exxcel */
+
+        /** Exportar a Exxcel */
         exportar: () => {
           let filtros = funs.get_filtros();
           window.location.href = `${ctxG.rutabase}/exportexcel?` + $.param(filtros);
         },
 
-
-        /* Muestra Modal los campos de preguntas con sus alias*/
+        /** Muestra Modal los campos de preguntas con sus alias*/
         codificar_alias_pregunta: () => {
           $.post(`${ctxG.rutabase}/getpreguntas`, cmp.uAuth.addToken({}), function (res) {
             let elementos = res.data;
@@ -160,7 +158,7 @@ export class DatosComponent implements OnInit {
           })
 
         },
-        /* Guarda los Alias de las preguntas*/
+        /** Guarda los Alias de las preguntas*/
         save_alias: () => {
           let listaElemsAlias = _.map($("[__alias]"), function (elem, k) {
             return { id: $(elem).attr('__id'), alias: $(elem).val() }

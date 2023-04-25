@@ -30,7 +30,7 @@
             background-color: rgb(255 255 255 / 68%);" >
             <div __frms class="" style=" min-height:80vh; overflow-y: auto; align-items: center;">
 
-              <div __card __frm_cabecera
+              <div __frm_cabecera
                 style="background-color: transparent; color: #116e7a;text-align: center; padding: 10px; border-bottom: 1px solid #ccc;">
                 <h1 clasS="fw600 text-theme1--30">FORMULARIO 101</h1>
                 <h4  class="text-theme1--30 fw600 mn ">
@@ -41,8 +41,40 @@
                 </div>
               </div>
 
-              <div __card __frm_datos_general >
-
+              <div __card __frm_datos_general class=" wp100 mt30" >
+                <div class="quest-titulo">
+                  DATOS REGISTRADOS
+                </div>
+                <div class="datos-generales">
+                  <div class="item-dato-general">
+                    <em class="item-label">1. NÚMERO DE FORMULARIO</em>
+                    <div class="item-contenido text-center" __info_general="numero_formulario">Automático</div>
+                  </div>
+                  <div class="item-dato-general">
+                    <em class="item-label">2. NÚMERO DE NIM</em>
+                    <div class="item-contenido text-center" __info_general="nim"></div>
+                  </div>
+                  <div class="item-dato-general">
+                    <em class="item-label">3. NÚMERO DE NIT</em>
+                    <div class="item-contenido text-center" __info_general="nit"></div>
+                  </div>
+                  <div class="item-dato-general">
+                    <em class="item-label">4. PERIODO</em>
+                    <div class="item-contenido text-center" __info_general="fecha_registro"></div>
+                  </div>
+                  <div class="item-dato-general" style="flex-basis: 100%;">
+                    <em class="item-label">5. OPERADOR MINERO</em>
+                    <div class="item-contenido" __info_general="nombres"></div>
+                  </div>
+                  <div class="item-dato-general" style="flex-basis: 100%;">
+                    <em class="item-label">6. PROCEDENCIA</em>
+                    <div class="item-contenido" __info_general="procedencia"></div>
+                  </div>
+                  <!-- <div class="item-dato-general" style="flex-basis: 100%;">
+                    <em class="item-label">7. Tipo de Mineral y Leyes DM %</em>
+                    <div class="item-contenido" __info_general="mineral"></div>
+                  </div> -->
+                </div>
               </div>
 
               <div __card __frm_formulario class=" mt30 flex flex-wrap align-end">

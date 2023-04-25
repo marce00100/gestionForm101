@@ -25,6 +25,7 @@ Route::get('/', function () {
 	return view('welcome');
 });
 
+/** Exporta a excel despues de aplicar los filtros, (esta fuera del grupo porque da error con cors) */
 Route::group(['prefix' => 'api'], function () {
 		Route::get('exportexcel', [Datos::class, 'exportExcel']);
 });
@@ -73,8 +74,24 @@ Route::group(['prefix' => 'api', 'middleware' => ['cors']], function () {
 	Route::post('save-respuestas',            [Form::class, 'saveRespuestas'])->middleware(['authorize:1|3']);
 	/** Lista deformularios llenos */
 	Route::post('forms-llenos-user',          [Form::class, 'formsLlenosUser'])->middleware(['authorize:1|3']);
-	/** Form lleno con sus  respuestas  */
-	Route::get('formenviado-resp',       			[Form::class, 'formLlenoRespuestas'])->middleware([]);
+	/** Form lleno con sus  respuestas, no necesita token, para visualizacion y pdf */
+	Route::get('form-lleno-resp',       			[Form::class, 'formLlenoRespuestas'])->middleware([]);
+	/** Form lleno con sus  respuestas, si necesita token, para editar formulario */
+	Route::post('form-lleno-resp-foredit', 		[Form::class, 'formLlenoRespuestasToken'])->middleware(['authorize:1|3']);
+
+	
+	/** --DATOS */
+	
+	/** Obtiene una lista de los usuarios operadores */
+	Route::post('get-usuarios-operadores', [Datos::class, 'getUsuariosOperadores']) 	->middleware(['authorize:1']);
+	/** Realiza la actualizacion en la tabla de datos consolidados de los nuevos registros */
+	Route::post('sincronizartabla'       , [Datos::class, 'sincronizarTabla'])        ->middleware(['authorize:1']);
+	/** Obtine todas las preguntas y sus alias */
+	Route::post('getpreguntas'           , [Datos::class, 'obtenerPreguntas'])        ->middleware(['authorize:1']);
+	/** Guarda los ALias para cada pregunta */
+	Route::post('guardar-alias'          , [Datos::class, 'guardarPreguntasAlias'])	  ->middleware(['authorize:1']);
+	/** Obtiene la data consolidadad depues de aplicar filtros */
+	Route::post('getdatos-respuestas'    , [Datos::class, 'getDatos'])                ->middleware(['authorize:1']);
 
 
 	/** -- USUARIOS */
@@ -90,7 +107,8 @@ Route::group(['prefix' => 'api', 'middleware' => ['cors']], function () {
 	/** Envio SMS */
 	Route::post('sms',      				[Usuarios::class, 'sms'])        ->middleware(['authorize:1']);
 	
-	
+		// Route::post('cambiar-password', [UsuariosController::class, 'cambioPassword']); //  ->middleware(['auth']);
+
 	/** -- CONTENIDOS */
 	
 	/** lista de contenidos */
@@ -99,23 +117,8 @@ Route::group(['prefix' => 'api', 'middleware' => ['cors']], function () {
 	Route::post('get-content',  [Contenidos::class, 'getContent'])->middleware(['authorize:1|3']);
 	/** Guardar contenido y dependencias */
 	Route::post('save-content', [Contenidos::class, 'saveContent'])->middleware(['authorize:1']);
-	
-	/** --DATOS */
-	
-	/** Obtiene una lista de los usuarios operadores */
-	Route::post('get-usuarios-operadores', [Datos::class, 'getUsuariosOperadores']) 	->middleware(['authorize:1']);
-	/** Realiza la actualizacion en la tabla de datos consolidados de los nuevos registros */
-	Route::post('sincronizartabla'       , [Datos::class, 'sincronizarTabla'])        ->middleware(['authorize:1']);
-	/** Obtine todas las preguntas y sus alias */
-	Route::post('getpreguntas'           , [Datos::class, 'obtenerPreguntas'])        ->middleware(['authorize:1']);
-	/** Guarda los ALias para cada pregunta */
-	Route::post('guardar-alias'          , [Datos::class, 'guardarPreguntasAlias'])	  ->middleware(['authorize:1']);
-	/** Obtiene la data consolidadad depues de aplicar filtros */
-	Route::post('getdatos-respuestas'    , [Datos::class, 'getDatos'])                ->middleware(['authorize:1']);
-	/** Exporta a excel depeus de aplicar filtros */
-	// Route::get ('exportexcel'            , [Datos::class, 'exportExcel']) ;
 
-	// Route::post('cambiar-password', [UsuariosController::class, 'cambioPassword']); //  ->middleware(['auth']);
+
 
 
 });

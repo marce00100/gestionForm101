@@ -34,6 +34,7 @@ const routes: Routes = [
 
   /** rutas operador */
   { path: 'form101',         component: Form101Component,         canActivate: [PuertaAuthGuard] },
+  { path: 'form101/:uid',    component: Form101Component,         canActivate: [PuertaAuthGuard] },
   { path: 'listaforms',      component: ListaformsComponent,      canActivate: [PuertaAuthGuard] },
   { path: 'listaforms/:uid', component: ListaformsComponent,      canActivate: [PuertaAuthGuard] },
   { path: 'contenidos',      component: VisorContenidosComponent, canActivate: [PuertaAuthGuard] },

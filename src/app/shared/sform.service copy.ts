@@ -29,14 +29,15 @@ export class SFormService {
    * @param objFrmLleno frmlleno con array de respuestas
    * @returns HTML
    */
-  public renderFormLlenoCompleto(container, objFrmLleno, qr = true, firmas = true) {
+  public renderFormLleno(container, objFrmLleno, qr = true, firmas = true) {
     /* Se guarda el obgeto en la vaiable privada */
     this.objFrmLleno = objFrmLleno;
-    let frm = this.htmlRenderFormModoVista(objFrmLleno);
+    let frm = this.htmlRenderForm(objFrmLleno);
     $(container).html(frm);
 
     if (qr) {
       let url = this.getUrlPublicForm();
+      console.log('________',url);
       this.generarQR("[__codigo_qr]", url);
     }
 
@@ -51,19 +52,63 @@ export class SFormService {
    * @param objFrm 
    * @returns html
    */
-  private htmlRenderFormModoVista(objFrm: any) {
+  private htmlRenderForm(objFrm: any) {
+
+    let fecha_registro = moment(objFrm.fecha_registro).format('DD/MM/YYYY');
+
+    let htmlNombres = !_.isEmpty(objFrm.nombres) ? /*html*/`<span style="font-weight:400; font-size:0.8em">Nombre: </span> <span>${objFrm.nombres} ${objFrm.apellidos}</span>` : '';
+    let saltoLinea = !_.isEmpty(htmlNombres) && !_.isEmpty(objFrm.razon_social) ? "<br>" : "";
+    htmlNombres += !_.isEmpty(objFrm.razon_social) ? /*html*/`${saltoLinea}<span style="font-weight:400; font-size:0.8em">Razón Social: </span> <span>${objFrm.razon_social}</span>` : '';
+    // $("[__info_general=nombres]").html(htmlNombres);    
+
+    let htmlProcedencia = /*html*/`<span>CHUQUISACA</span>`;         
+    htmlProcedencia += (objFrm.municipio) ? /*html*/`<br>Municipio: <span>${objFrm.municipio} - Cód. Mun.: <span>${objFrm.codigo_municipio} </span>` : '';
     
     let frm = /*html*/`
       <div __frm id="__frm" class="fs13 text-111" style=" min-height:80vh; overflow-y: auto; align-items: center; 
         min-width: 650px; max-width: 650px; width: 650px; position: relative">
         
-        <div __card __frm_cabecera>
-          <img src="./assets/img/gadch_vertical_light_lg_gris.png" style="width:130px; position:absolute; top: 0px;left: 20px" /> 
-          ${this.htmlRenderCabecera(objFrm)}
+        <div __card __frm_cabecera class="flex flex-y align-center" style="text-align: center; border-bottom: 1px solid #ccc; position:relative; ">
+          <img src="./assets/img/gadch_vertical_light_lg_gris.png" style="width:130px; position:absolute; top: 0px;left: 20px" />  
+          <h1 clasS="fw600 text-theme1--30" style="margin-top:80px">FORMULARIO 101</h1>
+          <h4  class="text-theme1--30 fw600 mn ">
+              PARA MINERALES <span __tipo_formulario>${objFrm.tipo_formulario_nombre}</span>
+          </h4>
+          <div class="mt20  text-dark-darker fs12 fw600 wp80 center-block" >FORMULARIO ÚNICO DEPARTAMENTAL PARA CONTROL DE SALIDA,
+              AUTORIZACIÓN DE TRANSPORTE Y VENTA DE MINERALES <span __tipo_formulario>${objFrm.tipo_formulario_nombre}</span>
+            </div>
         </div>
 
-        <div __card __frm_datos_general >
-          ${this.htmlRenderDatosGeneral(objFrm)}
+        <div __card __frm_datos_general class=" wp100 mt30" >
+          <div class="quest-titulo">
+            DATOS REGISTRADOS
+          </div>
+          <div class="datos-generales">
+            <div class="item-dato-general">
+              <em class="item-label">1. NÚM. DE FORMULARIO</em>
+              <div class="item-contenido text-center" __info_general="numero_formulario">${objFrm.numero_formulario}</div>
+            </div>
+            <div class="item-dato-general">
+              <em class="item-label">2. NÚMERO DE NIM</em>
+              <div class="item-contenido text-center" __info_general="nim">${objFrm.nim}</div>
+            </div>
+            <div class="item-dato-general">
+              <em class="item-label">3. NÚMERO DE NIT</em>
+              <div class="item-contenido text-center" __info_general="nit">${objFrm.nit}</div>
+            </div>
+            <div class="item-dato-general">
+              <em class="item-label">4. PERIODO</em>
+              <div class="item-contenido text-center" __info_general="fecha_registro">${fecha_registro}</div>
+            </div>
+            <div class="item-dato-general" style="flex-basis: 100%;">
+              <em class="item-label">5. OPERADOR MINERO</em>
+              <div class="item-contenido" __info_general="nombres">${htmlNombres}</div>
+            </div>
+            <div class="item-dato-general" style="flex-basis: 100%;">
+              <em class="item-label">6. PROCEDENCIA</em>
+              <div class="item-contenido" __info_general="procedencia">${htmlProcedencia}</div>
+            </div>
+          </div>
         </div>
         
         <div __card __frm_datos_respuestas class=" mt10 flex flex-wrap align-start">
@@ -74,77 +119,6 @@ export class SFormService {
         </div>
       </div>`;
     return frm;
-  }
-
-  /**
-   * Obtiene html de la cabecera Para generar la cabecera del form: titulo,subtitulo etc
-   * @param objFrm objeto con valor del tipo de formulario 
-   * @returns html dela cabecera
-   */
-  public htmlRenderCabecera(objFrm){
-    let htmlCabecera = /*html*/`
-            <div class="flex flex-y align-center" style="text-align: center; border-bottom: 1px solid #ccc; position:relative; ">
-              
-              <h1 clasS="fw600 text-theme1--30" style="margin-top:80px">FORMULARIO 101</h1>
-              <h4  class="text-theme1--30 fw600 mn ">
-                  PARA MINERALES <span __tipo_formulario>${objFrm.tipo_formulario_nombre || ''}</span>
-              </h4>
-              <div class="mt20  text-dark-darker fs12 fw600 wp80 center-block" >FORMULARIO ÚNICO DEPARTAMENTAL PARA CONTROL DE SALIDA,
-                  AUTORIZACIÓN DE TRANSPORTE Y VENTA DE MINERALES <span __tipo_formulario>${objFrm.tipo_formulario_nombre || ''}</span>
-                </div>
-            </div>`
-    return htmlCabecera;
-  }
-
-  /**
-   * Obtiene html de la informacion o datos generales
-   * @param objFrm Objeto con los datos del usuario y nim, datos generales
-   * @returns 
-   */
-  public htmlRenderDatosGeneral(objFrm){
-    let fecha_registro =  moment(objFrm.fecha_registro ? objFrm.fecha_registro : Date.now()).format('DD/MM/YYYY');
-
-    let htmlNombres = !_.isEmpty(objFrm.nombres) ? /*html*/`<span style="font-weight:400; font-size:0.8em">Nombre: </span> <span>${objFrm.nombres} ${objFrm.apellidos}</span>` : '';
-    let saltoLinea = !_.isEmpty(htmlNombres) && !_.isEmpty(objFrm.razon_social) ? "<br>" : "";
-    htmlNombres += !_.isEmpty(objFrm.razon_social) ? /*html*/`${saltoLinea}<span style="font-weight:400; font-size:0.8em">Razón Social: </span> <span>${objFrm.razon_social}</span>` : '';
-    // $("[__info_general=nombres]").html(htmlNombres);    
-
-    let htmlProcedencia = /*html*/`<span>CHUQUISACA</span>`;         
-    htmlProcedencia += (objFrm.municipio) ? /*html*/`<br>Municipio: <span>${objFrm.municipio} - Cód. Mun.: <span>${objFrm.codigo_municipio} </span>` : '';
-
-    let htmlDatosGeneral = /*html*/`
-            <div class=" wp100 mt30" >
-              <div class="quest-titulo">
-                DATOS REGISTRADOS
-              </div>
-              <div class="datos-generales">
-                <div class="item-dato-general">
-                  <em class="item-label">1. NÚM. DE FORMULARIO</em>
-                  <div class="item-contenido text-center" __info_general="numero_formulario">${objFrm.numero_formulario || 'Automático'}</div>
-                </div>
-                <div class="item-dato-general">
-                  <em class="item-label">2. NÚMERO DE NIM</em>
-                  <div class="item-contenido text-center" __info_general="nim">${objFrm.nim || ''}</div>
-                </div>
-                <div class="item-dato-general">
-                  <em class="item-label">3. NÚMERO DE NIT</em>
-                  <div class="item-contenido text-center" __info_general="nit">${objFrm.nit || ''}</div>
-                </div>
-                <div class="item-dato-general">
-                  <em class="item-label">4. PERIODO</em>
-                  <div class="item-contenido text-center" __info_general="fecha_registro">${fecha_registro}</div>
-                </div>
-                <div class="item-dato-general" style="flex-basis: 100%;">
-                  <em class="item-label">5. OPERADOR MINERO</em>
-                  <div class="item-contenido" __info_general="nombres">${htmlNombres}</div>
-                </div>
-                <div class="item-dato-general" style="flex-basis: 100%;">
-                  <em class="item-label">6. PROCEDENCIA</em>
-                  <div class="item-contenido" __info_general="procedencia">${htmlProcedencia}</div>
-                </div>
-              </div>
-            </div>`
-    return htmlDatosGeneral;
   }
 
   /**

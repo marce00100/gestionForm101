@@ -170,6 +170,7 @@ class DatosController extends MasterController {
 																			AND  c.column_name NOT IN('id', 'id_form_lleno', 'id_usuario')"))->implode('campo', ', ');
 
 		$firstObject = collect(\DB::select("SELECT {$campos} FROM {$nombreTabla} limit 1"))->first();
+		/** Crea array con los nombres delascolumnas */
 		$columns = array_keys(get_object_vars($firstObject));
 
 		$respuestasList = collect(\DB::select("SELECT {$campos} FROM {$nombreTabla}  WHERE {$condiciones} ORDER BY id"));
