@@ -87,6 +87,11 @@ export class DatosComponent implements OnInit {
           // let tipoFormulario = [{ tipo: 'METALICOS', texto: 'METALICOS' }, { tipo: 'NO METALICOS', texto: 'NO METALICOS' }];
           let optsTipoForm = xyzFuns.generaOpcionesArray(tipoFormulario, "TODOS");
           $("[__filtro=tipo_formulario]").html(optsTipoForm);
+
+          let estadoFormLleno = ['EMITIDO', 'ANULADO'];
+          let optsEstadoFormLleno = xyzFuns.generaOpcionesArray(estadoFormLleno, "TODOS");
+          $("[__filtro=estado_form_lleno]").html(optsEstadoFormLleno);
+          $("[__filtro=estado_form_lleno]").val('EMITIDO');
         },
 
         /** Obtiene los filtros para los datos*/
@@ -97,6 +102,8 @@ export class DatosComponent implements OnInit {
             fecha_reg_desde: $("[__filtro=fecha_desde]").val(),
             fecha_reg_hasta: $("[__filtro=fecha_hasta]").val(),
             id_usuario: $("[__filtro=id_usuario]").val(),
+            estado_form_lleno: $("[__filtro=estado_form_lleno]").val(),
+            ingenio_minero: $("[__filtro=ingenio_minero]").val(),
           }
         },
 

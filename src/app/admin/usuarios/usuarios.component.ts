@@ -31,9 +31,10 @@ export class UsersComponent implements OnInit {
         contenedor: '#users_contenedor',
         modal: "#modal",
         dataTableTarget: "#dataT",
+        id_rol_operador: 3, /*El id_rol del rol operador */
+        config_comprar_formularios: 0,
         usersList: [],
         municipios: [],
-        id_rol_operador: 3, /*El id_rol del rol operador */
         smsList: [],
       }
 
@@ -272,8 +273,13 @@ export class UsersComponent implements OnInit {
           xyzFuns.spinner();
           $.get(`${ctxG.rutabase}/get-usuarios`, cmp.uAuth.addToken({}), (resp) => {
             ctxG.usersList = resp.data;
-            conT.fillDataT();
-            xyzFuns.spinner(false);
+            /** Carga si esta habilitado la opcion de comprar formularios (Para mostrar las opcines de recargar formularios_dispnibles no */
+            $.post(ctxG.rutabase + '/param-valor', cmp.uAuth.addToken({ nombre: 'comprar_formularios', dominio: 'config' }), (res) => {
+              ctxG.config_comprar_formularios = res.data;
+              conT.fillDataT();
+              xyzFuns.spinner(false);
+            })
+            // xyzFuns.spinner(false);
           });
         },
         fillDataT: function () {
@@ -324,6 +330,15 @@ export class UsersComponent implements OnInit {
               },
               { title: 'Email', data: 'email', },
               { title: 'Celular', data: 'numero_celular', },
+              {
+                title: 'Forms Disp.', data: 'formularios_disponibles', 
+                render: function (data, type, row, meta) {
+                  if(ctxG.config_comprar_formularios == 0){
+                    return 'deshabilitado'
+                  }
+                  return (row.formularios_disponibles != null && row.formularios_disponibles != "") ? row.formularios_disponibles : 0;
+                }
+              },
             ],
             language: xyzFuns.dataTablesEspanol(),
           });
@@ -341,8 +356,7 @@ export class UsersComponent implements OnInit {
       let funs = {
         crearFormulario: () => {
           regmodel.create_fields(regmodel.model.sections);
-          regmodel.inicializaControles();
-          
+          regmodel.inicializaControles();          
         },
 
         /** opciones propias de la venta de Datos Nim */
@@ -432,6 +446,8 @@ export class UsersComponent implements OnInit {
             return objeto;
           }
           objeto.nims = funs.functionsNims.getNims();
+
+          objeto.formularios_disponibles = $("[__field_formularios_disponibles]").val();
           return objeto;
         },
 
@@ -442,6 +458,9 @@ export class UsersComponent implements OnInit {
           $("[__rg_field][type=password]").attr('paraverificarcambio', $("[__rg_field][type=password]").val());
 
           funs.functionsNims.setNims(obj.nims);
+
+          $("[__formularios_disponibles_label]").html(obj.formularios_disponibles ?? 0);
+          
         },
         /** Para usuario nuevo muestramodal vacio */
         nuevo: () => {
@@ -497,16 +516,25 @@ export class UsersComponent implements OnInit {
           });
 
         },
-        limpiarModal: () => {
+        /**
+         * Limpia y Prepara la ventana MOdal , segun si esatn habilitadas las opciones de compra de fomrularios
+         */
+        preparaModal: () => {
           $(`${ctxG.modal} [__rg_field]`).val('').removeClass('br-a br-danger');
-          $(`${ctxG.modal} [__op_field]`).val('').removeClass('br-a br-danger');;
+          $(`${ctxG.modal} [__op_field]`).val('').removeClass('br-a br-danger');
           funs.functionsNims.limpiarFieldsNims();
           $("[__nims_operador] table tbody").html('');
           $("[__wrapper_operador]").hide();
+
+          $("[__formularios_disponibles_label]").html("0");
+          $("[__field_formularios_disponibles]").val('0');
           
           /* Quita las clases de error en todos los campos requeridos  */
           $("[required]").removeClass(regmodel.model.classError);
           xyzFuns.alertMsgClose('[__error]');
+
+          /* Muestra laopcion derecargar formularios disponibles si estan habilitadas las compras*/
+          (ctxG.config_comprar_formularios == 1) ? $("[__formularios_disponibles_section]").show() : $("[__formularios_disponibles_section]").hide();
 
         },
         panelSMS() {
@@ -586,7 +614,7 @@ export class UsersComponent implements OnInit {
           /** Click en botones de accion como editar nuevo */
           .on('click', '[__accion]', (e) => {
             let accion = $(e.currentTarget).attr('__accion');
-            funs.limpiarModal();
+            funs.preparaModal();
             if (accion == 'nuevo')
               funs.nuevo();
             if (accion == 'editar') {

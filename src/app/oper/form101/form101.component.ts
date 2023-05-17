@@ -28,12 +28,13 @@ export class Form101Component implements OnInit {
   }
 
   /**
-   * Verifica si existe parametros , entonces es edicion
+   * Verifica si existe parametros , entonces devuelve un objeto con el uid y la accion que puede ser editar o anular
    * @returns uid
    */
   existeParametro(){
     let uid = this.routeurl.snapshot.paramMap.get('uid');
-    return (uid && uid.length > 0) ? uid : false;
+    let accion = this.routeurl.snapshot.paramMap.get('accion');
+    return (uid && uid.length > 0) ? { uid: uid, accion: accion } : false;
   }
 
   form() {
@@ -47,6 +48,7 @@ export class Form101Component implements OnInit {
         municipios: [],
         datosUserNims: [],
         objFrmData: {},
+        config_comprar_formularios: 0,
       }
 
       let form = {
@@ -468,21 +470,30 @@ export class Form101Component implements OnInit {
 
       let funs = {
         verificaNuevoOEdicion: () => {
-          let uidFormParaEditar = component.existeParametro();
+          let parametros = component.existeParametro();
+          funs.mostrarSeccionFormularioVigentes();
+
           /* si no existe el parametro querystring  uid entonces es un nuevo formulario */
-          if (!uidFormParaEditar) {
+          if (!parametros) {
             funs.cargarComboUserNims();
+            $("[__accion_form=anular]").hide();
           }
           /* si es para editar */
           else {
+            let uid = parametros.uid;
+            let accion = parametros.accion;
             funs.spinner();
-            $.post(`${ctxG.rutabase}/form-lleno-resp-foredit`, component.uauth.addToken({ fluid: uidFormParaEditar }), (resp) => {
+            $.post(`${ctxG.rutabase}/form-lleno-resp-foredit`, component.uauth.addToken({ fluid: uid }), (resp) => {
               if (resp.status == 'error') {
                 funs.stateView('inicial');
                 funs.mostrarError(resp.msg);
                 funs.spinner(false);
                 return;
               }
+              
+              $("[__formularios_disponibles_label]").html(resp.data.formularios_disponibles);
+
+              $("[__accion_form=anular]").show();
 
               let formlleno = resp.data;
               let nim_concat = `FORM-101 ${formlleno.tipo_formulario_nombre} - NIM: ${formlleno.nim} - Municipio: ${formlleno.municipio}`;
@@ -491,17 +502,42 @@ export class Form101Component implements OnInit {
               $("[__select_nim]").prop('disabled', true);
 
               funs.renderFormulario(formlleno);
+              
+              if(accion == 'anular'){
+                $("[__accion_form=anular]").trigger('click');
+              }
               funs.spinner(false);
             })
           }
-            
-              
+
         },
         /** Carga los Formularios inicialmente */
         cargarComboUserNims: () => {
           funs.stateView('inicial')
           funs.spinner();
           $.post(`${ctxG.rutabase}/nimsforms-activos-for-user`, component.uauth.addToken({}), (res) => {
+
+            $("[__formularios_disponibles_label]").html(res.data[0].formularios_disponibles);
+
+            /*Verifica si esta habilitada la compra de creditos y tambien si el usuario dispone de formularios para enviasr */
+            if(ctxG.config_comprar_formularios == 1 && res.data[0].formularios_disponibles <= 0){
+              funs.stateView('inicial');
+              funs.mostrarError(/*html*/`No puede enviar mas formularios, se agotó su disponibilidad de formularios. 
+                            <br><b>Debe adquirir una cantidad de formularios para poder enviar nuevamente.</b>
+                            <p>Comuníquese con la gobernación de Chuquisaca para mas información.</p>`);
+              funs.spinner(false);
+              return;
+            }
+            /* Si no tiene NIMS asociados */
+            if(res.data.length == 0){
+              $("[__select_nim]").prop('disabled', true); 
+              funs.mostrarError(/*html*/`<br><b>No se tiene ningún Número de NIM registrado.</b><br>
+              Es posible que haya caducado o no se realizó el registro con la documentación correspondiente. 
+              <br><br>Por favor contáctese con las oficinas de la Gobernación de Chuquisaca.<br>` )
+              funs.spinner(false);
+              return;
+            }
+
             ctxG.datosUserNims = _.map(res.data, (item) => {
                     item.nim_concat = `FORM-101 ${item.tipo_formulario_nombre} - NIM: ${item.nim} - Municipio: ${item.municipio}`;
                     return item;
@@ -513,12 +549,7 @@ export class Form101Component implements OnInit {
               $("[__select_nim] option")[1].selected =  true; 
               $("[__select_nim]").trigger('change').prop('disabled', true); 
             }
-            if(res.data.length == 0){
-              $("[__select_nim]").prop('disabled', true); 
-              funs.mostrarError(/*html*/`<br><b>No se tiene ningún Número de NIM registrado.</b><br>
-              Es posible que haya caducado o no se realizó el registro con la documentación correspondiente. 
-              <br><br>Por favor contáctese con las oficinas de la Gobernación de Chuquisaca.<br>` )
-            }
+            
 
             funs.spinner(0);
           });
@@ -558,6 +589,15 @@ export class Form101Component implements OnInit {
           let htmlDatosGeneral= component.sform.htmlRenderDatosGeneral(objDatoGeneral);
           $("[__frm_datos_general]").html(htmlDatosGeneral);
         },
+        /** Mostrar seccion de formulatios vigentes depende si esta habilitada la configuracion de comprar_formularios */
+        mostrarSeccionFormularioVigentes: () => {
+          $.post(`${ctxG.rutabase}/param-valor`, component.uauth.addToken({ nombre: 'comprar_formularios', dominio: 'config' }), (res) => {
+            ctxG.config_comprar_formularios = res.data;
+            $("[__formularios_disponibles_section]").hide();
+            if(ctxG.config_comprar_formularios == 1)
+              $("[__formularios_disponibles_section]").show();
+          });
+        },
         /** Guarda el Form */
         save() {
           let noCumplenValidacion = funs.noCumplenValidacion(ctxG.content, '.__elemento[required]', 'error-validacion');
@@ -565,11 +605,14 @@ export class Form101Component implements OnInit {
             return;
 
           funs.spinner();
+          delete ctxG.objFrmData.respuestas; /* se quita las respuestas, para que no sobreponga a datasend */
           let dataSend: any = form.getData();
           $.extend(dataSend, ctxG.objFrmData);
+
+          (ctxG.objFrmData.id) ? dataSend.accion = 'editar' : dataSend.accion = 'nuevo';
+
           // dataSend.id_formulario = ctxG.objFrmData.id_formulario;
           console.log('Obj enviar save', dataSend);
-
           $.post(`${ctxG.rutabase}/save-respuestas`, component.uauth.addToken(dataSend), (res) => {
             if(res.status == 'error'){
               funs.mostrarError(res.msg);
@@ -579,6 +622,29 @@ export class Form101Component implements OnInit {
 
             funs.spinner(false);
             funs.stateView('guardado', res.data.uid); 
+          }).fail(function (r) {
+            funs.mostrarError("Hubo un error inesperado.");
+            funs.spinner(false);
+          })
+        },
+        saveAnular() {
+          funs.spinner();
+          delete ctxG.objFrmData.respuestas; /* se quita las respuestas, para que no sobreponga a datasend */
+          let dataSend = {
+            id : ctxG.objFrmData.id,
+            uid : ctxG.objFrmData.uid,
+            accion: 'anular'
+          };
+          console.log('Obj enviar save', dataSend);
+          $.post(`${ctxG.rutabase}/save-respuestas`, component.uauth.addToken(dataSend), (res) => {
+            if(res.status == 'error'){
+              funs.mostrarError(res.msg);
+              funs.spinner(false);
+              return;
+            }
+
+            funs.spinner(false);
+            component.router.navigate(['listaforms'])
           }).fail(function (r) {
             funs.mostrarError("Hubo un error inesperado.");
             funs.spinner(false);
@@ -636,13 +702,50 @@ export class Form101Component implements OnInit {
                   </div>
                   <div class="panel-body">
                     <div class="p20 fs14 bg-light text-center_ text-primary--60" style="text-align:justify; border-bottom: 1px solid #afafaf;" >
-                      <p>El presente Formulario 101, tiene el carácter de declaración jurada y es de uso obligatorio para los operadores mineros, personas naturales y jurídicas que realicen el transporte y comercialización de minerales metálicos y no metálicos.</b></p>
+                      <p>El presente Formulario 101, tiene el carácter de declaración jurada y es de uso obligatorio para los operadores mineros, personas naturales y jurídicas que realicen el transporte y comercialización de minerales metálicos y no metálicos.</p>
                       <p><b>A partir de su emisión tiene 3 días para su utilización, caso contrario el mismo quedará sin efecto.</b></p>
                     </div>
                     <h4 class="text-center text-theme1--20 fw600">Desea continuar? </h4>
                     <div class="flex justify-evenly p10">
                       <button __accion_form="close" class="btn bg-eee ph20 br6 br-a br-dark fs14"> Cerrar</button>
                       <button __accion_form="save" class="btn btn-primary ph20 br6 br-a br-dark fs14"><i class="glyphicons glyphicons-ok"></i> Confirmar</button>
+                    </div>
+                  </div>
+                </div>`
+          }
+          let alert = /*html*/`
+                    <div __alert style="display:none; z-index: 99000"> 
+                      <div class="flex justify-center align-center wp100 " style="height: 100vh; z-index: 99000; position: fixed; top: 0px; left: 0vw; 
+                      background-color: ${op.background_color} ">
+                        <div class="flex justify-center align-center br3"style="  width: calc(300px + 25vw); max-width: 90%; 
+                          background-color: #f4f4f8; box-shadow: 0px 0px 8px 0px #0000004a; position: relative; top: -50px">                        
+                              ${op.texto}
+                        </div>
+                      </div>
+                    </div> `;
+          $(ctxG.content).append(alert);
+          $("[__alert]").show(300);
+        },
+        confirmarAnular() {
+          let op: any = {
+            background_color: '#00000060',
+            class_icon: '',
+            class_texto: '',
+            texto: /*html*/`
+                <div class="panel mn wp100"   style="">
+                  <div class="panel-heading h-50 bg-danger--20 text-fff ">
+                    <h5><i class="fa fa-send mr10"></i>Anular Formulario</h5>           
+                    <span class="glyphicons glyphicons-remove_2 p3 close fs15" style="position: absolute; top: 5px; right: 10px; color: inherit; text-shadow: none; opacity: 0.8"></span>     
+                  </div>
+                  <div class="panel-body">
+                    <div class="p20 fs14 bg-light text-center_ text-primary--60" style="text-align:justify; border-bottom: 1px solid #afafaf;" >
+                      <p>Si elimina el presente formulario ya no podrá recuperarlo. </p>
+                      <p>Esta acción quedará guardada en la base de datos, para efectos de control.</p>
+                    </div>
+                    <h4 class="text-center text-theme1--20 fw600">Desea anular el formulario ${ctxG.objFrmData.numero_formulario}? </h4>
+                    <div class="flex justify-evenly p10">
+                      <button __accion_form="close" class="btn bg-eee ph20 br6 br-a br-dark fs14"> Cerrar</button>
+                      <button __accion_form="save_anular" class="btn bg-danger-60 ph20 br6 br-a br-dark fs14"> Anular</button>
                     </div>
                   </div>
                 </div>`
@@ -783,11 +886,18 @@ export class Form101Component implements OnInit {
             if(accion == 'send'){
               funs.confirmar();
             }
+            if(accion == 'anular'){
+              funs.confirmarAnular();
+            }
             if (accion == 'home') {
               component.router.navigate(['listaforms'])
             }
             if(accion == 'save'){
               funs.save();
+              $(e.currentTarget).closest("[__alert]").remove();
+            }
+            if(accion == 'save_anular'){
+              funs.saveAnular();
               $(e.currentTarget).closest("[__alert]").remove();
             }
             if (accion == 'ver_form') {
@@ -850,11 +960,6 @@ export class Form101Component implements OnInit {
       let formInit = (() => {
         listeners();
         funs.verificaNuevoOEdicion();
-        // funs.cargarComboUserNims();
-
-        // funs.creaFormularioDatosCabecera();
-        // form.creaFormulario();
-
       })()
 
 

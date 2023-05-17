@@ -31,10 +31,10 @@ class FormularioController extends MasterController {
                                 AND f.estado_formulario = 'ACTIVO'
                                 AND u.id = {$id_usuario}
                                 order by n.id_formulario");
-
+		
 		return  response()->json([
 			'data'      => $user,
-			'status'   => 'ok'
+			'status'   => 'ok',
 		]);
 	}
 
@@ -43,48 +43,63 @@ class FormularioController extends MasterController {
 	 */
 	public function saveRespuestas(Request $req) {
 
+		/* Si esta activada la configuracion comprar_formularios y el usuaro no tiene forms vigentes no hace nada , y se sale */
+		if($this->getConfigs()->comprar_formularios == 1 && $this->getUserLogged()->formularios_disponibles <= 0){
+			return response()->json([
+				'status' => 'ok',
+				'msg' => 'No tiene creditos para enviar formularios nuevos. Debe adquirir creditos para envio de formularios'
+			]);		}
+
 		$id_usuario = $this->getUserLogged()->id;
 
+		if($req->accion == 'anular'){
+			\DB::table('forms_llenos')->where(['uid' => $req->uid, 'estado_form_lleno' => 'EMITIDO' ])->update(['estado_form_lleno' => 'ANULADO']);
+			return response()->json([
+				'status' => 'ok',
+				'msg' => 'Se realizó la anulación del formulario.'
+			]);
+		}
+
 		/** Obtiene el valor base de la configuracion  */
-		$numFormBase = ConfigController::getValorConfig('numero_formulario_base');
-		/**Obtiene el MAximo Numero deFormulario */
+		$numFormBase =$this->getConfigs()->numero_formulario_base;
+		/**Obtiene el MAximo Numero de Formulario */
 		$maxNumeroForm = collect(\DB::select("SELECT max(numero_formulario) as numero_formulario
                                         FROM forms_llenos"))->first()->numero_formulario;
 
 		$numeroFormulario = $maxNumeroForm + 1  > $numFormBase ? $maxNumeroForm + 1 : $numFormBase + 1;
 
 		$form_contestado                    = (object)[];
-		$form_contestado->id                = $req->id ?? null;
+		// $form_contestado->id                = $req->id ?? null;
 		$form_contestado->id_formulario     = $req->id_formulario;
 		$form_contestado->id_usuario        = $id_usuario; //Auth::user() ? Auth::user()->id : 0;
-		$form_contestado->numero_formulario = $numeroFormulario;
 		$form_contestado->tiempo_seg        = $req->tiempo_seg;
 		$form_contestado->estado_form_lleno = 'EMITIDO';
 		$form_contestado->ip                = $this->getIp();
-		$form_contestado->fecha_registro    = $this->now();
 		$form_contestado->nombres           = strtoupper(trim($req->nombres));
 		$form_contestado->apellidos         = strtoupper(trim($req->apellidos));
 		$form_contestado->razon_social      = strtoupper(trim($req->razon_social));
 		$form_contestado->nit               = $req->nit;
 		$form_contestado->nim               = $req->nim;
 		$form_contestado->id_municipio      = $req->id_municipio;
-		// $form_contestado->fecha_registro						= $this->now();
-		$form_contestado->uid   						= rand(1, 9999) . uniqid();
 
 
-		// //TODO:start QUITAR next code - solo es para hacer pasar sin guardar- para pruebas
-		// return (object)[
-		// 	'data'   => $form_contestado,
-		// 	'status' => "ok",
-		// 	'msg'    => 'Se guardó correctamente'
-		// ];
-		// //TODO:end
+		/* Campos que se llenen cuando es insert y cuanod es update */
+		($req->id) ? $form_contestado->uid = $req->uid                              : $form_contestado->uid = rand(1, 9999) . uniqid();
+		($req->id) ? $form_contestado->numero_formulario = $req->numero_formulario  : $form_contestado->numero_formulario = $numeroFormulario;
+		($req->id) ? $form_contestado->fecha_registro = $req->fecha_registro        : $form_contestado->fecha_registro = $this->now();
+		($req->id) ? $form_contestado->updated_at = $this->now()                    :  false;
+		($req->id) ? $form_contestado->updated_by = $id_usuario                     :  false;
+		
+		/* Si tiene Id es que esta modificando por lo tanto todos los que tienen el mismo UID (o sea el miso numero de form) 
+		se actualizan en MODIFICADO para que el nuevo registro  sea EMITIDO */
+		if($req->id)
+			\DB::table('forms_llenos')->where('uid', $req->uid)->update(['estado_form_lleno' => 'MODIFICADO']);
 
 		try {
 			$form_contestado->id              = $this->guardarObjetoTabla($form_contestado, 'forms_llenos');
+			
 			/* se recorren las respuestas */
-			if ($req->respuestas) {
-				
+			if ($req->respuestas) {				
 				foreach ($req->respuestas as $resp) {
 					$respuesta                          = (object)[];
 					$resp                               = (object)($resp);
@@ -98,6 +113,14 @@ class FormularioController extends MasterController {
 					$this->guardarObjetoTabla($respuesta, 'forms_llenos_respuestas');
 				}
 			}
+			
+			/**
+			 * Si no tiene id entonces es un nuevo formualario,
+			 * por lo tanto se debe descontar en en el usario el campo formularios_disponibles */
+			if(!isset($req->id) && $this->getConfigs()->comprar_formularios == 1){
+				\DB::table('users')->where(['id' => $id_usuario])->decrement('formularios_disponibles');
+			}
+
 		} catch (Exception $e) {
 			return (object)[
 				'status' => "error",
@@ -117,7 +140,8 @@ class FormularioController extends MasterController {
 	 */
 	public function formsLlenosUser(Request $req){
 		$id_usuario = $this->getUserLogged()->id;
-		$list = $this->formsLlenosQuery((object)['id_usuario' => $id_usuario]);
+		
+		$list = $this->formsLlenosQuery((object)['id_usuario' => $id_usuario, 'estado_form_lleno' => 'EMITIDO']);
 		return response()->json([
 			'data' => $list,
 			'status' => 'ok'
@@ -130,19 +154,25 @@ class FormularioController extends MasterController {
 	 */
 	private function formsLlenosQuery($obj){
 		$query = '';
-		$query .= isset($obj->id_usuario) ? " AND fl.id_usuario = {$obj->id_usuario} " : "";
-		$query .= isset($obj->uid) ? " AND fl.uid = '{$obj->uid}' " : "";
-		$query .= isset($obj->id_municipio) ? " AND fl.id_municipio = {$obj->id_municipio} " : "";
+		$query .= isset($obj->id_usuario)        ? " AND fl.id_usuario = {$obj->id_usuario} " : "";
+		$query .= isset($obj->id_municipio)      ? " AND fl.id_municipio = {$obj->id_municipio} " : "";
+		$query .= isset($obj->estado_form_lleno) ? " AND fl.estado_form_lleno = '{$obj->estado_form_lleno}' " : "";
 		// $query .= $obj->fecha_registro ? " AND fl.id_usuario = {$obj->id_usuario} " : "";
 		// $query .= $obj->id_usuario ? " AND fl.id_usuario = {$obj->id_usuario} " : "";
-
-		$dias_vigencia = ConfigController::getValorConfig('dias_vigencia');
+		$configs = $this->getConfigs();
+		$dias_vigencia = $configs->dias_vigencia;
+		$minutos_modificacion = $configs->minutos_para_modificacion > 0  ? $configs->minutos_para_modificacion : 60 * 24 * 365 * 1000; /* si es cero o negativo esta deshabilitado, se pone un numero grande de mins:  mins en 1000 años */
+		
+		// TODO: implementar en front los minutos demodificacion 
 		$formsLlenos  = collect(\DB::select(
-												"SELECT fl.*, 
+												"SELECT fl.* 
 													/* date_trunc('day', now()) - date_trunc('day', fl.fecha_registro) AS dias_transcurridos,*/
-													CASE WHEN CAST(EXTRACT(day from (date_trunc('day', now()) - date_trunc('day', fl.fecha_registro))) as integer) <= {$dias_vigencia}
-													THEN 1 ELSE 0  END AS vigencia ,
-													r.nombre as municipio, r.codigo_numerico as codigo_municipio, 
+													, CASE WHEN CAST(EXTRACT(day from (date_trunc('day', now()) - date_trunc('day', fl.fecha_registro))) as integer) <= {$dias_vigencia}
+													THEN 1 ELSE 0  END AS vigencia 
+													, EXTRACT(EPOCH FROM (now() - fl.fecha_registro)) / 60 AS minutos_pasados
+													, CASE WHEN EXTRACT(EPOCH FROM (now() - fl.fecha_registro)) / 60 <= {$minutos_modificacion}
+													THEN 1 ELSE 0 END AS puede_modificar
+													, r.nombre as municipio, r.codigo_numerico as codigo_municipio, 
 													f.nombre as tipo_formulario_nombre 
 													FROM forms_llenos fl, regiones r, formularios f
 													WHERE fl.id_municipio = r.id AND fl.id_formulario = f.id 
@@ -150,7 +180,6 @@ class FormularioController extends MasterController {
 													ORDER BY fl.id DESC"));
 
 		$formsLlenos->map(function ($formLleno, $k) {
-
 			$formLleno->respuestas = collect(\DB::select(
 																	"SELECT e.id as id_elemento, e.texto, e.tipo, e.alias, e.orden, 
 																			string_agg(fr.respuesta, ', ') as respuesta, 
@@ -164,7 +193,6 @@ class FormularioController extends MasterController {
 																			WHERE e.id_formulario = {$formLleno->id_formulario} 
 																			GROUP BY e.id, e.texto, e.tipo,  e.alias, e.orden
 																			ORDER BY e.orden"))->groupBy('alias');
-
 			return $formLleno;											
 		});
 	
@@ -177,16 +205,16 @@ class FormularioController extends MasterController {
 	 */
 	private function obtenerFormLlenoRespuestas($obj){
 		$form_lleno_uid = $obj->fluid;
-		$dias_vigencia = ConfigController::getValorConfig('dias_vigencia');
+		$dias_vigencia = $this->getConfigs()->dias_vigencia;
 		$formLleno  = collect(\DB::select(
 											"SELECT fl.*, 
 													/* date_trunc('day', now()) - date_trunc('day', fl.fecha_registro) AS dias_transcurridos,*/
 													CASE WHEN CAST(EXTRACT(day from (date_trunc('day', now()) - date_trunc('day', fl.fecha_registro))) as integer) <= {$dias_vigencia}
 													THEN 1 ELSE 0  END AS vigencia ,
-													r.nombre as municipio, r.codigo_numerico as codigo_municipio, f.nombre as tipo_formulario_nombre 
-													FROM forms_llenos fl, regiones r, formularios f
-													WHERE fl.id_municipio = r.id AND fl.id_formulario = f.id 
-													AND fl.uid = '{$form_lleno_uid}' "))->first();
+													r.nombre as municipio, r.codigo_numerico as codigo_municipio, f.nombre as tipo_formulario_nombre , u.formularios_disponibles
+													FROM forms_llenos fl, regiones r, formularios f, users u
+													WHERE fl.id_municipio = r.id AND fl.id_formulario = f.id and fl.id_usuario = u.id
+													AND fl.uid = '{$form_lleno_uid}' AND estado_form_lleno = 'EMITIDO'"))->first();
 									
 		/** Se agegan las respuestas al formulario lleno , se ordenan por los elementos para conseguir todas las preguntas y titulos etc, y se completan con LEFT JOIN con las respustas (aunque esten vacias se tendra el formulario completo con sus respuestas ) */
 		/** Si son varias respuestas , se las pone en forma de matriz para que tengan toda la informacion de cada opcion especialmente para la edicion del form */
@@ -232,7 +260,7 @@ class FormularioController extends MasterController {
 		if($id_usuario != $formLleno->id_usuario)
 			return response()->json([
 				'status' => 'error',
-				'msg' => 'El formulario no peretenece al usuario actual.'
+				'msg' => 'El formulario no pertenece al usuario actual.'
 			]);
 
 		return response()->json([

@@ -19,6 +19,7 @@ export class UAuthService {
     { name: "Adm. Usuarios",    redirectTo: "usuarios",            icon: "glyphicons glyphicons-group fa-lg ",      roles: [1] },
     { name: "Adm. Contenidos",  redirectTo: "gestion-contenidos",  icon: "fa fa-paperclip fa-lg ",                  roles: [1] },
     { name: "Editor de Form.",  redirectTo: "gestorforms",         icon: "glyphicons glyphicons-magic fa-lg ",      roles: [1] },
+    { name: "Configuración",    redirectTo: "configuracion",       icon: "glyphicons glyphicons-settings fa-lg ",   roles: [1] },
     { name: "Historial envíos", redirectTo: "listaforms",          icon: "glyphicons glyphicons-cargo fa-lg ",      roles: [3] },
     { name: "Formulario 101",   redirectTo: "form101",             icon: "glyphicons glyphicons-notes_2 fa-lg ",    roles: [3] },
     { name: "Noticias",         redirectTo: "contenidos",          icon: "fa fa-bullhorn fa-lg ",                   roles: [3] },

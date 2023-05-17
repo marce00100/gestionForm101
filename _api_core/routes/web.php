@@ -47,13 +47,17 @@ Route::group(['prefix' => 'api', 'middleware' => ['cors']], function () {
 	/** -- PARAMETROS - CONFIG - REGIONES - GENERALES*/
 
 	/** Funcion gral */
-	Route::post('datafrom',               [Config::class, 'dataFrom'])->middleware(['authorize:1|2|3']);
+	Route::post('datafrom',               [Config::class, 'dataFrom'])                   ->middleware(['authorize:1|2|3']);
 	/** Obtiene Provincias y Municipios de Chuqui*/
-	Route::get('municipiosch',            [Config::class, 'getMunicipiosCh'])->middleware(['authorize:1|2|3']);
+	Route::get('municipiosch',            [Config::class, 'getMunicipiosCh'])            ->middleware(['authorize:1|2|3']);
 	/** Solo Parámetros activos de un dominio */
 	Route::post('params-activos-dominio', [Config::class, 'getParametrosActivosDominio'])->middleware(['authorize:1|2|3']);
 	/** Todos los Parámetros de un dominio */
-	Route::post('params-dominio',         [Config::class, 'getParametrosDominio'])->middleware(['authorize:1|2|3']);
+	Route::post('params-dominio',         [Config::class, 'getParametrosDominio'])       ->middleware(['authorize:1|2|3']);
+	/** valor de un parametro con dominio */
+	Route::post('param-valor',         		[Config::class, 'getParametroValor'])           ->middleware(['authorize:1|2|3']);
+	/** guarda las configuraciones */
+	Route::post('save-configs',         	[Config::class, 'saveConfigs'])                 ->middleware(['authorize:1|2|3']);
 
 
 	/** -- GESTION FORMULARIOS */

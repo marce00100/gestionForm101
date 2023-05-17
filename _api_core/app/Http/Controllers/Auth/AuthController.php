@@ -26,10 +26,10 @@ class AuthController extends MasterController {
 		/** Verifica con el usuario y password */
 		$username = trim(strtolower($request->username));
 		try {
-			if (!Auth::attempt(['username' => $username, 'password' => $request->password])){
+			if (!Auth::attempt(['username' => $username, 'password' => $request->password, 'estado_usuario' => 'ACTIVO' ])) {
 				return response()->json([
 					'status' => 'error',
-					'msg' => 'Las Credenciales de autenticación son incorrectas.'
+					'msg' => 'Las Credenciales de autenticación son incorrectas. O el usuario no existe.'
 				]);
 			}
 			
@@ -41,6 +41,8 @@ class AuthController extends MasterController {
 
 			/** Para inicializar el objeto tokenUserInfo */
 			$this->tokenUserInfo =  AuthController::verifyUserToken($newToken);
+
+			// if()
 
 			$user = (object)[
 				'username'       => $user->username,
@@ -66,6 +68,7 @@ class AuthController extends MasterController {
 		} 
 		catch (Exception $th) {
 			return response()->json([
+				'status' => 'error',
 				'msg' => $th->getMessage()
 			]);
 		}

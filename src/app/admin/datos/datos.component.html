@@ -38,34 +38,45 @@
 
             <div class="br8 mv10  bg-light dark "
               style=" border: 1px solid lightgray; width: 90%;  margin: 10px auto;">
-              <div class="fs12" style="display:grid; grid-template-columns: 1fr 1fr 1fr ; gap: 10px; 
-                        justify-items: end; width: 90%; margin: 20px auto; ">
+              <div class="fs12" style="display:flex; flex-wrap: wrap; gap: 10px; 
+                        justify-content: center; width: 90%; margin: 20px auto; ">
 
-                <div class="bg-ddd p10 br8 text-center" style="grid-column: 1 / span 4;     justify-self: center;">
+                <div class="bg-ddd p10 br8 text-center" style="flex-basis: 100%; ">
                   <button __accion_datos="sincronizar_tabla" class="btn btn-sm mt5 bg-marron br-a br-dark br6 ">Actualizar
                     tabla de consolidados</button>
                   <div><em>Actualizar con la información de formularios llenados mas recientes. Este proceso se lo debe realizar cada que necesite información actualizada.</em></div>
                 </div>
-                <h2 style=" margin: 0;   grid-column: 1 / span 4; justify-self: start;">Filtrar
+                <h2 style=" margin: 0;  flex-basis: 100%; justify-content: start;">Filtrar
                 </h2>
-                <div class="pw100">
+                <div class="pw100" style="flex-basis: 30; flex-grow: 1;">
                   <span>Municipio</span>
                   <select __filtro=municipio class="w200 form-control"
                     name="" id="" placeholder="Departamento"></select>
                 </div>
-                <div class="pw100" style=" grid-column: 2 / span 3; justify-self: start;">
-                  <span>Operadores Mineros</span>
+                <div class="pw100" style="flex-basis: 60%; flex-grow: 2;">
+                  <span>Razon Social/Operadores Mineros</span>
                   <select __filtro=id_usuario class="pw80 form-control" name="" id="" placeholder=""></select>
                 </div>
-                <div class="pw100"><span>Tipo Formulario</span>
+                
+                
+                <div class="pw100" style="flex-basis: 30; flex-grow: 1;"><span>Tipo Formulario</span>
                   <select __filtro=tipo_formulario class="w200 form-control"
                     name="" id="" placeholder="tipo formulario">
                   </select>
                 </div>
-                <div class="pw100"><span>Fecha Desde (incluye)</span> 
+                <div class="pw100" style="flex-basis: 60%; flex-grow: 2;">
+                  <span>Ingenio minero o Comercializadora</span>
+                  <input __filtro=ingenio_minero class="pw80 form-control" name="" id="" placeholder="">
+                </div>
+                <div class="pw100" style="flex-basis: 30; flex-grow: 1;">
+                  <span>Estado</span>
+                  <select __filtro=estado_form_lleno class="w200 form-control"
+                    name="" id="" placeholder=""></select>
+                </div>
+                <div class="pw100" style="flex-basis: 30; flex-grow: 1;"><span>Fecha Desde (incluye)</span> 
                   <input __filtro=fecha_desde class="w200 form-control" type="date" placeholder="desde">
                 </div>
-                <div class="pw100"><span>Fecha Hasta (incluye)</span> 
+                <div class="pw100" style="flex-basis: 30; flex-grow: 1;"><span>Fecha Hasta (incluye)</span> 
                   <input __filtro=fecha_hasta class="w200 form-control" type="date" placeholder="hasta">
                 </div>
               </div>
@@ -89,7 +100,7 @@
                 </div>
               </div>
               <div>
-                <table __datos_respuestas id="dataT" class=" hover row-border tabla-head bg-table" style="margin: 0 0 40px 0">
+                <table __datos_respuestas id="dataT" class=" hover row-border tabla-head bg-table" style="margin: 0 0 40px 0; width: 100%;">
 								</table>
                 <!-- <div __datos_respuestas id="dataT" style="margin: 0 0 40px 0"></div> -->
               </div>

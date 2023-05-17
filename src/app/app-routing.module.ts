@@ -23,6 +23,7 @@ import { UsersComponent }             from './admin/usuarios/usuarios.component'
 import { GestorFormsComponent }       from './admin/gestorforms/gestorforms.component';
 import { GestionContenidosComponent } from './admin/gestion-contenidos/gestion-contenidos.component';
 import { DatosComponent }             from './admin/datos/datos.component';
+import { ConfigComponent }            from './admin/config/config.component';
 
 
 const routes: Routes = [
@@ -33,17 +34,18 @@ const routes: Routes = [
   { path: 'verformulario/:uid', component: ViewformComponent },
 
   /** rutas operador */
-  { path: 'form101',         component: Form101Component,         canActivate: [PuertaAuthGuard] },
-  { path: 'form101/:uid',    component: Form101Component,         canActivate: [PuertaAuthGuard] },
-  { path: 'listaforms',      component: ListaformsComponent,      canActivate: [PuertaAuthGuard] },
-  { path: 'listaforms/:uid', component: ListaformsComponent,      canActivate: [PuertaAuthGuard] },
-  { path: 'contenidos',      component: VisorContenidosComponent, canActivate: [PuertaAuthGuard] },
+  { path: 'form101',                 component: Form101Component,         canActivate: [PuertaAuthGuard] },
+  { path: 'form101/:uid/:accion',    component: Form101Component,         canActivate: [PuertaAuthGuard] },
+  { path: 'listaforms',              component: ListaformsComponent,      canActivate: [PuertaAuthGuard] },
+  { path: 'listaforms/:uid',         component: ListaformsComponent,      canActivate: [PuertaAuthGuard] },
+  { path: 'contenidos',              component: VisorContenidosComponent, canActivate: [PuertaAuthGuard] },
 
   /** rutas admin */  
   { path: 'gestorforms',        component: GestorFormsComponent,       canActivate: [PuertaAuthGuard, PuertaNivel1] },
   { path: 'usuarios',           component: UsersComponent,             canActivate: [PuertaAuthGuard, PuertaNivel1] },
   { path: 'gestion-contenidos', component: GestionContenidosComponent, canActivate: [PuertaAuthGuard, PuertaNivel1] },
   { path: 'seguimientoforms',   component: DatosComponent,             canActivate: [PuertaAuthGuard, PuertaNivel1] },
+  { path: 'configuracion',      component: ConfigComponent,            canActivate: [PuertaAuthGuard, PuertaNivel1] },
   
   { path: '**', redirectTo: 'login' }
 ];

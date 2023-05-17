@@ -11,7 +11,7 @@ class MasterController extends Controller {
 	private $keySession = 'usuario';
 
 	/**
-	 * 
+	 * Crea la variable de session del idusuario
 	 */
 	public function setUserLogged($idUser){
 		if(!$idUser){
@@ -28,7 +28,7 @@ class MasterController extends Controller {
 	} 
 
 	/**
-	 * Retorna la sesion del Ussuario Logged
+	 * Retorna la sesion del Ussuario Logged, esta contiene todos los campos del usuario SELECT * fro users
 	 */
 	public function getUserLogged(){
 		return session($this->keySession);
@@ -147,10 +147,8 @@ class MasterController extends Controller {
 		return date("Y-m-d H:i:s", time() - 4 * 60 * 60);
 	}
 
-
-	protected function obtenerUsuario($id) {
-		$usuario = collect(\DB::select("SELECT u.id, u.codigo_entidad, u.id_rol, r.rol FROM usuarios u, roles r WHERE u.id_rol = r.id AND u.id = {$id}"))->first();
-		return $usuario;
+	protected function getConfigs(){
+		return \App\Http\Controllers\Config\ConfigController::configs();
 	}
 
 }

@@ -10,14 +10,16 @@ import { UsersComponent }             from './usuarios/usuarios.component';
 import { GestorFormsComponent }       from './gestorforms/gestorforms.component';
 import { GestionContenidosComponent } from './gestion-contenidos/gestion-contenidos.component';
 import { DatosComponent }             from './datos/datos.component';
+import { ConfigComponent }            from './config/config.component';
 
 @NgModule({
   declarations: [
-    AdminComponent,
+    // AdminComponent,
     UsersComponent,
     GestorFormsComponent,
     GestionContenidosComponent,
-    DatosComponent
+    DatosComponent,
+    ConfigComponent
 
   ],
   imports: [

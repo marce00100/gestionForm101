@@ -104,10 +104,10 @@ export class SFormService {
   public htmlRenderDatosGeneral(objFrm){
     let fecha_registro =  moment(objFrm.fecha_registro ? objFrm.fecha_registro : Date.now()).format('DD/MM/YYYY');
 
-    let htmlNombres = !_.isEmpty(objFrm.nombres) ? /*html*/`<span style="font-weight:400; font-size:0.8em">Nombre: </span> <span>${objFrm.nombres} ${objFrm.apellidos}</span>` : '';
-    let saltoLinea = !_.isEmpty(htmlNombres) && !_.isEmpty(objFrm.razon_social) ? "<br>" : "";
-    htmlNombres += !_.isEmpty(objFrm.razon_social) ? /*html*/`${saltoLinea}<span style="font-weight:400; font-size:0.8em">Razón Social: </span> <span>${objFrm.razon_social}</span>` : '';
-    // $("[__info_general=nombres]").html(htmlNombres);    
+    // let htmlNombres = !_.isEmpty(objFrm.nombres) ? /*html*/`<span style="font-weight:400; font-size:0.8em">Nombre: </span> <span>${objFrm.nombres} ${objFrm.apellidos}</span>` : '';
+    // let saltoLinea = !_.isEmpty(htmlNombres) && !_.isEmpty(objFrm.razon_social) ? "<br>" : "";
+    // htmlNombres += !_.isEmpty(objFrm.razon_social) ? /*html*/`${saltoLinea}<span style="font-weight:400; font-size:0.8em">Razón Social: </span> <span>${objFrm.razon_social}</span>` : '';
+    let htmlNombres = /*html*/`<span style="font-weight:400; font-size:0.8em">Razón Social: </span> <span>${!_.isEmpty(objFrm.razon_social) ? objFrm.razon_social : 'No aplica'}</span>`;
 
     let htmlProcedencia = /*html*/`<span>CHUQUISACA</span>`;         
     htmlProcedencia += (objFrm.municipio) ? /*html*/`<br>Municipio: <span>${objFrm.municipio} - Cód. Mun.: <span>${objFrm.codigo_municipio} </span>` : '';

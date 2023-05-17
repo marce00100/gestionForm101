@@ -164,6 +164,8 @@ class DatosController extends MasterController {
 		$condiciones .= isset($filtro->fecha_reg_desde) && $filtro->fecha_reg_desde != ''   ? " AND fecha_registro >= '{$filtro->fecha_reg_desde}' " : "";
 		$condiciones .= isset($filtro->fecha_reg_hasta) && $filtro->fecha_reg_hasta != ''   ? " AND fecha_registro <= '{$filtro->fecha_reg_hasta} 11:59:59' " : "";
 		$condiciones .= isset($filtro->id_usuario)      && $filtro->id_usuario      != ''   ? " AND id_usuario = '{$filtro->id_usuario}' " : "";
+		$condiciones .= isset($filtro->estado_form_lleno)  && $filtro->estado_form_lleno != ''   ? " AND estado_form_lleno = '{$filtro->estado_form_lleno}' " : "";
+		$condiciones .= isset($filtro->ingenio_minero)  && $filtro->ingenio_minero  != ''   ? " AND ingenio_minero ilike '%{$filtro->ingenio_minero}%' " : "";
 
 		$campos = collect(\DB::select("SELECT '\"' || c.column_name || '\"' as campo FROM information_schema.columns As c
 																			WHERE table_name = '{$nombreTabla}' 

@@ -56,13 +56,13 @@ export class ListaformsComponent implements OnInit {
   }
 
   /**
-   * Cuando se presiona en el boton de nuevo form o editar
+   * Cuando se presiona en el boton de nuevo form o editar o anular
    */
-  irFormulario101(uid = false) {
+  irFormulario101(uid = false, accion = false) {
     if (uid === false)
       this.router.navigate(['form101'])
     if (uid)
-      this.router.navigate(['form101/' + uid])
+      this.router.navigate(['form101/' + uid + '/' + accion])
   }
 
   /**
@@ -213,9 +213,9 @@ export class ListaformsComponent implements OnInit {
 
             if (accion == 'nuevo')
               cmp.irFormulario101();
-            if (accion == 'editar') {
+            if (accion == 'editar' || accion == 'anular') {
               let uid = $(e.currentTarget).attr('__uid_form_lleno');
-              cmp.irFormulario101(uid)
+              cmp.irFormulario101(uid, accion)
             }
             if (accion == 'mostrar') {
               let uid = $(e.currentTarget).attr('__uid_form_lleno');

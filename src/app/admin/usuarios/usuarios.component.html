@@ -46,7 +46,7 @@
 								</div>
 							</div>
 							<div class="">
-								<table __users_list id="dataT" class=" hover row-border tabla-head bg-table" style="margin: 0 0 40px 0">
+								<table __users_list id="dataT" class=" hover row-border tabla-head bg-table" style="margin: 0 0 40px 0; width: 100%">
 								</table>
 							</div>
 						</div>
@@ -126,7 +126,16 @@
 
 									</div>
 									<!-- END CUADRO de NIMs asociados -->
-
+									<!-- Numero de formularios disponibles -->
+									<div class="flex justify-center bg-light dark_ br-a br-greyer mt20 p20 br6 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10 col-xs-12" __formularios_disponibles_section>
+										<div  class="fw600 flex justify-center">
+											<span>Número de formularios disponibles: </span>
+											<span __formularios_disponibles_label class="ph15 bg-success-40 br8 ml20 fs14"></span>
+										</div>
+										<div class="mt5 flex justify-center">
+											<span>Agregar N formularios: </span><input type="number" __field_formularios_disponibles class="p5 ph10">
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -135,7 +144,7 @@
 					<div class="panel-footer flex flex-wrap justify-evenly">
 						<div __error class="wp100"></div>
 						<!-- CON ICONOS -->
-						<button __cerrar class="btn bg-danger lighter br-a br-dark-light br6 btn-md w150 ">Cancelar</button>
+						<button __cerrar class="btn bg-danger lighter br-a br-dark-light br6 btn-md w150 ">Cerrar</button>
 						<button __save type="submit" class="btn btn-primary br-a br-dark-light btn-md br6 w200">Guardar</button>
 					</div>
 				</div>

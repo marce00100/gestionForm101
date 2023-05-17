@@ -17,9 +17,10 @@ class UsuariosController extends MasterController {
 	 * GET Obtiene una lista de USUARIOS con sus roles
 	 */
 	public function getUsuarios(Request $req) {
+
 		$usuariosList = collect(\DB::select("SELECT u.id as id_usuario, u.username, u.email, u.nombres, u.apellidos, u.carnet, u.nit, u.razon_social
                                     , u.estado_usuario, u.fecha_registro, u.numero_celular, u.nit
-                                    , u.id_rol, r.rol 
+                                    , u.id_rol, r.rol , u.formularios_disponibles
                                     FROM users u 
                                     LEFT JOIN roles r ON u.id_rol = r.id ORDER BY u.fecha_registro desc "));
 
@@ -36,7 +37,7 @@ class UsuariosController extends MasterController {
 	public function getUser(Request $req) {
 		$user = collect(\DB::select("SELECT u.id as id_usuario, u.username, u.email, u.nombres, u.apellidos, u.carnet, u.nit, u.razon_social
                                 , u.estado_usuario, u.fecha_registro, u.numero_celular
-                                , u.id_rol, r.rol 
+                                , u.id_rol, r.rol, u.formularios_disponibles
                                 FROM users u 
                                 LEFT JOIN roles r ON u.id_rol = r.id
                                 WHERE u.id = {$req->id_usuario}"))->first();
@@ -72,6 +73,8 @@ class UsuariosController extends MasterController {
 		/** Encaso de ser update no deben actualizarse los siguiente */
 		!($req->id_usuario) ? $userObj->fecha_registro = $this->now() : false; 
 
+
+
 		/* Verifica si existe otra coincidencia de email o username con los demas users, para ello se toman solo losIDs diferentes del actual,
         Si no tiene id, se toma un numero negativo para comparar con los demas usuarios, porque con valor null no selecciona nada  */
 		$id_user_verificacion = isset($userObj->id) ? $userObj->id : -9999;
@@ -88,6 +91,14 @@ class UsuariosController extends MasterController {
 		/* Solo si se ha modificado el password */
 		if (isset($req->password))
 			$userObj->password = bcrypt($req->password);
+
+		/* Actualiza el numero de formularios disponiles*/
+		$numeroFormsDisponiblesUser = 0;
+		if($req->id_usuario){
+			$user = collect(\DB::select("SELECT * from users where id = $req->id_usuario"))->first();
+			$numeroFormsDisponiblesUser = isset($user) ?  $user->formularios_disponibles : 0;
+		}
+		$userObj->formularios_disponibles = $numeroFormsDisponiblesUser + ($req->formularios_disponibles ?? 0);
 
 		$userObj->id_usuario = $this->guardarObjetoTabla($userObj, 'users');
 
@@ -107,7 +118,7 @@ class UsuariosController extends MasterController {
 		}
 
 		$user = collect(\DB::select("SELECT u.id as id_usuario, u.username, u.email, u.nombres, u.apellidos, u.carnet, u.nit, u.razon_social
-                                , u.estado_usuario, u.fecha_registro, u.numero_celular
+                                , u.estado_usuario, u.fecha_registro, u.numero_celular, u.formularios_disponibles
                                 , u.id_rol, r.rol 
                                 FROM users u 
                                 LEFT JOIN roles r ON u.id_rol = r.id
@@ -156,21 +167,18 @@ class UsuariosController extends MasterController {
 
 
 	/** POST Envia mesajes SMS a traves una conexion con celular por la misma red.
-	 * TODO paramtrizar
+	 * 
 	 */
 	public function sms(Request $req) {
 		$mensaje = $req->mensaje;
 		$celular = $req->numero_celular;
 
-		// return response()->json([
-		// 	'data' => $celular,
-		// 	'msg' => $mensaje
-		// ]);
+		$serverSMS = $this->getConfigs()->server_sms;
 
 		//open connection
 		$ch = curl_init();
 
-		curl_setopt($ch, CURLOPT_URL, "http://192.168.1.247:8081/sendSMS");
+		curl_setopt($ch, CURLOPT_URL, "{$serverSMS}/sendSMS");
 		curl_setopt($ch, CURLOPT_POST, true);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
 			array(
