@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { SFormService } from 'src/app/shared/sform.service';
 import { UAuthService } from 'src/app/shared/uauth.service';
 declare var $: any;
 declare var _: any;
@@ -14,17 +15,30 @@ declare var moment: any;
 })
 export class DatosComponent implements OnInit {
 
-  constructor(private uAuth: UAuthService) { }
+  constructor(
+    private uAuth: UAuthService,
+    public sform: SFormService
+  ) { }
 
   ngOnInit() {
     this.seguimiento();
+  }
+
+  /**
+   * Muestra mensaje temporal de .. Copiado al CLipboard
+   */
+  mostrarCopiado(){
+    let el = $("[__copyUrl] [__copiado]");
+    el.fadeIn(400);
+    setTimeout(() => {
+      el.fadeOut(300);
+    }, 2000);
   }
 
   seguimiento() {
     let cmp = this;
 
     $(function () {
-
       let ctxG: any = {
         rutabase: xyzFuns.urlRestApi,
         contenedor: '#datos_contenedor',
@@ -46,11 +60,24 @@ export class DatosComponent implements OnInit {
         //     });
         // },
         fillDataT: function (columnas, data) {
+
           let columns = [];
           _.forEach(columnas, function (col) {
             columns.push({ title: col, data: col, width: '120' });
+            
           });
-
+          columns.unshift({
+            title: '_', sort: false, width: 100, className: 'dt-head-center',
+            render: function (data, type, row, meta) {
+              let segRestantesServer = row.segundos_restantes_modificacion;
+              let buttonVer = /*html*/
+                `<div __accion_datos="mostrar_form" __uid_form_lleno=${row.uid}
+                        style="display: inline-flex; align-items: center "class="p5 h-40 text-dark bg-eee text-fff mr5 mt5 br6 br-a br-greyer cursor " title="Ver">
+                        <i class="fa fa-tag fa-lg mr5"></i> ver </div>`;
+              return buttonVer;
+            }
+          })
+          
           conT.dt = $(ctxG.dataTableTarget).DataTable({
                     destroy: true,
                     data: data,
@@ -58,6 +85,7 @@ export class DatosComponent implements OnInit {
                     // info:true,
                     scrollX: true,
                     className: 'fs-10',
+                    order: [[ 1, "desc" ],[9,'desc']],
                     columns: columns,
                     language: xyzFuns.dataTablesEspanol(),        
                   });
@@ -186,9 +214,24 @@ export class DatosComponent implements OnInit {
           })
         },
 
+        mostrar_form: (uid_form_lleno) => {
+          funs.spinner();
+          $.get(`${ctxG.rutabase}/form-lleno-resp`, { fluid: uid_form_lleno }, (resp) => {
+            ctxG.formllenoSel = resp.data;
+            cmp.sform.renderFormLlenoCompleto("[__frm_content]", ctxG.formllenoSel)
+            // cmp.renderformLlenoCompleto("[__frm_content]", ctxG.formllenoSel);
+            xyzFuns.showModal("#modalFormLleno");
+            funs.spinner(false);
+          })
+        },
+
         cerrarModal: () => {
           $.magnificPopup.close();
-        }
+        },
+
+        spinner: (obj = {}) => {
+          xyzFuns.spinner(obj, ctxG.content)
+        },
 
       }
     
@@ -200,8 +243,12 @@ export class DatosComponent implements OnInit {
         $('#datos_contenedor')
 
           .on('click', '[__accion_datos]', function (e) {
-            var elem = e.currentTarget;
-            funs[$(elem).attr('__accion_datos')](); 
+            var accion = $(e.currentTarget).attr('__accion_datos');
+            console.log(accion)
+            if(accion =='mostrar_form')
+              funs.mostrar_form($(e.currentTarget).attr('__uid_form_lleno'));
+            else
+              funs[accion]();
           })
           .on('click', '[__configuracion_alias]', function(){
             $("[__configuracion_alias_cuadro]").toggle(300);

@@ -139,11 +139,14 @@ class FormularioController extends MasterController {
 	 * POST LISTA DE FORMULARIOS LLENOS del USUARIO   segun parametros
 	 */
 	public function formsLlenosUser(Request $req){
+		$tiempoIni = microtime(true);
 		$id_usuario = $this->getUserLogged()->id;
 		
 		$list = $this->formsLlenosQuery((object)['id_usuario' => $id_usuario, 'estado_form_lleno' => 'EMITIDO']);
+
 		return response()->json([
 			'data' => $list,
+			'tiempo'=> microtime(true)- $tiempoIni,
 			'status' => 'ok'
 		]);
 
@@ -161,23 +164,43 @@ class FormularioController extends MasterController {
 		// $query .= $obj->id_usuario ? " AND fl.id_usuario = {$obj->id_usuario} " : "";
 		$configs = $this->getConfigs();
 		$dias_vigencia = $configs->dias_vigencia;
-		$minutos_modificacion = $configs->minutos_para_modificacion > 0  ? $configs->minutos_para_modificacion : 60 * 24 * 365 * 1000; /* si es cero o negativo esta deshabilitado, se pone un numero grande de mins:  mins en 1000 años */
+		/* se obtiene el valor del parametro de configuracion minutos_para modificar, si este es menor o igual que 0 entonces no esta habilitada esta opcion */
+		$minutos_modificacion = $configs->minutos_para_modificacion; 
 		
-		// TODO: implementar en front los minutos demodificacion 
 		$formsLlenos  = collect(\DB::select(
-												"SELECT fl.* 
-													/* date_trunc('day', now()) - date_trunc('day', fl.fecha_registro) AS dias_transcurridos,*/
-													, CASE WHEN CAST(EXTRACT(day from (date_trunc('day', now()) - date_trunc('day', fl.fecha_registro))) as integer) <= {$dias_vigencia}
-													THEN 1 ELSE 0  END AS vigencia 
-													, EXTRACT(EPOCH FROM (now() - fl.fecha_registro)) / 60 AS minutos_pasados
-													, CASE WHEN EXTRACT(EPOCH FROM (now() - fl.fecha_registro)) / 60 <= {$minutos_modificacion}
-													THEN 1 ELSE 0 END AS puede_modificar
-													, r.nombre as municipio, r.codigo_numerico as codigo_municipio, 
-													f.nombre as tipo_formulario_nombre 
-													FROM forms_llenos fl, regiones r, formularios f
-													WHERE fl.id_municipio = r.id AND fl.id_formulario = f.id 
-													{$query} 
-													ORDER BY fl.id DESC"));
+										"SELECT fl.id as id_form_lleno, fl.id_formulario, fl.id_usuario, fl.numero_formulario, 
+												fl.estado_form_lleno, fl.fecha_registro, /* fl.nombres, fl.apellidos, fl.razon_social,*/ 
+												fl.nim, fl.uid 
+												/* Comprueba si esta vigente el formulario  segun el parametro  dias_vigencia de configuracion */
+												, CASE WHEN CAST(EXTRACT(day from (date_trunc('day', now()) - date_trunc('day', fl.fecha_registro))) as integer) <= {$dias_vigencia}
+														then 1 else 0  end as vigencia 
+
+												/* Dato que muestra la configuracon del parametro minutos_para_modificacion */		
+												, {$minutos_modificacion} AS config_minutos_para_modificacion    
+												/* Comprueba si puede modificar, si minutos_modificacion es menor o igual a 0 , no esta habilitada esta
+												*  opcion, por lo tanto puede modificar mientras este vigente, o si tiene segundos_restantes_modificacion  
+												* devuelve 1, si no puede modificar duelve 0
+												* ({$minutos_modificacion} * 60 -EXTRACT(EPOCH FROM (now() - fl.fecha_registro)) obtiene el tiempo restante en segs
+												*/
+												, CASE WHEN {$minutos_modificacion} <= 0 
+																		or ({$minutos_modificacion} * 60 - EXTRACT(EPOCH FROM (now() - fl.fecha_registro)) > 0 )
+														THEN 1 ELSE 0 END AS puede_modificar
+												/** Calcula el tiempo restante para modificar.
+												* si el valor del parametro minutos_para_modificacion >  0 esta habilitada, 
+												* entonces se calcula el tiempo restante en segundos , si es negativo ya no deberia poder modificar,  
+												*  si minutos_para_modificacion es <= 0 devuelve null
+												*/
+												, CASE WHEN {$minutos_modificacion} > 0 
+														THEN {$minutos_modificacion} * 60 - ROUND(EXTRACT(EPOCH FROM (now() - fl.fecha_registro)))
+														ELSE null END
+														AS segundos_restantes_modificacion
+
+												, r.nombre as municipio, r.codigo_numerico as codigo_municipio, 
+												f.nombre as tipo_formulario_nombre 
+										FROM forms_llenos fl, regiones r, formularios f
+										WHERE fl.id_municipio = r.id AND fl.id_formulario = f.id 
+										{$query} 
+										ORDER BY fl.id DESC"));
 
 		$formsLlenos->map(function ($formLleno, $k) {
 			$formLleno->respuestas = collect(\DB::select(
@@ -189,7 +212,7 @@ class FormularioController extends MasterController {
 																			-- fr.respuesta, fr.respuesta_opcion, 
 																			-- fr.dimensiones, fr.nombre_dimension, fr.valor_dimension
 																			FROM elementos e  
-																			LEFT JOIN forms_llenos_respuestas fr on e.id = fr.id_elemento AND fr.id_form_lleno =  {$formLleno->id} 
+																			LEFT JOIN forms_llenos_respuestas fr on e.id = fr.id_elemento AND fr.id_form_lleno =  {$formLleno->id_form_lleno} 
 																			WHERE e.id_formulario = {$formLleno->id_formulario} 
 																			GROUP BY e.id, e.texto, e.tipo,  e.alias, e.orden
 																			ORDER BY e.orden"))->groupBy('alias');
@@ -207,18 +230,19 @@ class FormularioController extends MasterController {
 		$form_lleno_uid = $obj->fluid;
 		$dias_vigencia = $this->getConfigs()->dias_vigencia;
 		$formLleno  = collect(\DB::select(
-											"SELECT fl.*, 
+											"SELECT fl.* 
 													/* date_trunc('day', now()) - date_trunc('day', fl.fecha_registro) AS dias_transcurridos,*/
-													CASE WHEN CAST(EXTRACT(day from (date_trunc('day', now()) - date_trunc('day', fl.fecha_registro))) as integer) <= {$dias_vigencia}
+													, CASE WHEN CAST(EXTRACT(day from (date_trunc('day', now()) - date_trunc('day', fl.fecha_registro))) as integer) <= {$dias_vigencia}
 													THEN 1 ELSE 0  END AS vigencia ,
-													r.nombre as municipio, r.codigo_numerico as codigo_municipio, f.nombre as tipo_formulario_nombre , u.formularios_disponibles
-													FROM forms_llenos fl, regiones r, formularios f, users u
-													WHERE fl.id_municipio = r.id AND fl.id_formulario = f.id and fl.id_usuario = u.id
-													AND fl.uid = '{$form_lleno_uid}' AND estado_form_lleno = 'EMITIDO'"))->first();
+													r.nombre as municipio, r.codigo_numerico as codigo_municipio, f.nombre as tipo_formulario_nombre , 
+													u.formularios_disponibles
+											FROM forms_llenos fl, regiones r, formularios f, users u
+											WHERE fl.id_municipio = r.id AND fl.id_formulario = f.id and fl.id_usuario = u.id
+											AND fl.uid = '{$form_lleno_uid}' AND estado_form_lleno = 'EMITIDO'"))->first();
 									
 		/** Se agegan las respuestas al formulario lleno , se ordenan por los elementos para conseguir todas las preguntas y titulos etc, y se completan con LEFT JOIN con las respustas (aunque esten vacias se tendra el formulario completo con sus respuestas ) */
 		/** Si son varias respuestas , se las pone en forma de matriz para que tengan toda la informacion de cada opcion especialmente para la edicion del form */
-		$respuestas = collect(\DB::select("SELECT e.id as id_elemento, e.texto, e.descripcion, e.tipo, e.orden, e.config, 
+		$respuestas = collect(\DB::select("SELECT e.id as id_elemento, e.texto, e.descripcion, e.tipo, e.orden, e.config, e.alias,
 																	-- string_agg(fr.respuesta, ', ') as respuesta, 
 																	-- string_agg(concat(fr.respuesta, ' ', fr.nombre_dimension, ' ', fr.valor_dimension), ', ') as respuesta_dimension ,
 																	-- count(e.id) as cantidad,

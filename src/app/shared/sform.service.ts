@@ -66,7 +66,7 @@ export class SFormService {
           ${this.htmlRenderDatosGeneral(objFrm)}
         </div>
         
-        <div __card __frm_datos_respuestas class=" mt10 flex flex-wrap align-start">
+        <div __card __frm_datos_respuestas class=" mt10 flex flex-wrap align-start_">
           ${this.htmlRenderRespuestas(objFrm.respuestas)}
         </div>
         <div __card __sellos class="flex justify-between mt30">
@@ -157,31 +157,50 @@ export class SFormService {
     let time = Date();
 
     _.forEach(respuestas, function (resps, k) {
-      let elemObj = resps[0]; 
+      let respFirstObj = resps[0]; 
 
-      if(elemObj.tipo == 'titulo'){
-        htmlResp += /* html*/`<h3 class="wp100 quest-titulo">${elemObj.texto}</h3>`
+      if(respFirstObj.tipo == 'titulo'){
+        htmlResp += /* html*/`<h3 class="wp100 quest-titulo">${respFirstObj.texto}</h3>`
       }
-      if(elemObj.tipo == 'pregunta'){
-        let cnfElem = JSON.parse(elemObj.config) || {};
-        /* Si tiene dimensiones muestra la respuesta con dimensiones */
-        // let respuesta = elemObj.valores_dimension.length > 0 ? elemObj.respuesta_dimension : elemObj.respuesta || '';
+      if(respFirstObj.tipo == 'pregunta'){
+        let cnfElem = JSON.parse(respFirstObj.config) || {};
 
-        /* si es arraydeuno*/
-        let respuesta = resps.length == 1 ? resps[0].respuesta ?? '' 
-          : _.chain(resps)
-          .sortBy('id_form_lleno_respuesta')
-          .reduce( 
-            function (result, resp) { 
-              let item = resp.respuesta;
-              if ((resp.nombre_dimension && resp.nombre_dimension.length > 0) && (resp.valor_dimension && resp.valor_dimension.length > 0))
-                item += ` ${resp.valor_dimension}(${resp.nombre_dimension})`;
-              
-            return result + `${item}, `}, '');
-        
+        /* CASO PREGUNTA NORMAL */
+        let respuesta = respFirstObj.respuesta ? respFirstObj.respuesta.trim() : '' ;
+
+        /**  CASOS ESPECIALES   */
+        /** si es mineral puede ser array mas de uno, y ademas de que si esta vacio el valor_dimension llenarlo a mano con espacio de linea punteada vacia */
+        if (respFirstObj.alias == 'mineral') {
+          respuesta = _.chain(resps)
+            .sortBy('id_form_lleno_respuesta')
+            .reduce(
+              function (result, resp) {
+                let item = resp.respuesta;                
+                /* Si tiene dimensiones muestra la respuesta con dimensiones */
+                if ((resp.nombre_dimension && resp.nombre_dimension.length > 0) && (resp.valor_dimension && resp.valor_dimension.length > 0))
+                  item += ` ${resp.valor_dimension}(${resp.nombre_dimension})`;
+                /* Para crear cuadros vacios para completer una vez impreso */
+                if ((resp.nombre_dimension && resp.nombre_dimension.length > 0) && (!resp.valor_dimension || resp.valor_dimension.length == 0))
+                  item += ` ________(${resp.nombre_dimension})`;
+
+                return result + `${item}, `
+              }, '');
+        }
+        if (respFirstObj.alias == 'peso_neto' && respuesta == '') {
+          respuesta = '____________';
+        }
+        if (respFirstObj.alias == 'peso_bruto' && respuesta == '') {
+          respuesta = '____________';
+        }
+        if (respFirstObj.alias == 'numero_lote' && respuesta == '') {
+          respuesta = '____________';
+        }
+        // if (respFirstObj.alias == 'mineral' && respuesta == '') {
+          
+        // }
         htmlResp += /* html*/`
-                        <div class="flex justify-start align-start" style="width: ${cnfElem.ancho}%; border-bottom: 1px solid #ccc">
-                          <span class=" p5 fw600" style="/*flex-grow:1*/">${elemObj.texto}:</span>  
+                        <div class="flex justify-start align-center grow-1" style="width: ${cnfElem.ancho}%; border-bottom: 1px solid #ccc">
+                          <span class=" p5 fw600" style="/*flex-grow:1*/">${respFirstObj.texto}:</span>  
                           <span class="p5" style="/*flex-grow:1*/">${respuesta}</span>  
                         </div>`
       }

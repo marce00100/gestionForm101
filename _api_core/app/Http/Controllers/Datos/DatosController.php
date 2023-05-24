@@ -17,8 +17,8 @@ class DatosController extends MasterController {
 
 	private $tablaDatosRespuestas = 'data_consolidado';
 	
-	private $createFieldsBase    = ['id_form_lleno', 'numero_formulario', 'fecha_registro', 'tipo_formulario', 'id_usuario', 'nombres_apellidos', 'razon_social',  
-															'nit', 'nim', 'estado_form_lleno', 'uid',
+	private $createFieldsBase    = [/*'id_form_lleno', */'numero_formulario', 'fecha_registro', 'tipo_formulario', 'id_usuario', 'nombres_apellidos', 'razon_social',  
+															'nit', 'nim', 'estado_form_lleno', 'fecha_actualizacion', 'uid',
 															'municipio', 'codigo_municipio' ];
 
 	/**
@@ -47,7 +47,7 @@ class DatosController extends MasterController {
 
 		$formsLlenosUltimos = collect(\DB::select("SELECT fl.id as id_form_lleno, f.nombre as tipo_formulario, fl.id_usuario, 
 																					concat(fl.nombres,' ', fl.apellidos) as nombres_apellidos, fl.razon_social, 
-																					fl.numero_formulario,  fl.nit, fl.fecha_registro, fl.nim, fl.estado_form_lleno, fl.uid,
+																					fl.numero_formulario,  fl.nit, fl.fecha_registro, fl.nim, fl.estado_form_lleno, fl.updated_at as fecha_actualizacion,  fl.uid,
 																					r.nombre as municipio, r.codigo_numerico as codigo_municipio 
 																					FROM forms_llenos fl, regiones r, formularios f
 																					WHERE fl.id_municipio = r.id  
@@ -170,10 +170,10 @@ class DatosController extends MasterController {
 		$campos = collect(\DB::select("SELECT '\"' || c.column_name || '\"' as campo FROM information_schema.columns As c
 																			WHERE table_name = '{$nombreTabla}' 
 																			AND  c.column_name NOT IN('id', 'id_form_lleno', 'id_usuario')"))->implode('campo', ', ');
-
+		
 		$firstObject = collect(\DB::select("SELECT {$campos} FROM {$nombreTabla} limit 1"))->first();
 		/** Crea array con los nombres delascolumnas */
-		$columns = array_keys(get_object_vars($firstObject));
+		$columns = $firstObject ? array_keys(get_object_vars($firstObject)) : explode(',', $campos);
 
 		$respuestasList = collect(\DB::select("SELECT {$campos} FROM {$nombreTabla}  WHERE {$condiciones} ORDER BY id"));
 		return (object)[
