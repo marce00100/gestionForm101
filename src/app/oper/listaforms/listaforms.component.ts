@@ -36,7 +36,7 @@ export class ListaformsComponent implements OnInit {
       $.get(`${xyzFuns.urlRestApi}/form-lleno-resp`, { fluid: uid }, (resp) => {
         let formlleno = resp.data;
         this.sform.renderFormLlenoCompleto("[__frm_content]", formlleno);
-        xyzFuns.showModal("#modal");
+        xyzFuns.showModal("#modalFormLleno");
         xyzFuns.spinner(false)
       })
     }
@@ -87,10 +87,11 @@ export class ListaformsComponent implements OnInit {
       let ctxG: any = {
         rutabase: xyzFuns.urlRestApi,
         content: '#listaforms_content',
-        modal: "#modal",
+        modal: "#modalFormLleno",
         dataTableTarget: "#dataT",
         dataList: [], 
-        formllenoSel: {}
+        formllenoSel: {},
+        temporizadores: []
       }
 
 
@@ -113,20 +114,19 @@ export class ListaformsComponent implements OnInit {
             // info:true,
             scrollX: true,
             className: 'fs-10',
-            "order": [[ 0, "desc" ]],
+            order: [[ 0, "desc" ]],
             columns: [
               // {title: 'Ejemplo', data: 'ejemplo', width: '50% | 600', className: 'dt-right dt-head-center dt-body-left', type:'num',},
               
               { title: 'NUM-FORM', data: 'numero_formulario',
                 render: function (data, type, row, meta) {
-                  return /*html*/`<span class="${row.vigencia == 1 ? 'fw600' : ''}">${row.numero_formulario}</span>
-                  <!-- <em style="display:block" class=" ${row.vigencia == 1 ? 'fw600' : ''}">${row.vigencia == 1 ? 'Vigente' : 'No vig.'}</em>-->`;
+                  return /*html*/`<span class="${row.vigencia == 1 ? 'fw600' : ''}">${row.numero_formulario}</span>`;
                 }
               },
               {
-                title: 'Fecha Registro', data: 'fecha_registro', type: 'date',
+                title: 'Fecha Registro', data: 'fecha_registro', type: 'date', width: 100,
                 render: function (data, type, row, meta) {
-                  return (row.fecha_registro != null && row.fecha_registro != "") ? moment(row.fecha_registro).format('YYYY-MM-DD') : "";
+                  return (row.fecha_registro != null && row.fecha_registro != "") ? moment(row.fecha_registro).format('YYYY-MM-DD hh:mm') : "";
                 }
               },
               { title: 'NIM', data: 'nim', },
@@ -145,30 +145,43 @@ export class ListaformsComponent implements OnInit {
               },
               // { title: 'Estado', data: 'estado_form_lleno' },
               {
-                title: 'ACCIONES', sort:false, width:150, className: 'dt-head-center',
+                title: 'ACCIONES', sort:false, width:180, className: 'dt-head-center',
                 render: function (data, type, row, meta) {
+                  let segRestantesServer = row.segundos_restantes_modificacion;
                   let buttonVer = /*html*/
-                            `<span __accion_bandeja="mostrar"  __id_form_lleno=${row.id} __uid_form_lleno=${row.uid}
-                              style="cursor:pointer; "class="p5 text-dark ${row.vigencia == 1 ? 'bg-success-40' : 'bg-eee'}  text-fff mr5 mt5 br6 br-a br-greyer " title="Ver">
-                              <i class="fa fa-tag fa-lg "></i> ver </span>`
+                            `<div __accion_bandeja="mostrar"  __id_form_lleno=${row.id_form_lleno} __uid_form_lleno=${row.uid}
+                              style="display: inline-flex; align-items: center "class="p5 h-40 text-dark ${row.vigencia == 1 ? 'bg-success-40' : 'bg-eee'}  text-fff mr5 mt5 br6 br-a br-greyer cursor " title="Ver">
+                              <i class="fa fa-tag fa-lg mr5"></i> ver </div>`;
 
                   let buttonEditar = row.vigencia == 0 ? '' : 
-                            /*html*/
-                            `<span __accion_bandeja="editar"  __id_form_lleno=${row.id} __uid_form_lleno=${row.uid}
-                            style="cursor:pointer; "class="p5 text-dark bg-warning-40 text-fff mr5 mt5 br6 br-a br-greyer " title="Editar">
-                            <i class="fa fa-pencil fa-lg "></i> editar </span>` 
+                            (
+                              row.puede_modificar == 0 ? '':
+                              /*html*/
+                              `<div __accion_bandeja="editar"  __id_form_lleno="${row.id_form_lleno}" __uid_form_lleno=${row.uid}
+                              __seg_restantes_server=${segRestantesServer ? segRestantesServer : 'no_aplica' }
+                              style="display: inline-flex; align-items: center; "class="p5 h-40 text-dark bg-warning-40 text-fff mr5 mt5 br6 br-a br-greyer cursor " title="Editar">
+                                <i class="fa fa-pencil fa-lg mr5 "></i>
+                                <div style="display: inline-grid">
+                                  <span>editar</span>
+                                  <span __seg_restantes_calc style="font-size: 0.8em; margin-top: -4px;"></span>
+                                </div>
+                              </div>`
+                            ); 
 
                   let buttonAnular = row.vigencia == 0 ? '' : 
                             /*html*/
-                            `<span __accion_bandeja="anular"  __id_form_lleno=${row.id} __uid_form_lleno=${row.uid}
-                            style="cursor:pointer; "class="p5 text-dark bg-danger-40 text-fff mr5 mt5 br6 br-a br-greyer " title="Anular">
-                            <i class="fa fa-remove fa-lg "></i> </span>`
+                            `<div __accion_bandeja="anular"  __id_form_lleno=${row.id_form_lleno} __uid_form_lleno=${row.uid}
+                            style="display: inline-block; "class="p5 text-dark bg-danger-40 text-fff mr5 mt5 br6 br-a br-greyer cursor" title="Anular">
+                            <i class="fa fa-remove fa-lg "></i> </div>`;
 
                   return buttonVer + buttonEditar + buttonAnular;
                 }
               },
-
             ],
+            /** evento cuando se carga por primera vez la tabla */
+            initComplete: function(){
+              funs.colocaTemporizadorModificacion();             
+            },
             language: xyzFuns.dataTablesEspanol(),
           });
         },
@@ -195,6 +208,40 @@ export class ListaformsComponent implements OnInit {
             xyzFuns.showModal(ctxG.modal);
             funs.spinner(false);
           })
+        },
+        /**
+         * Se coloca el tiempo dinamicocomo temporizador en los botones de edicion, eliminandolos si pasa el tiempo disponible
+         */
+        colocaTemporizadorModificacion: () => {
+           // Función para actualizar el contador y ocultar los botones
+          function actualizarContador() {
+            let botonesEditar = $("[__accion_bandeja=editar]");                
+            _.forEach(botonesEditar, (elem) => {
+              let seg_restantes = $(elem).attr('__seg_restantes_server');
+              if (seg_restantes == 'no_aplica')
+                return;
+
+              seg_restantes = parseInt(seg_restantes);
+              if (seg_restantes > 0) {
+                let id_form_lleno = $(elem).attr('__id_form_lleno');
+                let duracion = moment.duration(seg_restantes, 'seconds');
+                // moment(minutos, 'm').format('mm') + ':' + moment(segundosRestantes, 's').format('ss');
+                // Obtener los minutos y segundos y se le da formato con cero a la izq en caso de ser un digito
+                let horas = duracion.hours(); 
+                let minutos = moment(duracion.minutes(), 'm').format('mm'); 
+                let segundos = moment(duracion.seconds(),'s').format('ss');
+                $(elem).find('[__seg_restantes_calc]').html(`${horas}:${minutos}:${segundos}`)
+                seg_restantes--;
+                $(elem).attr('__seg_restantes_server', seg_restantes);
+              }
+              else{
+                $(elem).remove();
+              }
+            })
+            if(botonesEditar.length == 0) 
+            clearInterval(temporizadorBotones);
+          }
+          let temporizadorBotones = setInterval(actualizarContador, 1000);
         },
 
         spinner: (obj = {}) => {
@@ -233,10 +280,10 @@ export class ListaformsComponent implements OnInit {
       }
 
       let init = () => {
+        listen();
         conT.cargarDatos();
       }
 
-      listen();
       init();
     })
   };
